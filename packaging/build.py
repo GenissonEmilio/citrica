@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from citrica import __version__
+from smoke import verify
 
 ROOT = Path(__file__).resolve().parent.parent
 os.chdir(ROOT)
@@ -31,6 +32,7 @@ for name in ["README.md", "LICENSE", "THIRD_PARTY.md"]:
 shutil.copy2(ROOT / "packaging/install.sh", payload / "install.sh")
 (payload / "install.sh").chmod(0o755)
 run(str(payload / "citrica"), "--doctor")
+verify(payload / "citrica")
 env = dict(os.environ, QT_QPA_PLATFORM="offscreen")
 subprocess.run([str(payload / "citrica"), "--screenshot", str(OUT / "citrica-preview.png")], env=env, check=True)
 run("tar", "-czf", str(OUT / f"citrica-{__version__}-linux-x86_64.tar.gz"), "-C", str(ROOT / "dist"), "citrica")

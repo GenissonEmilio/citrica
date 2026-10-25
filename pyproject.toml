@@ -28,6 +28,10 @@ Issues = "https://github.com/GenissonEmilio/citrica/issues"
 [tool.setuptools.package-data]
 citrica = ["assets/*.svg"]
 
+[tool.setuptools.packages.find]
+include = ["citrica*"]
+namespaces = false
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
