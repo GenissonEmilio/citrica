@@ -192,7 +192,8 @@ def _media(source: Path, target: Path, opts: Options, cancel: threading.Event):
     if not executable:
         raise ConversionError("Instale FFmpeg para converter áudio e vídeo.")
     ext = target.suffix.lower().lstrip(".")
-    args = [executable, "-hide_banner", "-loglevel", "error", "-nostdin", "-y", "-i", str(source)]
+    args = [executable, "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
+            "-protocol_whitelist", "file,pipe", "-i", str(source)]
     if opts.strip_metadata:
         args += ["-map_metadata", "-1", "-map_chapters", "-1"]
     audio = {"mp3": ["-c:a", "libmp3lame", "-q:a", "2"], "wav": ["-c:a", "pcm_s16le"],
