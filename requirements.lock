@@ -1,0 +1,16 @@
+altgraph==0.17.5
+iniconfig==2.3.1
+packaging==26.3
+pillow==12.3.0
+pillow_heif==1.8.1
+pluggy==1.7.0
+Pygments==2.21.0
+pyinstaller==6.22.3
+pyinstaller-hooks-contrib==2026.9
+pymupdf==1.28.2
+pypdf==6.21.2
+PySide6_Essentials==6.12.0
+pytest==9.1.1
+ruff==0.17.2
+setuptools==84.2.1
+shiboken6==6.12.0

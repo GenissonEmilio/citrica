@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Cítrica
+Comment=Conversão de arquivos local e radial para Linux
+Exec=citrica %F
+Icon=io.github.GenissonEmilio.citrica
+Terminal=false
+Categories=Utility;Graphics;AudioVideo;
+Keywords=convert;converter;pdf;image;offline;
+MimeType=image/png;image/jpeg;image/webp;image/avif;application/pdf;video/mp4;audio/mpeg;
+Actions=Dock;
+
+[Desktop Action Dock]
+Name=Área flutuante
+Exec=citrica --dock
