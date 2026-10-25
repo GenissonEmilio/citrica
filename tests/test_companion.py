@@ -11,7 +11,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialogButtonBox
 
-from citrica.companion import ImageSelection, ToolDialog, file_action, validate_shortcut
+from citrica.companion import ImageSelection, ToolDialog, file_action, readable_shortcut, validate_shortcut
 from citrica.desktop import request
 
 
@@ -19,7 +19,11 @@ def test_shortcut_validation_and_conflict():
     listing = subprocess.CompletedProcess([], 0, '', '')
     with patch('citrica.companion.subprocess.run', return_value=listing):
         assert validate_shortcut('Super+Shift+C') == '<Super><Shift>c'
-        for key in ['Shift+C', 'C', 'Super+Super+C', 'Super+UnrecognizedKeyName', 'Super+Alt']:
+        for key, expected in [('Super+F8', '<Super>F8'), ('Ctrl+Enter', '<Control>Return'),
+                              ('Alt+Space', '<Alt>space'), ('Super+PgUp', '<Super>Page_Up')]:
+            assert validate_shortcut(key) == expected
+            assert validate_shortcut(readable_shortcut(expected)) == expected
+        for key in ['Shift+C', 'C', 'Super+Super+C', 'Super+UnrecognizedKeyName', 'Super+Alt', 'Super+C,D']:
             with pytest.raises(ValueError):
                 validate_shortcut(key)
     listing.stdout = "org.gnome.desktop.wm.keybindings test ['<Shift><Super>c']"

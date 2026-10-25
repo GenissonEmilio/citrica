@@ -20,6 +20,25 @@ from citrica.gui import ICON, STYLE
 from citrica.runtime import external_environment
 from citrica.tools import TOOLS, execute
 
+KEY_NAMES = {'Esc': 'Escape', 'Enter': 'Return', 'Return': 'Return', 'Space': 'space',
+             'Backspace': 'BackSpace', 'Del': 'Delete', 'Ins': 'Insert', 'PgUp': 'Page_Up',
+             'PgDown': 'Page_Down', 'Backtab': 'ISO_Left_Tab', 'Home': 'Home', 'End': 'End',
+             'Left': 'Left', 'Right': 'Right', 'Up': 'Up', 'Down': 'Down', 'Tab': 'Tab',
+             'Pause': 'Pause', 'Print': 'Print', 'Menu': 'Menu', 'CapsLock': 'Caps_Lock',
+             'NumLock': 'Num_Lock', 'ScrollLock': 'Scroll_Lock', ',': 'comma', '.': 'period',
+             '-': 'minus', '=': 'equal', '/': 'slash', '\\': 'backslash', '[': 'bracketleft',
+             ']': 'bracketright', ';': 'semicolon', "'": 'apostrophe', '`': 'grave'}
+
+
+def readable_shortcut(accelerator):
+    import re
+    modifiers = {'Super': 'Super', 'Control': 'Ctrl', 'Alt': 'Alt', 'Shift': 'Shift'}
+    mods = [modifiers.get(m, m) for m in re.findall(r'<([^>]+)>', accelerator)]
+    key = accelerator.rsplit('>', 1)[-1]
+    reverse = {value: name for name, value in KEY_NAMES.items()}
+    key = reverse.get(key, key.upper() if len(key) == 1 else key)
+    return '+'.join([*mods, key])
+
 
 class ImageSelection(QLabel):
     selected = Signal(str)
@@ -108,9 +127,18 @@ def validate_shortcut(text):
     if len({p.lower() for p in parts[:-1]}) != len(parts[:-1]):
         raise ValueError('Não repita um modificador.')
     sequence = QKeySequence.fromString(parts[-1])
-    if sequence.isEmpty() or sequence[0].key() == Qt.Key.Key_unknown:
+    if sequence.count() != 1 or sequence[0].key() == Qt.Key.Key_unknown:
         raise ValueError('Tecla inválida.')
-    accelerator = ''.join(modifiers[p.lower()] for p in parts[:-1]) + parts[-1].lower()
+    name = sequence.toString(QKeySequence.SequenceFormat.PortableText)
+    if name in KEY_NAMES:
+        key = KEY_NAMES[name]
+    elif len(name) == 1 and name.isascii() and name.isalnum():
+        key = name.lower()
+    elif re.fullmatch(r'F(?:[1-9]|[12][0-9]|3[0-5])', name):
+        key = name
+    else:
+        raise ValueError('Use letra A–Z, número, F1–F35 ou uma tecla de navegação.')
+    accelerator = ''.join(modifiers[p.lower()] for p in parts[:-1]) + key
     # Check existing GNOME and user custom bindings without changing any of them.
     listing = subprocess.run(['gsettings', 'list-recursively'], capture_output=True, text=True, timeout=15,
                              env=external_environment())
@@ -181,10 +209,7 @@ class Settings(QDialog):
         if (extension_dir() / 'schemas/gschemas.compiled').exists():
             try:
                 key = shell_settings('toggle-wheel')[0]
-                self.shortcut.setText(key.replace('<Super>', 'Super+').replace('<Shift>', 'Shift+')
-                                      .replace('<Control>', 'Ctrl+').replace('<Alt>', 'Alt+').upper()
-                                      .replace('SUPER', 'Super').replace('SHIFT', 'Shift').replace('CTRL', 'Ctrl')
-                                      .replace('ALT', 'Alt'))
+                self.shortcut.setText(readable_shortcut(key))
                 self.modifier.setCurrentIndex(1 if shell_settings('drag-key') == 'super' else 0)
                 self.animations.setChecked(shell_settings('animations'))
             except Exception:

@@ -35,6 +35,7 @@ Também copia um arquivo pelo setor Copiar e cola numa segunda janela do Nautilu
 
 ~~~bash
 python tests/desktop/run_session.py tests/desktop/run_actions.py
+python tests/desktop/run_session.py tests/desktop/run_settings.py
 ~~~
 
 ## Motor e diálogos
@@ -43,7 +44,7 @@ A suíte pytest concluiu **85 testes**, sem falhas (um aviso de depreciação da
 
 Todas as 26 entradas do catálogo de ferramentas têm execução real coberta nos testes de motor. Os testes conferem dimensões, páginas, duração/canais, pixels, metadados ou limites de bytes conforme a operação. Há casos positivos com imagem NASA para rosto, texto gerado localmente para Tesseract e QR gerado nos testes. Não se usa apenas uma lista simulada de capacidades.
 
-A validação de atalho recusa tecla inválida, modificadores repetidos, Shift isolado e conflito registrado no GNOME, inclusive quando a ordem dos modificadores difere.
+A validação de atalho recusa tecla inválida, sequências com mais de uma tecla, modificadores repetidos, Shift isolado e conflito registrado no GNOME, inclusive quando a ordem dos modificadores difere. O teste run_settings.py digita Super+F8 na janela real, salva, confirma a preferência no Shell e invoca a roda com esse novo atalho; ao terminar, restaura Super+Shift+C.
 
 No CI Ubuntu 24.04, `packaging/build.py` testa o executável congelado por subprocessos: JPG, HEIC, AVIF, PDF, renderização de todas as páginas, detecção de rostos/texto e fundo. O pacote somente é publicado depois desses testes e da abertura das configurações em modo offscreen. O CI não executa o compositor GNOME 50: essa evidência é local no Fedora.
 

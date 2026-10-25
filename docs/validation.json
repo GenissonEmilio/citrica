@@ -34,5 +34,9 @@
     "terminal_cwd": true,
     "shelf_drag": true
   },
-  "sharing": "LocalSend unavailable; transfer between machines not tested"
+  "sharing": "LocalSend unavailable; transfer between machines not tested",
+  "settings_ui": {
+    "settings_save": true,
+    "saved_shortcut_invoked": true
+  }
 }
