@@ -63,7 +63,8 @@ def family(path: Path) -> str:
 
 
 def dependencies() -> dict[str, str | None]:
-    return {name: shutil.which(name) for name in ("ffmpeg", "libreoffice")}
+    from citrica.runtime import program
+    return {name: program(name) for name in ("ffmpeg", "libreoffice")}
 
 
 def formats(path: Path) -> list[str]:
@@ -106,10 +107,9 @@ def check_cancel(cancel: threading.Event):
 
 def run_process(args: list[str], cancel: threading.Event, timeout: int = 1800):
     """Use a temporary log to avoid pipe deadlocks and unbounded log memory."""
-    from citrica.runtime import external_environment
-    env = external_environment()
+    from citrica.runtime import popen_external
     with tempfile.TemporaryFile() as log:
-        with subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=log, stderr=log, env=env) as proc:
+        with popen_external(args, stdin=subprocess.DEVNULL, stdout=log, stderr=log) as proc:
             deadline = time.monotonic() + timeout
             try:
                 while proc.poll() is None:
@@ -146,6 +146,16 @@ def publish(staged: Path, destination: Path) -> Path:
             return candidate
         except FileExistsError:
             index += 1
+        except OSError:
+            # Windows rename fails atomically if the destination exists and also
+            # works on filesystems that do not support hard links (e.g. exFAT).
+            if os.name != 'nt':
+                raise
+            try:
+                staged.rename(candidate)
+                return candidate
+            except FileExistsError:
+                index += 1
 
 
 def _image(source: Path, target: Path, opts: Options, cancel: threading.Event):

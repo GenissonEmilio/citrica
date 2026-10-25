@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 import math
-import shutil
-import subprocess
 import tempfile
 import threading
 from pathlib import Path
@@ -13,7 +11,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
 from citrica.core import ConversionError, Options, check_cancel, convert, family, merge_pdfs, publish, run_process
-from citrica.runtime import external_environment
+from citrica.runtime import program, run_external
 
 # All geometry is explicit in source pixels; all times are seconds. No destructive
 # edits are performed: even metadata edits and compression publish a new copy.
@@ -95,7 +93,7 @@ def available_tools(paths, actions=False):
             continue
         if not actions and len(kinds) > 1 and name not in {'compress', 'strip', 'metadata', 'target_size'}:
             continue
-        if kinds & {'video', 'audio'} and not actions and not shutil.which('ffmpeg'):
+        if kinds & {'video', 'audio'} and not actions and not program('ffmpeg'):
             continue
         if name == 'qr' and importlib.util.find_spec('zxingcpp') is None:
             continue
@@ -105,7 +103,7 @@ def available_tools(paths, actions=False):
             from citrica.vision import text_available
             if not text_available():
                 continue
-        if name == 'share' and not shutil.which('localsend'):
+        if name == 'share' and not program('localsend'):
             continue
         if name == 'join_media' and len(kinds) != 1:
             continue
@@ -134,8 +132,11 @@ def rectangle(params, width, height):
 
 
 def media_info(path):
-    result = subprocess.run(['ffprobe', '-v', 'error', '-show_format', '-show_streams', '-of', 'json', str(path)],
-                            check=True, capture_output=True, text=True, timeout=30, env=external_environment())
+    executable = program('ffprobe')
+    if not executable:
+        raise ConversionError('FFprobe não encontrado. Instale FFmpeg com FFprobe.')
+    result = run_external([executable, '-v', 'error', '-show_format', '-show_streams', '-of', 'json', str(path)],
+                          check=True, capture_output=True, text=True, encoding='utf-8', timeout=30)
     return json.loads(result.stdout)
 
 
@@ -260,7 +261,7 @@ def _image_tool(tool, path, params, target):
 
 
 def _media_tool(tool, paths, params, folder, cancel):
-    ffmpeg = shutil.which('ffmpeg')
+    ffmpeg = program('ffmpeg')
     if not ffmpeg:
         raise ConversionError('FFmpeg não instalado.')
     source = paths[0]
@@ -342,7 +343,8 @@ def _media_tool(tool, paths, params, folder, cancel):
                 raise ConversionError('Para unir, selecione mídias com os mesmos codecs, dimensões e canais.')
         manifest = folder / 'concat.txt'
         # FFmpeg concat quoting uses single-quote escape, not shell interpolation.
-        manifest.write_text(''.join("file '" + str(p).replace("'", "'\\''") + "'\n" for p in paths))
+        manifest.write_text(''.join("file '" + p.as_posix().replace("'", "'\\''") + "'\n" for p in paths),
+                            encoding='utf-8')
         args = [ffmpeg, '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0',
                 '-protocol_whitelist', 'file,pipe', '-i', str(manifest)]
     if tool != 'snapshot' and video:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import sys
 import threading
 from pathlib import Path
 
@@ -34,6 +35,8 @@ from citrica import __version__
 from citrica.core import LABELS, Options, batch, common_formats, dependencies, family, merge_pdfs
 
 ICON = Path(__file__).parent / "assets" / "citrica.svg"
+if sys.platform == 'win32' and ICON.with_suffix('.ico').is_file():
+    ICON = ICON.with_suffix('.ico')
 ORANGE = "#ed713d"
 
 STYLE = """

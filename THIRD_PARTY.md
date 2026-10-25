@@ -19,6 +19,8 @@ Os textos de LGPL-3.0 e GPL-3.0 do projeto Qt acompanham o pacote em `licenses/`
 
 Os programas de linha de comando FFmpeg e LibreOffice são executados separadamente, se instalados no sistema, e não são redistribuídos como executáveis neste pacote. As respectivas licenças dependem da distribuição e dos codecs habilitados. Nenhum código, ícone, vídeo ou screenshot do Tangerine é redistribuído.
 
+A distribuição Windows 0.4.0 também usa Tesseract como dependência opcional externa, instalado pelo usuário; não inclui a DLL nem o modelo OCR no ZIP/instalador. A detecção local de rostos OpenCV e os motores de imagem/PDF/QR estão incluídos. As informações sobre Tesseract incluído no pacote, abaixo, referem-se à distribuição Linux.
+
 ## Visão local, QR e bibliotecas numéricas (0.2.0)
 
 | Dependência | Licença / origem |

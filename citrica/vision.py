@@ -3,6 +3,7 @@ import csv
 import ctypes
 import ctypes.util
 import io
+import os
 import sys
 from pathlib import Path
 
@@ -12,8 +13,15 @@ from citrica.core import ConversionError
 def ocr_paths():
     root = Path(getattr(sys, '_MEIPASS', Path(__file__).parent))
     bundled = next(root.glob('libtesseract.so*'), None)
+    if sys.platform == 'win32':
+        folders = [root / 'ocr', Path(os.environ.get('CITRICA_OCR_DIR', root / 'ocr')),
+                   Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Tesseract-OCR']
+        bundled = next((p for folder in folders for p in folder.glob('*tesseract*.dll')), None)
     library = str(bundled) if bundled else ctypes.util.find_library('tesseract')
-    model = next((p for p in [root / 'ocr-data', Path('/usr/share/tesseract/tessdata'),
+    model = next((p for p in [root / 'ocr-data',
+                              Path(os.environ.get('CITRICA_OCR_DIR', root / 'ocr')) / 'tessdata',
+                              Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Tesseract-OCR/tessdata',
+                              Path('/usr/share/tesseract/tessdata'),
                               Path('/usr/share/tesseract-ocr/5/tessdata')]
                   if (p / 'eng.traineddata').is_file()), None)
     return library, model

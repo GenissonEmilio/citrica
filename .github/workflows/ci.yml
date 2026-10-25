@@ -1,4 +1,4 @@
-name: Testes e release Linux
+name: Testes e release Linux e Windows
 on:
   push:
     branches: [main]
@@ -53,7 +53,7 @@ jobs:
           retention-days: 14
   publish:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: linux
+    needs: [linux, windows]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -67,4 +67,46 @@ jobs:
       - name: Publicar release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" release/* --title "Cítrica $GITHUB_REF_NAME · Linux" --notes-file docs/RELEASE.md --prerelease --draft
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          root = Path('release')
+          files = [p for p in sorted(root.iterdir()) if not p.name.startswith('SHA256SUMS')]
+          (root / 'SHA256SUMS').write_text(''.join(f"{hashlib.file_digest(p.open('rb'), 'sha256').hexdigest()}  {p.name}\n" for p in files))
+          PY
+          gh release create "$GITHUB_REF_NAME" release/* --title "Cítrica $GITHUB_REF_NAME · Linux e Windows" --notes-file docs/RELEASE.md --draft
+  windows:
+    runs-on: windows-2022
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Motores externos para os testes Windows
+        shell: pwsh
+        run: |
+          choco install ffmpeg libreoffice-fresh tesseract --yes --no-progress
+          if ($LASTEXITCODE -notin @(0, 1641, 3010)) { throw "Falha nas dependências Windows: $LASTEXITCODE" }
+          "C:\Program Files\LibreOffice\program" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "C:\Program Files\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Dependências Python
+        run: |
+          python -m pip install -r requirements.lock
+          python -m pip install -e . --no-deps
+      - name: Testes reais do motor e interface Qt no Windows
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+      - name: Instalador e portátil Windows x64
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python packaging/build_windows.py
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          name: citrica-windows-x86_64
+          path: release/*
+          retention-days: 14

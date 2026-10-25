@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import sys
 import threading
 from pathlib import Path
 
 from PySide6.QtCore import QMimeData, QPoint, QRect, Qt, QThread, QUrl, Signal
-from PySide6.QtGui import QColor, QDrag, QIcon, QPainter, QPen, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QDrag, QIcon, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QFormLayout,
     QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPlainTextEdit, QPushButton, QVBoxLayout,
@@ -360,7 +361,7 @@ class ToolDialog(QDialog):
 
     def open_result(self):
         if self.latest_output:
-            subprocess.Popen(['xdg-open', str(self.latest_output)], env=external_environment())
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.latest_output)))
 
     def closeEvent(self, event):
         if self.worker and self.worker.isRunning():
@@ -388,7 +389,10 @@ def file_action(tool, paths):
         mime = QMimeData()
         urls = [QUrl.fromLocalFile(str(p)) for p in paths]
         mime.setUrls(urls)
-        mime.setData('x-special/gnome-copied-files', ('copy\n' + '\n'.join(u.toString() for u in urls)).encode())
+        if sys.platform == 'win32':
+            mime.setData('application/x-qt-windows-mime;value="Preferred DropEffect"', (1).to_bytes(4, 'little'))
+        else:
+            mime.setData('x-special/gnome-copied-files', ('copy\n' + '\n'.join(u.toString() for u in urls)).encode())
         app.clipboard().setMimeData(mime)
         # Clipboard ownership must remain alive until the user pastes or replaces it.
         from PySide6.QtCore import QTimer
@@ -398,7 +402,11 @@ def file_action(tool, paths):
         return 'resident'
     elif tool == 'terminal':
         directory = str(paths[0] if paths[0].is_dir() else paths[0].parent)
-        if shutil.which('ptyxis'):
+        if sys.platform == 'win32':
+            from citrica.runtime import popen_external
+            popen_external([__import__('os').environ.get('COMSPEC', 'cmd.exe')], cwd=directory,
+                           creationflags=subprocess.CREATE_NEW_CONSOLE)
+        elif shutil.which('ptyxis'):
             subprocess.Popen(['ptyxis', '--standalone', '--new-window', '--working-directory', directory],
                              env=external_environment())
         elif shutil.which('gnome-terminal'):
@@ -420,10 +428,11 @@ def file_action(tool, paths):
                 publish(staged, Path(target) / path.name)
                 path.unlink()
     elif tool == 'share':
-        executable = shutil.which('localsend')
+        from citrica.runtime import program, popen_external
+        executable = program('localsend')
         if not executable:
-            raise ValueError('Instale LocalSend para compartilhar no Linux. AirDrop é exclusivo da Apple.')
-        subprocess.Popen([executable, *map(str, paths)], env=external_environment())
+            raise ValueError('Instale LocalSend para compartilhar arquivos.')
+        popen_external([executable, *map(str, paths)])
     return None
 
 

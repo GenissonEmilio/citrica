@@ -12,6 +12,7 @@ from PIL import Image
 from pypdf import PdfReader, PdfWriter
 
 from citrica.core import Cancelled, ConversionError, Options, common_formats, convert, merge_pdfs
+from citrica.runtime import program
 
 
 @pytest.fixture
@@ -187,7 +188,7 @@ def test_real_audio_video_and_shell_metacharacters(tmp_path):
     assert not Path("SHOULD_NOT_EXIST").exists()
 
 
-@pytest.mark.skipif(not shutil.which("libreoffice"), reason="LibreOffice not installed")
+@pytest.mark.skipif(not program("libreoffice"), reason="LibreOffice not installed")
 def test_office_real_roundtrip(tmp_path):
     source = tmp_path / "document.rtf"
     source.write_text(r"{\rtf1\ansi Hello Linux}")

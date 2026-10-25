@@ -1,0 +1,217 @@
+"""Shared-engine and Qt behavior tests for the Windows wheel; Win32 tests run on Windows CI."""
+import json
+import math
+import os
+import time
+
+os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
+
+import pytest
+from PIL import Image
+from PySide6.QtCore import QMimeData, QObject, QPoint, QPointF, Qt, QUrl, Signal
+from PySide6.QtGui import QDragEnterEvent, QDropEvent
+from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QApplication
+
+from citrica.gui import STYLE
+from citrica.windows import config
+from citrica.windows.app import Desktop
+from citrica.windows.wheel import CENTER, LABEL_RADIUS, SIZE, hit_test, offered_paths
+
+
+class FakeNative(QObject):
+    toggle = Signal()
+    mode = Signal(str)
+    released = Signal()
+    key = Signal(str)
+
+    def __init__(self, app, settings):
+        super().__init__()
+        self.settings, self.visible, self.registered = settings, False, None
+
+    def register(self, text):
+        config.parse_shortcut(text)
+        if text == 'Ctrl+Alt+X':
+            raise ValueError('Atalho em uso')
+        self.registered = text
+
+    def reset_drag(self):
+        pass
+
+    def left_down(self):
+        return False
+
+    def close(self):
+        pass
+
+
+def spin_until(predicate, timeout=5000):
+    deadline = time.monotonic() + timeout / 1000
+    while time.monotonic() < deadline:
+        QApplication.processEvents()
+        if predicate():
+            return
+        QTest.qWait(10)
+    raise AssertionError('Qt operation did not finish')
+
+
+@pytest.fixture
+def desktop(tmp_path, monkeypatch):
+    app = QApplication.instance() or QApplication([])
+    app.setStyleSheet(STYLE)
+    monkeypatch.setenv('APPDATA', str(tmp_path / 'settings'))
+    monkeypatch.setenv('XDG_CACHE_HOME', str(tmp_path / 'cache'))
+    controller = Desktop(app, FakeNative, listen=False)
+    # Unit tests must not let an unrelated real cursor override synthetic drops.
+    controller.pointer_timer.stop()
+    yield controller
+    controller.hide_wheel()
+    for job in list(controller.jobs):
+        job.cancel.set()
+        job.wait(5000)
+    QApplication.processEvents()
+    controller.close()
+
+
+def image_file(tmp_path):
+    path = tmp_path / 'fóto com espaços.png'
+    Image.new('RGB', (320, 200), 'orange').save(path)
+    return path
+
+
+def point_for(desktop, name):
+    wheel = desktop.wheel
+    index = next(i for i, item in enumerate(wheel.items) if item['id'] == name)
+    angle = -math.pi / 2 + index * math.tau / len(wheel.items)
+    return QPoint(int(CENTER + LABEL_RADIUS * math.cos(angle)),
+                  int(CENTER + LABEL_RADIUS * math.sin(angle)))
+
+
+def assert_empty(desktop):
+    state = desktop.status()
+    assert state['paths'] == [] and state['items'] == []
+    assert state['selection'] is None and state['selected'] == -1 and not state['cachedSelection']
+    assert desktop.wheel._preview.isNull()
+
+
+def test_windows_hotkey_validation_and_atomic_preferences(tmp_path, monkeypatch):
+    monkeypatch.setenv('APPDATA', str(tmp_path))
+    assert config.parse_shortcut('Ctrl+Alt+C') == (3, ord('C'))
+    assert config.parse_shortcut('Win+Shift+F8') == (12, 0x77)
+    for text in ['Shift+C', 'Ctrl+Ctrl+A', 'Win+Super+C', 'C', 'Ctrl+F25', 'Alt+Unknown', '', None]:
+        with pytest.raises(ValueError):
+            config.parse_shortcut(text)
+    data = {'shortcut': 'Win+Shift+F8', 'animations': False, 'drag_key': 'Shift'}
+    config.save(data)
+    assert config.load() == data
+    file = config.config_dir() / 'settings.json'
+    file.write_text('[invalid', encoding='utf-8')
+    assert config.load() == config.DEFAULTS
+    file.write_text('[]', encoding='utf-8')
+    assert config.load() == config.DEFAULTS
+
+
+def test_windows_ring_geometry_and_transparent_center(desktop, tmp_path):
+    source = image_file(tmp_path)
+    desktop.show_wheel([source])
+    spin_until(lambda: desktop.wheel.items and desktop.wheel.progress == 1)
+    for i in range(len(desktop.wheel.items)):
+        angle = -math.pi / 2 + i * math.tau / len(desktop.wheel.items)
+        x, y = CENTER + LABEL_RADIUS * math.cos(angle), CENTER + LABEL_RADIUS * math.sin(angle)
+        assert hit_test(x, y, len(desktop.wheel.items)) == i
+        assert desktop.wheel._geometry[i].contains(QPointF(x, y))
+    assert hit_test(CENTER, CENTER, 8) == -1
+    assert hit_test(0, 0, 8) == -1
+    snapshot = desktop.wheel.grab().toImage()
+    assert snapshot.pixelColor(1, 1).alpha() <= 2, 'Overlay must not have an opaque rectangular background'
+    assert desktop.wheel.width() == SIZE
+
+
+def test_windows_drop_forces_copy_and_reopen_is_empty(desktop, tmp_path):
+    source = image_file(tmp_path)
+    before = source.read_bytes()
+    desktop.show_wheel([])
+    mime = QMimeData()
+    mime.setUrls([QUrl.fromLocalFile(str(source))])
+    enter = QDragEnterEvent(QPoint(CENTER, CENTER), Qt.DropAction.CopyAction | Qt.DropAction.MoveAction,
+                            mime, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.ShiftModifier)
+    QApplication.sendEvent(desktop.wheel, enter)
+    assert enter.isAccepted() and enter.dropAction() == Qt.DropAction.CopyAction
+    spin_until(lambda: any(i['id'] == 'jpg' for i in desktop.wheel.items))
+    point = point_for(desktop, 'jpg')
+    desktop.wheel.select(hit_test(point.x(), point.y(), len(desktop.wheel.items)))
+    drop = QDropEvent(QPointF(point), Qt.DropAction.CopyAction | Qt.DropAction.MoveAction, mime,
+                     Qt.MouseButton.LeftButton, Qt.KeyboardModifier.ShiftModifier)
+    QApplication.sendEvent(desktop.wheel, drop)
+    assert drop.isAccepted() and drop.dropAction() == Qt.DropAction.CopyAction
+    assert_empty(desktop)  # Before the conversion worker or close animation ends.
+    spin_until(lambda: not desktop.busy)
+    assert source.read_bytes() == before
+    assert Image.open(next(tmp_path.glob('*.jpg'))).size == (320, 200)
+    desktop.toggle()
+    assert desktop.active
+    assert_empty(desktop)
+
+
+def test_windows_error_escape_and_late_reply_do_not_restore_file(desktop, tmp_path):
+    source = tmp_path / 'bad.png'
+    source.write_bytes(b'not an image')
+    desktop.show_wheel([source])
+    spin_until(lambda: any(i['id'] == 'jpg' for i in desktop.wheel.items))
+    desktop.apply(next(i for i in desktop.wheel.items if i['id'] == 'jpg'))
+    spin_until(lambda: not desktop.busy)
+    assert desktop.counts['errors'] == 1
+    desktop.show_wheel([])
+    assert_empty(desktop)
+    desktop.hide_wheel()
+    source = image_file(tmp_path)
+    desktop.show_wheel([source])
+    desktop.hide_wheel()  # The capability worker is deliberately still pending.
+    desktop.show_wheel([])
+    spin_until(lambda: not desktop.jobs)
+    assert_empty(desktop)
+    desktop.wheel.keyboard('Escape', QPoint())
+    assert not desktop.active
+    assert_empty(desktop)
+
+
+def test_windows_tools_actions_pages_keyboard_and_conflict(desktop, tmp_path):
+    source = image_file(tmp_path)
+    desktop.show_wheel([source], 'tools')
+    spin_until(lambda: desktop.wheel.items)
+    assert any(i['id'] == 'crop' for i in desktop.wheel.items)
+    more = next(i for i in desktop.wheel.items if i['kind'] == 'page')
+    desktop.apply(more)
+    assert any(i['id'] == 'redact_faces' for i in desktop.wheel.items)
+    desktop.drag_mode('actions')
+    copy = next(i for i in desktop.wheel.items if i['id'] == 'copy_path')
+    desktop.apply(copy)
+    assert desktop.app.clipboard().text() == str(source)
+    assert_empty(desktop)
+    desktop.show_wheel([source])
+    spin_until(lambda: desktop.wheel.items)
+    desktop.wheel.keyboard('Right', QPoint(10, 10))
+    desktop.wheel.pointer(QPoint(10, 10))
+    assert desktop.wheel.selected == 0
+    with pytest.raises(ValueError, match='em uso'):
+        desktop.apply_settings({'shortcut': 'Ctrl+Alt+X', 'animations': False, 'drag_key': 'Win'})
+    assert desktop.settings == config.DEFAULTS
+
+
+def test_windows_mime_rejects_remote_and_missing_files(tmp_path):
+    mime = QMimeData()
+    source = image_file(tmp_path)
+    mime.setUrls([QUrl.fromLocalFile(str(source)), QUrl('https://example.com/file.png')])
+    assert offered_paths(mime) == []
+    mime.setUrls([QUrl.fromLocalFile(str(tmp_path / 'missing.png'))])
+    assert offered_paths(mime) == []
+    mime.setUrls([QUrl.fromLocalFile(str(source))] * 2)
+    assert offered_paths(mime) == [source]
+
+
+def test_windows_ipc_rejects_invalid_request(desktop):
+    with pytest.raises(ValueError):
+        desktop.dispatch({'op': 'show', 'paths': 'not-a-list'})
+    with pytest.raises(ValueError):
+        desktop.dispatch({'op': 'execute-arbitrary-command'})
+    assert json.loads(json.dumps(desktop.dispatch({'op': 'status'})))['version']

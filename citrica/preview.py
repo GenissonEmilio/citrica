@@ -1,6 +1,7 @@
 """Small local previews for the Shell. Large originals never enter Shell's image loader."""
 import hashlib
 import os
+import sys
 import tempfile
 from pathlib import Path
 
@@ -19,7 +20,9 @@ def selection_info(paths):
     if len(paths) != 1 or not paths[0].is_file():
         return result
     source = paths[0]
-    cache = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache'))
+    default_cache = (Path(os.environ.get('LOCALAPPDATA', Path.home())) / 'Citrica/Cache'
+                     if sys.platform == 'win32' else Path.home() / '.cache')
+    cache = Path(os.environ.get('XDG_CACHE_HOME', default_cache))
     candidate = source if kind == 'image' else None
     if candidate is None:
         thumb_name = hashlib.md5(source.as_uri().encode(), usedforsecurity=False).hexdigest() + '.png'

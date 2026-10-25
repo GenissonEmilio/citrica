@@ -8,6 +8,7 @@ from pathlib import Path
 
 from PIL import Image
 from pypdf import PdfReader, PdfWriter
+from citrica.runtime import program
 
 
 def verify(executable: Path):
@@ -57,7 +58,7 @@ def verify(executable: Path):
             proc = subprocess.run([str(executable), '--desktop-request', payload],
                                   check=True, capture_output=True, text=True)
             assert all(Path(p).is_file() for p in json.loads(proc.stdout)['outputs'])
-        if shutil.which('libreoffice'):
+        if program('libreoffice'):
             text = root / 'document.txt'
             text.write_text('Citrica packaged Office verification')
             proc = subprocess.run([str(executable), str(text), '--to', 'docx'],
