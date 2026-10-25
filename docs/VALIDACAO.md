@@ -63,3 +63,23 @@ No CI Ubuntu 24.04, `packaging/build.py` testa o executável congelado por subpr
 | 275 opções comerciais | Tabela explícita de conversões no README | Sem SVG/RAR/Pages/EPUB/PDF→Office e sem equivalência numérica declarada |
 
 O teste automatizado cobre o fluxo e os motores com fixtures controlados. Não representa teste de todos os documentos, todos os codecs, todas as configurações de hardware ou todas as combinações de aplicativos. O estado da extensão na sessão do usuário é consultado separadamente; atualizações de código entram em vigor no próximo login do GNOME.
+
+## Portátil da release no Fedora
+
+O TAR.GZ produzido pelo CI [40155427130](https://github.com/GenissonEmilio/citrica/actions/runs/40155427130), commit 03e63d6, foi baixado e conferido com SHA256SUMS. Esse executável foi testado no Fedora, sem usar os imports do código-fonte para processar os arquivos:
+
+- JPG, HEIC, AVIF, PDF e renderização multipágina.
+- Rostos/texto e fundo; FFmpeg/ffprobe e LibreOffice externos.
+- Os quatro percursos do compositor: roda, Nautilus, ações e configurações, passando CITRICA_TEST_EXECUTABLE aos scripts atuais do repositório.
+- Configuração de Super+F8 pela janela real do portátil e invocação global do atalho salvo.
+
+~~~bash
+CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py
+CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_nautilus.py
+CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_actions.py
+CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_settings.py
+~~~
+
+Resultados estruturados em [validation.json](validation.json). O harness usa identificadores estáveis de janela para não perder o foco quando o título do terminal muda durante a inicialização.
+
+O portátil foi instalado no usuário, com o comando citrica, aplicativo no menu e atalho Super+Shift+C. A sessão principal ainda mantém o módulo anterior carregado pelo Looking Glass; a revisão 3 instalada entra em vigor no próximo login do GNOME. A validação do módulo novo foi feita no compositor isolado, sem encerrar a sessão de trabalho do usuário.

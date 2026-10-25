@@ -36,8 +36,16 @@ def main():
     before = {w['title'] for w in windows()}
     action('terminal')
     terminal = wait_window(lambda w: w['title'] not in before)
-    step('PlaceWindow', terminal['title'], 100, 100)
+    step('PlaceWindow', f"window-id:{terminal['id']}", 100, 100)
+    deadline = time.monotonic() + 3
+    while time.monotonic() < deadline:
+        focus = json.loads(call('Test', 'State')[0])
+        if focus['focus'] == terminal['id'] and not focus['overview']:
+            break
+        step('PlaceWindow', f"window-id:{terminal['id']}", 100, 100)
+    assert focus['focus'] == terminal['id'] and not focus['overview']
     time.sleep(1)
+    call('Test', 'Screenshot', str(STATE / 'terminal-start.png'))
     # Type a command only into this new terminal in the test compositor.
     with tempfile.TemporaryDirectory(prefix='citrica-terminal-') as directory:
         output = Path(directory) / 'cwd.txt'
@@ -49,6 +57,7 @@ def main():
         deadline = time.monotonic() + 5
         while not output.exists() and time.monotonic() < deadline:
             time.sleep(.1)
+        call('Test', 'Screenshot', str(STATE / 'terminal-command.png'))
         assert output.read_text().strip() == str(STATE)
     step('Key', 65507, 'true')
     step('Key', 100, 'true')  # Ctrl+D closes only this test shell.

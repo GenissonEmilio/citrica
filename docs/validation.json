@@ -38,5 +38,47 @@
   "settings_ui": {
     "settings_save": true,
     "saved_shortcut_invoked": true
+  },
+  "packaged_fedora": {
+    "application_commit": "03e63d6",
+    "portable_sha256": "01fa1644da51c2bab24c6f8a75f0a59caf0b90a49c7ab7f689130706da2e5247",
+    "core_smoke": true,
+    "desktop": {
+      "shift_drag": true,
+      "drop_converts": true,
+      "shortcut": true,
+      "escape": true,
+      "animation": true,
+      "alt_tools": true,
+      "ctrl_actions": true,
+      "copy_path": true,
+      "pagination": true,
+      "tool_dialog": true,
+      "cancel_drag": true,
+      "super_drag_setting": true,
+      "keyboard_navigation": true,
+      "custom_shortcut": true,
+      "disable_animation": true
+    },
+    "nautilus": {
+      "nautilus_shift_drag": true,
+      "drop_converts": true,
+      "original_preserved": true,
+      "output_dimensions": [
+        320,
+        200
+      ],
+      "copy_paste_file": true
+    },
+    "actions": {
+      "terminal_cwd": true,
+      "shelf_drag": true
+    },
+    "settings_ui": {
+      "settings_save": true,
+      "saved_shortcut_invoked": true
+    },
+    "installed_user_version": "0.2.0",
+    "user_session": "Previous extension module still loaded; a new GNOME login is required for revision 3"
   }
 }

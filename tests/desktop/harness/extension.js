@@ -35,17 +35,19 @@ export default class Harness extends Extension {
         pressed ? Clutter.KeyState.PRESSED : Clutter.KeyState.RELEASED); }
     Windows() { return JSON.stringify(global.get_window_actors().map(a => {
         const r = a.meta_window.get_frame_rect();
-        return {title:a.meta_window.title,rect:[r.x,r.y,r.width,r.height],visible:a.visible,
+        return {id:a.meta_window.get_stable_sequence(),title:a.meta_window.title,rect:[r.x,r.y,r.width,r.height],visible:a.visible,
             minimized:a.meta_window.minimized,workspace:a.meta_window.get_workspace().index()};
     })); }
     Prepare() { Main.welcomeDialog?.close(); Main.overview.hide(); }
-    State() { return JSON.stringify({pointer:global.get_pointer()}); }
+    State() { return JSON.stringify({pointer:global.get_pointer(),
+        focus:global.display.focus_window?.get_stable_sequence(),overview:Main.overview.visible}); }
     ClipboardAsync(_args, invocation) {
         St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_c, text) =>
             invocation.return_value(new GLib.Variant('(s)', [text ?? ''])));
     }
     PlaceWindow(title, x, y) {
-        const w = global.get_window_actors().map(a => a.meta_window).find(w => w.title === title);
+        const w = global.get_window_actors().map(a => a.meta_window).find(w =>
+            title === `window-id:${w.get_stable_sequence()}` || w.title === title);
         if (w) {
             Main.welcomeDialog?.close(); Main.overview.hide();
             w.unminimize(); w.change_workspace(global.workspace_manager.get_active_workspace());
