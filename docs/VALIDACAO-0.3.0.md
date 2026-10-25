@@ -92,4 +92,4 @@ O portátil produzido pelo [CI 40193324649](https://github.com/GenissonEmilio/ci
 
 O pacote foi instalado no usuário com o comando `citrica`, menu do aplicativo e Super+Shift+C. A revisão nativa instalada é versão 3, revisão 1. Na consulta após instalar, a sessão principal ainda executava versão 2 sem revisão e, portanto, **a roda nova ainda não estava ativa nessa sessão**. As configurações mostram essa pendência. O GNOME 50 mantém o módulo importado em memória e exige novo login para trocar a versão; não foi encerrada a sessão de trabalho do usuário.
 
-Resultados, checksum e distinção entre revisão instalada e carregada estão em [validation.json](validation.json). As capturas desta documentação foram atualizadas com o percurso do executável empacotado no compositor isolado.
+Resultados, checksum e distinção entre revisão instalada e carregada estão em [validation-0.3.0.json](validation-0.3.0.json). As capturas desta documentação foram atualizadas com o percurso do executável empacotado no compositor isolado.

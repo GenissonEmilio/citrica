@@ -105,6 +105,9 @@ jobs:
       - name: Arraste OLE e atalhos no desktop Windows do CI
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         run: python tests/windows/native_flow.py dist/Citrica/Citrica.exe
+      - name: Instalar, abrir e desinstalar o pacote Windows
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python tests/windows/install_smoke.py release/citrica-0.4.0-windows-x86_64-setup.exe
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
@@ -118,6 +121,7 @@ jobs:
           path: |
             build/windows-native/**/*.json
             build/windows-native/**/*.log
+            build/windows-installer/*.log
             release/*.png
             release/*validation.json
           retention-days: 7
