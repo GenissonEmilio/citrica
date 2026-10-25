@@ -25,6 +25,10 @@ Veja o [guia de instalação e roteiro de teste no Windows](docs/WINDOWS.md).
 
 ## Fedora / GNOME 50 / Wayland
 
+Demonstração no Fedora: arraste o arquivo, escolha o formato na roda e receba a cópia convertida. [Baixar o vídeo em MP4](docs/citrica-linux.mp4).
+
+https://github.com/user-attachments/assets/812f2703-e781-4b44-a544-3829eae95688
+
 Baixe o RPM da [release v0.4.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.4.0):
 
 ~~~bash
