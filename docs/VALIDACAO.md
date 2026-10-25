@@ -4,7 +4,7 @@ A 0.4.0 adiciona a integração Windows ao motor compartilhado. A validação au
 
 ## Motor e interface
 
-No Fedora, a suíte concluiu **96 testes aprovados e um teste Win32 ignorado**, que é executado pelo CI Windows. Há dois avisos de depreciação de construtores de eventos Qt nos testes.
+No Fedora, a suíte concluiu **98 testes aprovados e um teste Win32 ignorado**, que é executado pelo CI Windows. Há quatro avisos de depreciação de construtores de eventos Qt nos testes.
 
 A suíte cobre conversões reais de imagem/PDF/Office/mídia/legendas/arquivos, preservação dos originais, colisões concorrentes, cancelamento, caminhos inseguros recusados, recorte visual, orientação EXIF, rostos, texto e QR. As 26 entradas do catálogo de ferramentas têm testes com resultados verificáveis, conforme documentado na [validação 0.3.0](VALIDACAO-0.3.0.md). As dependências opcionais usadas pelo CI são instaladas antes dos testes.
 
@@ -20,11 +20,19 @@ Os testes da implementação Qt Windows conferem:
 - Erro de conversão, Escape, resposta atrasada e reabertura vazia.
 - Ferramentas, ações, copiar caminho, paginação que mantém a seleção somente dentro da abertura atual e navegação por teclado.
 - Preferências, validação de atalhos e recusa de conflito sem perder o atalho anterior.
+- Ativação silenciosa até receber uma oferta de arquivo local; uma seleção de texto não revela a roda.
+- O aplicativo permanece residente depois de Copiar e de o usuário substituir o conteúdo da área de transferência.
 - APIs Win32: registro real, conflito real com um atalho mantido por outra thread e liberação ao encerrar. Esse teste é executado somente no Windows.
 
-O CI usa **Windows Server 2022 x64**, Python 3.12 e as bibliotecas de requirements.lock. O executável PyInstaller é testado por subprocessos, sem usar os imports do código-fonte para fazer a conversão. O instalador Inno Setup e o portátil compartilham o mesmo payload, com inicializador gráfico e CLI separados.
+**99 testes passaram no CI Windows**, incluindo o teste Win32 de conflito de atalho. O CI usa **Windows Server 2022 x64**, Python 3.12 e as bibliotecas de requirements.lock. O executável PyInstaller é testado por subprocessos, sem usar os imports do código-fonte para fazer a conversão. O instalador Inno Setup e o portátil compartilham o mesmo payload, com inicializador gráfico e CLI separados.
+
+O instalador recebe também um teste automático de instalação no usuário, versão da CLI instalada, abertura das configurações, criação de Enviar para, desinstalação e remoção da entrada de inicialização automática. Capturas das configurações usam o plugin nativo Windows, com Segoe UI.
 
 `tests/windows/native_flow.py` tenta um percurso nativo com SendInput, uma origem Qt em outro processo e o executável gráfico empacotado. Verifica Shift global, OLE, JPG, original, atalho, reabertura vazia e Escape. Se o runner não oferecer desktop de entrada visível, isso é registrado como indisponível, não como teste aprovado. A origem Qt desse teste **não é o Explorer**.
+
+![Roda no Windows](windows-wheel.png)
+
+![Configurações no Windows](windows-settings.png)
 
 **Validação manual no Explorer: pendente do teste externo.** O [guia Windows](WINDOWS.md) traz o roteiro, dependências, instalação e coleta de diagnóstico. A cobertura automatizada não representa todos os computadores, monitores, escalas, codecs ou documentos. O instalador não tem assinatura digital.
 

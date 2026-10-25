@@ -8,7 +8,7 @@ Baixe `citrica-0.4.0-windows-x86_64-setup.exe` da release. O instalador usa a co
 
 Alternativa: extraia **todo** o ZIP portátil e abra `Citrica/Citrica.exe`. Mantenha `_internal` ao lado do executável. Não é preciso instalar Python. Abra com permissões normais, no mesmo nível do Explorer; executar o aplicativo como administrador pode impedir o arraste entre as janelas.
 
-O aplicativo no menu abre as configurações. Fechar essa janela mantém o Cítrica na bandeja. Clique duas vezes no ícone da bandeja para voltar às configurações; use **Sair** para encerrar o aplicativo.
+O aplicativo no menu abre as configurações. Fechar essa janela mantém o Cítrica na bandeja; o ícone pode estar no menu de ícones ocultos. Clique duas vezes nele para voltar às configurações; use **Sair** para encerrar o aplicativo.
 
 ## Usar a roda
 

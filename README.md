@@ -19,6 +19,8 @@ Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferram
 
 Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **FFmpeg/ffprobe, LibreOffice e Tesseract são opcionais externos no Windows.** O instalador ainda não tem assinatura digital. A validação manual do fluxo no Explorer está pendente do teste externo combinado; os resultados automatizados estão na documentação.
 
+![Roda em execução nativa no Windows do CI](docs/windows-wheel.png)
+
 Veja o [guia de instalação e roteiro de teste no Windows](docs/WINDOWS.md).
 
 ## Fedora / GNOME 50 / Wayland

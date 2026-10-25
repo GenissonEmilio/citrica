@@ -3,7 +3,7 @@
   "date": "2026-10-25 America/Fortaleza",
   "linux": {
     "environment": "Fedora 44 / GNOME Shell 50.5 / Mutter 50.6 / Wayland x86_64",
-    "pytest_passed": 96,
+    "pytest_passed": 98,
     "pytest_skipped": 1,
     "skip_reason": "Win32 test runs on Windows CI",
     "native": {
@@ -63,6 +63,24 @@
   },
   "windows": {
     "manual_explorer_validation": "pending external tester",
-    "automated_build": "in progress"
+    "automated_build": "passed",
+    "environment": "Windows Server 2022 x64 / Python 3.12 / GitHub Actions",
+    "pytest_passed": 99,
+    "source_test_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217201016",
+    "preliminary_packaged_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40216465845",
+    "packaged_engine_smoke": true,
+    "cross_process_qt_ole_drag": true,
+    "global_shift": true,
+    "global_hotkey": true,
+    "reopened_empty": true,
+    "global_escape": true,
+    "original_preserved": true,
+    "per_user_install": true,
+    "installed_gui_launch": true,
+    "uninstall": true,
+    "startup_entry_removed": true,
+    "screenshots_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40216465845",
+    "packaged_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217201144",
+    "packaged_application_commit": "d3a6ee1"
   }
 }
