@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from citrica.core import Options, common_formats, convert
+from citrica.runtime import external_environment
 
 UUID = "citrica@genissonemilio.github.io"
 DESKTOP_PATH = "/io/github/GenissonEmilio/Citrica/Desktop"
@@ -23,7 +24,7 @@ def backend_command():
 def desktop_call(method, *args):
     return subprocess.run(["gdbus", "call", "--session", "--dest", DESKTOP_NAME,
                            "--object-path", DESKTOP_PATH, "--method", DESKTOP_NAME + "." + method,
-                           *args], capture_output=True, text=True, timeout=5)
+                           *args], capture_output=True, text=True, timeout=5, env=external_environment())
 
 
 def extension_status():
@@ -50,13 +51,14 @@ def install_gnome():
         raise RuntimeError("Os arquivos da extensão GNOME não foram encontrados neste pacote.")
     destination = extension_dir()
     shutil.copytree(source, destination, dirs_exist_ok=True)
-    subprocess.run(["glib-compile-schemas", str(destination / "schemas")], check=True)
+    subprocess.run(["glib-compile-schemas", str(destination / "schemas")], check=True, env=external_environment())
     config = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "citrica/desktop.json"
     config.parent.mkdir(parents=True, exist_ok=True)
     config.write_text(json.dumps({"command": backend_command()}, ensure_ascii=False, indent=2))
     # A new extension is discovered by Shell at session startup. Enabling an unknown
     # UUID is intentionally not reported as successful on a running GNOME session.
-    result = subprocess.run(["gnome-extensions", "enable", UUID], capture_output=True, text=True)
+    result = subprocess.run(["gnome-extensions", "enable", UUID], capture_output=True, text=True,
+                            env=external_environment())
     if result.returncode:
         # Preserve all existing extension preferences and stage ours for the next login.
         script = """import gi,json
@@ -66,7 +68,8 @@ v=s.get_strv('enabled-extensions')
 u=json.loads(__import__('sys').argv[1])
 if u not in v: s.set_strv('enabled-extensions',v+[u]); Gio.Settings.sync()
 """
-        subprocess.run(["/usr/bin/python3", "-c", script, json.dumps(UUID)], check=True)
+        subprocess.run(["/usr/bin/python3", "-c", script, json.dumps(UUID)], check=True,
+                       env=external_environment())
     state = extension_status()
     active = state.get('version') == 2 and state.get('revision') == 3
     return {"path": str(destination), "active": active,

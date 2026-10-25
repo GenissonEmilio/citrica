@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 
 from citrica.desktop import desktop_call, extension_dir, extension_status, install_gnome
 from citrica.gui import ICON, STYLE
+from citrica.runtime import external_environment
 from citrica.tools import TOOLS, execute
 
 
@@ -91,7 +92,7 @@ else:
     args = ['/usr/bin/python3', '-c', script, str(extension_dir() / 'schemas'), key]
     if value is not None:
         args += [json.dumps(value)]
-    result = subprocess.run(args, capture_output=True, text=True, check=True)
+    result = subprocess.run(args, capture_output=True, text=True, check=True, env=external_environment())
     return json.loads(result.stdout) if value is None else None
 
 
@@ -111,7 +112,8 @@ def validate_shortcut(text):
         raise ValueError('Tecla inválida.')
     accelerator = ''.join(modifiers[p.lower()] for p in parts[:-1]) + parts[-1].lower()
     # Check existing GNOME and user custom bindings without changing any of them.
-    listing = subprocess.run(['gsettings', 'list-recursively'], capture_output=True, text=True, timeout=15)
+    listing = subprocess.run(['gsettings', 'list-recursively'], capture_output=True, text=True, timeout=15,
+                             env=external_environment())
     def normalized(value):
         aliases = {'control': 'ctrl', 'primary': 'ctrl', 'mod4': 'super'}
         mods = frozenset(aliases.get(m.lower(), m.lower()) for m in re.findall(r'<([^>]+)>', value))
@@ -331,9 +333,8 @@ class ToolDialog(QDialog):
                 self.open_output.show()
 
     def open_result(self):
-        from PySide6.QtGui import QDesktopServices
         if self.latest_output:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.latest_output)))
+            subprocess.Popen(['xdg-open', str(self.latest_output)], env=external_environment())
 
     def closeEvent(self, event):
         if self.worker and self.worker.isRunning():
@@ -372,9 +373,10 @@ def file_action(tool, paths):
     elif tool == 'terminal':
         directory = str(paths[0] if paths[0].is_dir() else paths[0].parent)
         if shutil.which('ptyxis'):
-            subprocess.Popen(['ptyxis', '--standalone', '--new-window', '--working-directory', directory])
+            subprocess.Popen(['ptyxis', '--standalone', '--new-window', '--working-directory', directory],
+                             env=external_environment())
         elif shutil.which('gnome-terminal'):
-            subprocess.Popen(['gnome-terminal', '--working-directory', directory])
+            subprocess.Popen(['gnome-terminal', '--working-directory', directory], env=external_environment())
         else:
             raise ValueError('Nenhum terminal compatível encontrado.')
     elif tool == 'move':
@@ -395,7 +397,7 @@ def file_action(tool, paths):
         executable = shutil.which('localsend')
         if not executable:
             raise ValueError('Instale LocalSend para compartilhar no Linux. AirDrop é exclusivo da Apple.')
-        subprocess.Popen([executable, *map(str, paths)])
+        subprocess.Popen([executable, *map(str, paths)], env=external_environment())
     return None
 
 

@@ -13,6 +13,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
 from citrica.core import ConversionError, Options, check_cancel, convert, family, merge_pdfs, publish, run_process
+from citrica.runtime import external_environment
 
 # All geometry is explicit in source pixels; all times are seconds. No destructive
 # edits are performed: even metadata edits and compression publish a new copy.
@@ -134,7 +135,7 @@ def rectangle(params, width, height):
 
 def media_info(path):
     result = subprocess.run(['ffprobe', '-v', 'error', '-show_format', '-show_streams', '-of', 'json', str(path)],
-                            check=True, capture_output=True, text=True, timeout=30)
+                            check=True, capture_output=True, text=True, timeout=30, env=external_environment())
     return json.loads(result.stdout)
 
 

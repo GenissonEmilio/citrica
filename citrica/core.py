@@ -106,15 +106,8 @@ def check_cancel(cancel: threading.Event):
 
 def run_process(args: list[str], cancel: threading.Event, timeout: int = 1800):
     """Use a temporary log to avoid pipe deadlocks and unbounded log memory."""
-    env = os.environ.copy()
-    # Qt's bundled libraries must not leak into external system executables.
-    original = env.get("LD_LIBRARY_PATH_ORIG")
-    if original is not None:
-        env["LD_LIBRARY_PATH"] = original
-    else:
-        env.pop("LD_LIBRARY_PATH", None)
-    env.pop("QT_PLUGIN_PATH", None)
-    env.pop("QT_QPA_PLATFORM_PLUGIN_PATH", None)
+    from citrica.runtime import external_environment
+    env = external_environment()
     with tempfile.TemporaryFile() as log:
         with subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=log, stderr=log, env=env) as proc:
             deadline = time.monotonic() + timeout

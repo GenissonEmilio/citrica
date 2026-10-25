@@ -3,6 +3,7 @@
 import subprocess
 import json
 import tempfile
+import shutil
 from pathlib import Path
 
 from PIL import Image
@@ -48,5 +49,23 @@ def verify(executable: Path):
             proc = subprocess.run([str(executable), '--desktop-request', payload],
                                   check=True, capture_output=True, text=True)
             assert all(Path(p).is_file() for p in json.loads(proc.stdout)['outputs'])
+        if shutil.which('ffmpeg'):
+            video = root / 'video.mp4'
+            subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
+                            '-c:v', 'libx264', str(video)], check=True)
+            payload = json.dumps({'op': 'tool', 'tool': 'speed', 'paths': [str(video)], 'params': {'factor': 2}})
+            proc = subprocess.run([str(executable), '--desktop-request', payload],
+                                  check=True, capture_output=True, text=True)
+            assert all(Path(p).is_file() for p in json.loads(proc.stdout)['outputs'])
+        if shutil.which('libreoffice'):
+            text = root / 'document.txt'
+            text.write_text('Citrica packaged Office verification')
+            proc = subprocess.run([str(executable), str(text), '--to', 'docx'],
+                                  check=True, capture_output=True, text=True)
+            docx = Path(proc.stdout.strip())
+            proc = subprocess.run([str(executable), str(docx), '--to', 'pdf'],
+                                  check=True, capture_output=True, text=True)
+            assert 'Citrica' in PdfReader(proc.stdout.strip()).pages[0].extract_text()
+        print('Binário empacotado: FFmpeg/ffprobe e LibreOffice externos verificados quando instalados.')
         print('Binário empacotado: detecção local de rostos/texto e ferramentas verificadas.')
         print("Binário empacotado: JPG, HEIC, AVIF, PDF e renderização multipágina verificados.")
