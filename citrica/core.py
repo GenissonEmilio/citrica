@@ -22,7 +22,7 @@ register_heif_opener()
 
 IMAGE = {"jpg", "jpeg", "png", "webp", "tif", "tiff", "bmp", "gif", "avif", "heic", "heif"}
 VIDEO = {"mp4", "mov", "mkv", "avi", "webm", "wmv", "m4v", "mpeg", "mpg"}
-AUDIO = {"mp3", "wav", "flac", "ogg", "opus", "m4a", "aac", "aiff", "wma"}
+AUDIO = {"mp3", "wav", "flac", "ogg", "opus", "m4a", "aac", "aiff", "wma", "mka"}
 DOC = {"doc", "docx", "odt", "rtf", "txt"}
 SHEET = {"xls", "xlsx", "ods", "csv", "tsv"}
 SLIDES = {"ppt", "pptx", "odp"}

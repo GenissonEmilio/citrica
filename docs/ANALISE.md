@@ -1,23 +1,21 @@
 # Do Tangerine ao Cítrica no Linux
 
-Referências analisadas em 24 de outubro de 2026:
+Referências: [App Store](https://apps.apple.com/es/app/tangerine-file-converter/id6813034065?mt=12), [reel fornecido](https://www.instagram.com/reel/DezqwzuGx6T/), [site oficial](https://www.tangerineformac.com/) e [press kit](https://www.tangerineformac.com/press), consultados em 24/10/2026.
 
-- [Tangerine na App Store](https://apps.apple.com/es/app/tangerine-file-converter/id6813034065?mt=12), com descrição também verificada pela API pública da Apple.
-- [Reel de rensenlabs](https://www.instagram.com/reel/DezqwzuGx6T/), acessado pelo navegador: apresenta arrastar, pressionar Shift e soltar para converter, com processamento offline.
-- [Site e demonstração oficial](https://www.tangerineformac.com/) e [press kit](https://www.tangerineformac.com/press).
+O fluxo central é iniciar um arraste, tocar Shift e soltar num formato próximo do ponteiro. A roda permanece depois de soltar a tecla. Command abre ferramentas no Mac e Control abre ações. O site anuncia 26 ferramentas, 6 ações e 275 opções de conversão. Esses números descrevem o produto de referência, não uma equivalência validada do Cítrica.
 
-A proposta central observada é reduzir a interrupção do trabalho: o formato aparece perto do arquivo, os menus dependem do tipo selecionado e o resultado fica junto da origem. O produto comercial também anuncia ferramentas de edição, ações sobre arquivos e lotes. Esta implementação reproduz o fluxo essencial com identidade própria, sem reutilizar código ou recursos do Tangerine. Não é uma reprodução completa das ferramentas anunciadas pelo produto comercial.
+A versão 0.1.0 tinha uma janela grande e uma área flutuante. Isso interrompia o fluxo e não atendia à experiência solicitada. A versão 0.2.0 substitui a entrada principal por uma extensão nativa do GNOME 50. Qt fica responsável pelas configurações e pelos diálogos de ferramentas. O motor continua independente e acessível pela CLI.
 
-## Decisões para Linux
+## Integração com o compositor
 
-**Qt Widgets / PySide6:** interface desktop, suporte a arrastar/soltar, teclado, X11 e Wayland. O motor funciona também sem interface via CLI. Pillow e pillow-heif tratam imagens; pypdf e PyMuPDF tratam PDF; FFmpeg e LibreOffice ampliam formatos com ferramentas já conhecidas no ecossistema Linux.
+Um cliente Wayland comum não observa o arraste de outro aplicativo. A extensão usa a seleção DND do Mutter e o estado global do ponteiro/modificadores dentro do GNOME Shell, sem desativar as restrições de segurança do Shell. A roda é um ator St na camada de chrome, com abertura animada de 180 ms, sem janela decorada. O polling ocorre apenas durante arrastes ou com a roda aberta.
 
-**Um gesto adaptado:** não há uma API universal que permita observar o arraste e pressionamentos globais de outros aplicativos no Wayland. A prévia usa uma janela flutuante receptora de arquivos e integrações por gerenciador. O usuário arrasta até o círculo, escolhe a saída e solta. Um atalho personalizado do desktop pode chamar `citrica --dock`. Uma integração futura específica com GNOME/KDE deve passar pelas permissões e APIs do compositor correspondente.
+Shift abre conversões, Alt substitui o Command para ferramentas, Ctrl abre ações. Super+Shift+C é o atalho padrão, configurável. Escape cancela; setas/Enter navegam. O conteúdo é consultado no motor local, que filtra operações pela seleção e dependências. O Shell recebe caminhos de arquivos locais, não executa texto extraído dos arquivos.
 
-**Original preservado:** a saída é criada em área temporária na pasta de destino. O commit usa criação atômica sem sobrescrita; colisões geram um nome novo, inclusive quando duas operações terminam simultaneamente. Um PDF renderizado produz todas as páginas. Imagens animadas são recusadas até haver exportação que preserve seus quadros.
+A implementação é específica de GNOME 50. KDE e outras versões de GNOME precisam de integração e validação próprias. Novas extensões/atualizações precisam ser carregadas pelo Shell numa nova sessão.
 
-**Escopo verificável:** a prévia não anuncia centenas de combinações ou equivalência com todas as funções comerciais. A tabela no README indica os recursos implementados e suas dependências. Os formatos são filtrados pela disponibilidade de motores; codecs individuais do FFmpeg ainda podem variar conforme a instalação.
+## Integridade e ferramentas
 
-## Evolução
+Conversões usam staging na pasta de destino e publicação atômica sem sobrescrita. Ferramentas produzem cópias; somente a ação explícita Mover remove a origem depois de publicar a cópia no destino. Imagens com orientação EXIF são apresentadas e processadas na mesma orientação.
 
-A prioridade seguinte é validar arrastar/soltar entre aplicações reais em GNOME/Wayland e KDE, depois avaliar uma extensão de desktop para aproximação do gesto global. O menu radial e o motor de conversão permanecem independentes dessa futura integração.
+O catálogo implementa operações de imagem, PDF, áudio e vídeo, incluindo detecção local de regiões de rosto/texto e compressão por tamanho. A qualidade visual e a detecção não são declaradas equivalentes aos algoritmos comerciais. AirDrop não é oferecido; LocalSend é uma integração opcional. Limites e provas estão em [VALIDACAO.md](VALIDACAO.md).

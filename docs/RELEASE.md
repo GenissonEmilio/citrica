@@ -1,15 +1,14 @@
-Primeira prévia funcional do **Cítrica**, um conversor local de arquivos para Linux inspirado no fluxo de arrastar e converter do Tangerine, com implementação e identidade próprias.
+O **Cítrica 0.2.0** corrige o fluxo da prévia anterior: arraste um arquivo no desktop, toque **Shift** e solte no formato da **roda nativa animada**, sem abrir a janela grande de conversão.
 
-- Interface Qt em português, menu radial e área flutuante para arrastar e soltar.
-- Imagens, PDF, áudio, vídeo, documentos Office, legendas e arquivos compactados, conforme os motores disponíveis.
-- Conversão em lote, qualidade/largura, limpeza de metadados e união de PDFs.
-- Cópias ao lado do original, publicação atômica e proteção contra sobrescrita.
-- CLI e instalador de menus de contexto para Nautilus, Nemo e Dolphin.
-- Pacotes **RPM, DEB e TAR.GZ** para **Linux x86_64**, compilados em Ubuntu 24.04, com **glibc >= 2.39**. Python/Qt/imagem/PDF incluídos; FFmpeg e LibreOffice opcionais, instalados separadamente.
-- `SHA256SUMS` e imagem de prévia incluídos.
+- Integração **GNOME Shell 50 / Wayland**: Shift para converter, Alt para ferramentas, Ctrl para ações; Esc para cancelar, setas/Enter para navegar.
+- Atalho padrão **Super+Shift+C**, configuração de atalho/modificador/animação e verificação de conflitos.
+- Diálogos específicos para recorte visual, ajustes, anotações, fundos, ocultação, metadados e ferramentas de PDF/áudio/vídeo.
+- Tamanho alvo para imagem, PDF, áudio e vídeo; detecção local de rostos/texto e leitura de QR. Modelos locais incluídos nos pacotes.
+- Originais preservados nas conversões/ferramentas; publicação atômica, sem sobrescrita.
+- RPM, DEB, portátil x86_64 e SHA256SUMS. glibc >= 2.39; Python/Qt/imagem/PDF incluídos. FFmpeg e LibreOffice são dependências opcionais do sistema.
 
-**Wayland:** use a área flutuante ou menus de contexto. Esta versão não intercepta Shift globalmente durante o arraste em outro aplicativo. Janelas acima das demais e bandeja dependem do compositor.
+**Fedora / GNOME 50:** instale o RPM e execute `citrica --install-gnome`. Saia e entre na sessão para o Shell carregar a extensão. O aplicativo do menu abre as configurações. O portátil tem `install.sh` para instalação no usuário.
 
-**Limitações:** prévia 0.1.0, sem paridade completa com o Tangerine. Sem OCR, recorte de mídia, SVG ou RAR; imagens animadas e multipágina são recusadas. Confira a tabela de formatos e as limitações no README. Compressão não garante tamanho menor; exportação Office depende do LibreOffice.
+**Validação:** suíte de conversões e interface, teste do executável empacotado e teste real em compositor GNOME 50/Wayland isolado no Fedora. Detalhes reproduzíveis, imagens e limites em [docs/VALIDACAO.md](https://github.com/GenissonEmilio/citrica/blob/main/docs/VALIDACAO.md).
 
-O CI verifica o motor, conversões reais, a interface e a abertura do binário empacotado antes da publicação. Validação manual entre gerenciadores de arquivos e diferentes compositores ainda está pendente. Licença AGPL-3.0-or-later.
+**Limites:** prévia para GNOME 50; não há roda global KDE/GNOME antigo. Não é paridade completa com os 275 formatos do Tangerine. Compartilhar exige LocalSend e envio confirmado nele; AirDrop não está implementado. Detecção automática pode omitir regiões e requer revisão. SVG/RAR/Pages/EPUB, PDF→Office e imagens animadas/multipágina continuam fora do escopo. Licença AGPL-3.0-or-later.

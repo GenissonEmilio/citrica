@@ -20,23 +20,44 @@ def run(*args):
     subprocess.run(list(args), check=True)
 
 
+ocr = []
+for library in [Path('/usr/lib/x86_64-linux-gnu/libtesseract.so.5'), Path('/usr/lib64/libtesseract.so.5.5')]:
+    if library.is_file():
+        ocr += ['--add-binary', f'{library.resolve()}:.']
+        break
+for model in [Path('/usr/share/tesseract-ocr/5/tessdata/eng.traineddata'),
+              Path('/usr/share/tesseract/tessdata/eng.traineddata')]:
+    if model.is_file():
+        ocr += ['--add-data', f'{model}:ocr-data']
+        break
+
 run(sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--name", "citrica",
     "--onedir", "--add-data", "citrica/assets:citrica/assets", "--collect-all", "pillow_heif",
+    "--add-data", "gnome:gnome",
+    "--collect-data", "cv2", "--copy-metadata", "opencv-python-headless",
     "--collect-all", "pymupdf", "--copy-metadata", "Pillow", "--copy-metadata", "pypdf",
     "--copy-metadata", "PyMuPDF", "--copy-metadata", "PySide6-Essentials",
-    "--copy-metadata", "shiboken6", "packaging/entry.py")
+    "--copy-metadata", "zxing-cpp", "--copy-metadata", "numpy",
+    "--copy-metadata", "shiboken6", *ocr, "packaging/entry.py")
 
 payload = ROOT / "dist/citrica"
 for name in ["README.md", "LICENSE", "THIRD_PARTY.md"]:
     shutil.copy2(ROOT / name, payload / name)
 shutil.copytree(ROOT / "licenses", payload / "licenses", dirs_exist_ok=True)
+for package in ['libtesseract5', 'liblept5', 'tesseract-ocr-eng']:
+    copyright_file = Path('/usr/share/doc') / package / 'copyright'
+    if copyright_file.is_file():
+        shutil.copy2(copyright_file, payload / 'licenses' / f'{package}-copyright.txt')
 shutil.copy2(ROOT / "requirements.lock", payload / "requirements.lock")
+shutil.copytree(ROOT / 'gnome', payload / 'gnome', dirs_exist_ok=True)
 shutil.copy2(ROOT / "packaging/install.sh", payload / "install.sh")
 (payload / "install.sh").chmod(0o755)
 run(str(payload / "citrica"), "--doctor")
 verify(payload / "citrica")
 env = dict(os.environ, QT_QPA_PLATFORM="offscreen")
-subprocess.run([str(payload / "citrica"), "--screenshot", str(OUT / "citrica-preview.png")], env=env, check=True)
+subprocess.run([str(payload / "citrica"), "--settings", "--screenshot", str(OUT / "citrica-preview.png")],
+               env=env, check=True)
+shutil.copy2(ROOT / 'docs/wheel.png', OUT / 'citrica-wheel.png')
 run("tar", "-czf", str(OUT / f"citrica-{__version__}-linux-x86_64.tar.gz"), "-C", str(ROOT / "dist"), "citrica")
 
 if shutil.which("dpkg-deb"):
@@ -60,7 +81,8 @@ if shutil.which("dpkg-deb"):
         "Depends: libc6 (>= 2.39), libgl1, libegl1, libxkbcommon0, libxcb-cursor0, libdbus-1-3, "
         "libxcb-icccm4, libxcb-keysyms1, libxcb-shape0, libxcb-xinerama0, libxcb-randr0, "
         "libxcb-render-util0, libxcb-xfixes0, libxkbcommon-x11-0, libfontconfig1, libglib2.0-0t64\n"
-        "Recommends: ffmpeg, libreoffice\nHomepage: https://github.com/GenissonEmilio/citrica\n"
+        "Recommends: ffmpeg, libreoffice, python3-gi, gnome-shell, libtesseract5, tesseract-ocr-eng\n"
+        "Homepage: https://github.com/GenissonEmilio/citrica\n"
         "Description: Conversor local de arquivos com menu radial para Linux\n"
         " Converta imagens, PDF, mídia, documentos, legendas e arquivos sem upload.\n")
     run("dpkg-deb", "--build", "--root-owner-group", str(deb), str(OUT / f"citrica_{__version__}_amd64.deb"))
@@ -80,7 +102,7 @@ AutoReqProv: no
 Requires: glibc >= 2.39
 Requires: libglvnd-glx, libglvnd-egl, libxkbcommon, libxcb, xcb-util-cursor, fontconfig, dbus-libs
 Requires: xcb-util-wm, xcb-util-keysyms, xcb-util-image, xcb-util-renderutil, libxkbcommon-x11
-Recommends: ffmpeg, libreoffice
+Recommends: ffmpeg, libreoffice, python3-gobject, gnome-shell, tesseract-libs, tesseract-langpack-eng
 %global debug_package %{{nil}}
 %global __os_install_post %{{nil}}
 %description

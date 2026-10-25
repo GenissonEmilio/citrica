@@ -1,110 +1,125 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
-<p align="center">Novo formato. Mesmo fluxo.<br>Um conversor de arquivos local, gratuito e de código aberto para Linux.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases">Baixar para Linux</a> · <a href="docs/ANALISE.md">Ideia e análise</a> · <a href="docs/ROADMAP.md">Próximos passos</a></p>
+<p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux.</p>
+<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/latest">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
-![Interface do Cítrica](docs/screenshot.png)
+![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
-Arraste arquivos para o círculo, solte em um formato e receba uma cópia na pasta do original. Use a janela principal, a área flutuante, o menu de contexto do gerenciador de arquivos ou o terminal. Não há upload, conta, telemetria ou limite de conversões. Os arquivos originais são preservados; nomes repetidos recebem um sufixo.
+O Cítrica 0.2 usa uma extensão do GNOME Shell para mostrar uma roda animada perto do ponteiro durante o arraste de arquivos. Não abre a janela grande de conversão da versão anterior. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
 
-Implementação independente inspirada na interação do [Tangerine](https://www.tangerineformac.com/), com código e identidade próprios. Não usa código nem recursos visuais do produto comercial e não é afiliada à Leap Studio.
+Implementação independente inspirada no fluxo do [Tangerine](https://www.tangerineformac.com/), com código e identidade próprios. Não é afiliada ao produto comercial e não oferece todas as suas combinações de formatos.
 
-## Instalação
+## Fedora / GNOME 50 / Wayland
 
-Baixe os pacotes na [release](https://github.com/GenissonEmilio/citrica/releases). A versão **0.1.0 é uma prévia funcional** para Linux **x86_64**, compilada no Ubuntu 24.04; requer glibc 2.39 ou superior. ARM e distribuições mais antigas ainda não foram validados. O pacote inclui Python, Qt e os motores de imagem/PDF; FFmpeg e LibreOffice são dependências opcionais do sistema.
+Baixe o RPM da [release v0.2.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.2.0):
 
-**Fedora 40+ / derivados RPM:**
+~~~bash
+sudo dnf install ./citrica-0.2.0-1.x86_64.rpm
+citrica --install-gnome
+~~~
 
-```bash
-sudo dnf install ./citrica-0.1.0-1.x86_64.rpm
-```
+Na primeira instalação, **saia e entre novamente na sessão do GNOME** para ele descobrir a extensão. Atualizações do código da extensão também exigem uma nova sessão; fechar o aplicativo não recarrega o Shell. As configurações informam se a sessão ainda está usando uma revisão anterior.
 
-**Ubuntu 24.04+ / derivados Debian compatíveis:**
+1. No gerenciador de arquivos, comece a arrastar uma imagem.
+2. Toque **Shift** e solte a tecla. A roda aparece com os formatos compatíveis.
+3. Continue arrastando e solte o arquivo no setor **JPG**, por exemplo.
+4. Uma cópia aparece junto ao original; uma notificação confirma a conclusão.
 
-```bash
-sudo apt install ./citrica_0.1.0_amd64.deb
-```
+**Alt** durante o arraste mostra ferramentas. **Ctrl** mostra ações. **Esc** cancela. O atalho **Super+Shift+C** abre/fecha a roda sem iniciar um arraste. Sem seleção, arraste um arquivo para ela ou clique no centro para escolher arquivos. Para várias páginas de opções, use **Mais** e clique na ferramenta desejada. Setas e Enter também selecionam e aplicam opções.
 
-**Portátil:** extraia `citrica-0.1.0-linux-x86_64.tar.gz` e execute `./citrica/citrica`. Não exige instalação de Python. Para registrar o aplicativo no seu usuário, execute `./citrica/install.sh`. Mantenha `_internal` junto do executável. O instalador cria `~/.local/bin/citrica`; essa pasta deve estar no `PATH` para usar o comando pelo nome.
+Abra **Cítrica** no menu de aplicativos ou execute `citrica --settings` para trocar o atalho, escolher Shift/Super durante o arraste e ligar/desligar a animação. O formulário verifica teclas inválidas e conflitos com atalhos registrados no GNOME.
 
-Confira o download com `sha256sum -c SHA256SUMS` na pasta dos arquivos baixados. O verificador pode informar arquivos ausentes se você não tiver baixado todos os pacotes.
+![Configurações do Cítrica](docs/settings.png)
 
-Dependências para todos os recursos:
+A integração global desta versão suporta **GNOME Shell 50**. A CLI funciona em outros ambientes, mas não há roda global equivalente para KDE, Cinnamon ou X11 nesta release. RPM/DEB/portátil são x86_64, com glibc >= 2.39. O CI compila no Ubuntu 24.04; instalar o DEB nesse sistema não acrescenta suporte à versão antiga do GNOME que ele utiliza.
 
-```bash
-# Ubuntu
-sudo apt install ffmpeg libreoffice
-# Fedora: use um pacote FFmpeg com os codecs libx264, libmp3lame, libvpx-vp9 e libopus.
+## Outros pacotes e dependências
+
+~~~bash
+# DEB, para sistemas compatíveis com as bibliotecas indicadas acima
+sudo apt install ./citrica_0.2.0_amd64.deb
+# Portátil, sem precisar instalar Python
+ tar -xzf citrica-0.2.0-linux-x86_64.tar.gz
+ ./citrica/install.sh
+~~~
+
+O instalador portátil registra o aplicativo em `~/.local/bin/citrica`, configura a extensão e instala menus de contexto no usuário atual. O RPM/DEB registra o aplicativo no sistema; `citrica --install-gnome` instala a extensão no usuário atual. Para menus de contexto opcionais, execute `citrica --install-integrations`. O script do Nautilus funciona sem plugin adicional; a entrada direta exige `nautilus-python`. As integrações Nemo/Dolphin continuam sendo alternativas para chamar a CLI/seleção; a roda requer GNOME 50.
+
+Os pacotes incluem Python, Qt, Pillow, motores PDF, leitor QR, modelo de rostos OpenCV e Tesseract com modelo de texto inglês. **FFmpeg e LibreOffice são programas opcionais do sistema**:
+
+~~~bash
+# Fedora: LibreOffice; use um FFmpeg com os codecs desejados habilitados
 sudo dnf install libreoffice
-```
+# Debian/Ubuntu
+sudo apt install ffmpeg libreoffice
+citrica --doctor
+~~~
 
-O FFmpeg do repositório da distribuição pode ter codecs limitados. Se um encoder estiver ausente, a operação informa o erro e preserva o arquivo de origem. `citrica --doctor` informa as dependências encontradas; não instala nada.
+Mídia exige FFmpeg/ffprobe; codecs variam entre instalações. Falhas de codec são informadas sem alterar a origem. LocalSend é opcional para compartilhamento, aparece nas ações somente quando o comando `localsend` está disponível e abre o aplicativo para concluir o envio. AirDrop não está implementado.
 
-## Como usar
+Confira `SHA256SUMS` na pasta dos downloads. Mantenha `_internal` junto ao executável portátil. A extensão e seu backend precisam continuar no caminho registrado; reinstale a integração se mover o aplicativo.
 
-1. Abra Cítrica e arraste um ou mais arquivos para o círculo; ou use **Escolher arquivos**.
-2. Solte sobre um formato, clique nele ou escolha na lista e use **Converter arquivos**.
-3. Ajuste qualidade, largura máxima e destino quando necessário. Os formatos oferecidos são a interseção das saídas disponíveis para a seleção.
-4. Abra a pasta de saída ou dê dois cliques em um resultado. Falhas aparecem na lista com o motivo completo na dica do item.
+## Ferramentas
 
-**Área flutuante:** clique na opção da barra lateral ou execute `citrica --dock`. A janela permanece acima das demais onde o compositor permitir. Arraste sobre o círculo para revelar formatos e solte no desejado. Também é possível soltar no centro e clicar no formato depois.
+As opções dependem do tipo de arquivo e das dependências disponíveis. As ferramentas geram cópias; **Mover** é a ação explícita que muda o local do original.
 
-**Integração:** `citrica --install-integrations` registra o aplicativo e instala menus para Dolphin e Nemo, um script do Nautilus e uma extensão do Nautilus Python no usuário atual. Reinicie o gerenciador. A extensão exige `python3-nautilus` no Ubuntu ou `nautilus-python` no Fedora; sem ela, use o submenu **Scripts → Converter com Cítrica**. Instale as integrações após colocar o aplicativo em sua localização definitiva. Os caminhos registrados apontam para esse executável.
+| Grupo | Ferramentas implementadas |
+| --- | --- |
+| Imagem | Comprimir, tamanho alvo, recortar visualmente, brilho/contraste/saturação/nitidez, anotar com texto/número/seta/retângulo/elipse, fundo sólido/gradiente/imagem, margens/proporção/cantos, ocultar área manualmente, ocultar rostos, ocultar texto, ler QR, colagem, imagens em PDF |
+| Áudio/vídeo | Comprimir, tamanho alvo, cortar tempo, velocidade, dividir, unir seleções compatíveis; recortar vídeo e capturar quadro; normalizar áudio, censurar trecho com tom e converter mono/estéreo |
+| PDF | Comprimir, tamanho alvo, unir, dividir em páginas, reorganizar páginas |
+| Metadados | Inspecionar, limpar e editar autor/título em imagens, PDF, áudio e vídeo |
+| Ações | Copiar, mover, copiar caminho, abrir terminal, prateleira flutuante, compartilhar por LocalSend quando instalado |
 
-No **Wayland**, um aplicativo comum não consegue interceptar Shift durante o arraste global de outro aplicativo. Esta versão usa a área flutuante e os menus de contexto; não promete capturar o gesto global do macOS. O posicionamento e a prioridade de janelas dependem do compositor. No GNOME, o ícone de bandeja também depende de suporte a AppIndicator. A janela principal continua disponível sem bandeja.
+Há 26 entradas de ferramentas e 6 ações no catálogo, com equivalentes adaptados ao Linux. Isso **não representa paridade completa** com cada função/algoritmo do Tangerine. Veja o [escopo testado](docs/VALIDACAO.md).
 
-Atalhos: `Ctrl+O` para selecionar, `Ctrl+Enter` para converter, `Esc` para cancelar. Os botões do menu radial aceitam navegação por Tab e ativação por teclado. Não há execução automática ao iniciar a sessão.
+O tamanho alvo publica somente resultados que respeitam o limite solicitado; se não conseguir, informa falha. Imagens saem em WebP e podem perder resolução; áudio sai em MP3 e vídeo em MP4. PDF preserva o texto e comprime imagens internas; pode não atingir limites muito baixos. Detecção de rosto/texto pode deixar áreas sem identificar: revise a cópia e use ocultação manual quando necessário. O modelo de texto incluído é inglês; este recurso oculta regiões de texto e não exporta documentos escaneados por OCR.
 
-## Formatos da versão 0.1.0
+## Conversões
 
 | Entrada | Saída | Motor |
 | --- | --- | --- |
 | JPG, PNG, WebP, TIFF, BMP, GIF, AVIF, HEIC/HEIF | PNG, JPG, WebP, AVIF, HEIC, TIFF, BMP, GIF, PDF | Pillow + pillow-heif |
-| PDF | PNG/JPG, uma imagem por página; TXT; PDF regravado | PyMuPDF + pypdf |
+| PDF | PNG/JPG por página, TXT, PDF | PyMuPDF + pypdf |
 | MP4, MOV, MKV, AVI, WebM, WMV, M4V, MPEG | MP4, WebM, MKV, MOV, GIF, MP3, WAV | FFmpeg |
-| MP3, WAV, FLAC, OGG, Opus, M4A, AAC, AIFF, WMA | MP3, WAV, FLAC, OGG, Opus, M4A, AIFF | FFmpeg |
-| DOC/DOCX, ODT, RTF, TXT | PDF, DOCX, ODT, TXT | LibreOffice; TXT→PDF tem motor interno |
+| MP3, WAV, FLAC, OGG, Opus, M4A, MKA, AAC, AIFF, WMA | MP3, WAV, FLAC, OGG, Opus, M4A, AIFF | FFmpeg |
+| DOC/DOCX, ODT, RTF, TXT | PDF, DOCX, ODT, TXT | LibreOffice; TXT→PDF interno |
 | XLS/XLSX, ODS, CSV, TSV | PDF, XLSX, ODS, CSV | LibreOffice |
 | PPT/PPTX, ODP | PDF, PPTX, ODP | LibreOffice |
 | SRT, VTT | SRT, VTT, TXT | Interno |
-| ZIP, TAR, TAR.GZ, TGZ | ZIP, TAR, TAR.GZ | Biblioteca padrão Python |
+| ZIP, TAR, TAR.GZ, TGZ | ZIP, TAR, TAR.GZ | Python |
 
-Ferramentas incluídas: redução de qualidade de imagens/vídeo, redimensionamento, remoção de metadados em imagens/PDF/mídia e união de PDFs na ordem da seleção. Para comprimir ou limpar uma imagem/PDF, selecione o mesmo formato de saída: será criada uma nova cópia. Reduzir qualidade não garante um tamanho menor. PDFs são regravados com compressão dos streams; não há redução de resolução de imagens internas ou meta exata de tamanho.
+Saídas são publicadas atomicamente, junto ao original por padrão; nomes repetidos recebem sufixos. Imagens animadas/multipágina são recusadas para evitar perda de quadros. SVG, RAR, Pages, EPUB e PDF→Office não estão implementados. Office depende do LibreOffice e seus filtros; a limpeza de metadados não cobre documentos Office. Legendas preservam texto e tempos básicos, sem estilos específicos. Arquivos compactados são reempacotados, sem extração pública; links, nomes inseguros e entradas duplicadas são recusados (10.000 entradas / 2 GiB descompactados).
 
-Limitações: imagens animadas e TIFFs com várias páginas são recusados para evitar perda silenciosa de quadros. SVG, RAR, Pages, OCR, edição de fotos, corte de vídeo e extração PDF→Office não estão nesta versão. PDF→TXT extrai texto existente; scans sem camada textual não passam por OCR. SRT/VTT preservam texto e tempos básicos; estilos, posicionamento e identificadores específicos de VTT não são preservados. Metadados de documentos Office não são removidos. Arquivos compactados são reempacotados, não extraídos; links, nomes inseguros e entradas duplicadas são recusados. Limite de 10.000 entradas / 2 GiB descompactados. A compatibilidade Office depende do filtro do LibreOffice e da formatação original.
+## Terminal e desenvolvimento
 
-## Terminal
-
-```bash
+~~~bash
 citrica foto.heic --to jpg
 citrica *.png --to webp --quality 80 --max-width 1920
 citrica documento.pdf --to png --output ./paginas
 citrica a.pdf b.pdf --merge-pdf --output ./resultado
 citrica video.mov --to mp4
-citrica legenda.srt --to vtt
-citrica pacote.zip --to tar.gz
 citrica foto.png --formats
-citrica --doctor
-```
+citrica --wheel foto.png
+citrica --tool crop foto.png
+~~~
 
-O retorno é 0 para sucesso, 1 se houver falha e 130 para interrupção pelo teclado. Operações usam arquivos temporários na pasta de destino e publicação atômica sem sobrescrita. Em lotes, os resultados já concluídos são mantidos se houver erro ou cancelamento.
+Python 3.12 ou superior:
 
-## Desenvolvimento
-
-Python 3.11 ou superior:
-
-```bash
+~~~bash
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -e '.[dev]'
-citrica
 QT_QPA_PLATFORM=offscreen python -m pytest -q
 ruff check citrica tests packaging
+# Teste real do compositor, somente em GNOME 50 instalado:
+python tests/desktop/run_session.py
+# Pacotes com PyInstaller, RPM/DEB quando as ferramentas estão instaladas:
 python packaging/build.py
-```
+~~~
 
-O CI testa conversões reais, preservação dos originais, colisões de nomes, metadados, PDF com várias páginas, documentos Office, mídia, cancelamento, validação de arquivos compactados e arrastar/soltar na interface Qt. Tags `v*` geram pacotes `.deb`, `.rpm`, `.tar.gz`, prévia e checksums; a release só é publicada após os testes e o teste de abertura do binário empacotado.
+O teste do desktop cria outro compositor GNOME/Wayland com barramento e configurações isolados. A extensão de teste nunca é instalada no desktop do usuário nem incluída nos pacotes. O CI verifica o motor e o executável empacotado; o teste GNOME 50 é executado separadamente no Fedora. [Detalhes e evidências](docs/VALIDACAO.md).
 
 ## Licença
 
-[AGPL-3.0-or-later](LICENSE). Consulte [THIRD_PARTY.md](THIRD_PARTY.md) para as dependências e licenças. O Cítrica não inclui FFmpeg nem LibreOffice nos pacotes; usa as instalações do sistema. Contribuições são bem-vindas por issues e pull requests.
+[AGPL-3.0-or-later](LICENSE). Dependências e avisos em [THIRD_PARTY.md](THIRD_PARTY.md). Os arquivos não são enviados para serviços externos durante conversões; o compartilhamento só abre o aplicativo escolhido por uma ação explícita.

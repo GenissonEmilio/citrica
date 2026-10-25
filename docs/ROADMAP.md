@@ -1,15 +1,14 @@
 # Próximos passos
 
-A versão 0.1.0 entrega o menu radial, área flutuante, CLI, conversão em lote, menus de contexto e pacotes Linux x86_64.
+A versão 0.2.0 implementa a roda nativa GNOME 50/Wayland com Shift/Alt/Ctrl globais, animação, atalho configurável, diálogos compactos e ferramentas de imagem/PDF/mídia.
 
-- Validar com usuários em GNOME/Wayland, KDE/Wayland e X11; melhorar acessibilidade e internacionalização.
-- Integrar portais/atalhos do desktop e avaliar extensões GNOME/KDE para invocar a roda durante um arraste global.
-- Detectar codecs específicos do FFmpeg antes de oferecer cada formato.
-- Melhorar progresso por duração/página e cancelamento de operações grandes em Pillow/pypdf.
-- Preservar animações e documentos com múltiplas imagens.
-- Adicionar divisão/reorganização de PDF, união de imagens em PDF e OCR opcional.
-- Adicionar recorte/ajustes de imagem, corte de mídia, estimativa de tamanho e inspeção de metadados.
-- Empacotar como Flatpak/AppImage e validar Linux ARM64 e distribuições mais antigas.
-- Testar integrações de contexto em instalações limpas de Nautilus, Nemo e Dolphin.
+- Validar outras versões de GNOME, KDE e configurações com múltiplos monitores/escalas.
+- Melhorar acessibilidade, tradução, feedback de progresso e seleção visual para vídeo.
+- Testar compartilhamento LocalSend entre duas máquinas e ações em pastas grandes.
+- Ampliar formatos como SVG, EPUB e documentos Pages; estudar PDF→Office.
+- Detectar codecs FFmpeg antes de oferecer cada formato.
+- Preservar animações/múltiplas imagens e ampliar cancelamento em operações longas.
+- Melhorar detecção de rostos/texto e oferecer modelos adicionais com seleção explícita.
+- Empacotar Flatpak/AppImage e validar ARM64/distribuições antigas.
 
-Não há datas prometidas. Cada item exige implementação e validação próprias.
+Não há datas prometidas. O catálogo atual e suas limitações estão no README e em VALIDACAO.md.

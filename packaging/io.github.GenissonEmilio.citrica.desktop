@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Cítrica
-Comment=Conversão de arquivos local e radial para Linux
+Comment=Roda de conversão local no desktop Linux
 Exec=citrica %F
 Icon=io.github.GenissonEmilio.citrica
 Terminal=false
@@ -11,5 +11,5 @@ MimeType=image/png;image/jpeg;image/webp;image/avif;application/pdf;video/mp4;au
 Actions=Dock;
 
 [Desktop Action Dock]
-Name=Área flutuante
+Name=Mostrar roda
 Exec=citrica --dock

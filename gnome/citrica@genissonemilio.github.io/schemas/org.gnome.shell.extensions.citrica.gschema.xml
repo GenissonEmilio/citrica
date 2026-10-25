@@ -1,0 +1,7 @@
+<schemalist>
+ <schema id="org.gnome.shell.extensions.citrica" path="/org/gnome/shell/extensions/citrica/">
+  <key name="toggle-wheel" type="as"><default>['&lt;Super&gt;&lt;Shift&gt;c']</default></key>
+  <key name="drag-key" type="s"><default>'shift'</default></key>
+  <key name="animations" type="b"><default>true</default></key>
+ </schema>
+</schemalist>

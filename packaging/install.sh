@@ -10,4 +10,5 @@ fi
 mkdir -p "$bin_dir"
 ln -sfn "$target_dir/citrica" "$bin_dir/citrica"
 "$target_dir/citrica" --install-integrations
+"$target_dir/citrica" --install-gnome
 printf '\nCítrica instalado em %s\nAbra pelo menu de aplicativos ou execute %s/citrica\n' "$target_dir" "$bin_dir"
