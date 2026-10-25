@@ -7,12 +7,14 @@ O código do Cítrica é distribuído sob AGPL-3.0-or-later. O pacote usa biblio
 | PyMuPDF / MuPDF | AGPL-3.0-or-later; https://pymupdf.readthedocs.io/en/latest/about.html#license |
 | PySide6 / Qt | LGPL-3.0 / GPL-3.0, conforme o componente; https://doc.qt.io/qtforpython-6/licenses.html |
 | Shiboken6 | LGPL-3.0 / GPL-3.0; mesmo projeto Qt for Python |
-| Pillow | HPND; https://github.com/python-pillow/Pillow |
+| Pillow | MIT-CMU (Pillow 12.3); https://github.com/python-pillow/Pillow |
 | pillow-heif / libheif | BSD-3-Clause / LGPL-3.0; https://github.com/bigcat88/pillow_heif |
 | pypdf | BSD-3-Clause; https://github.com/py-pdf/pypdf |
 | Python | PSF-2.0; https://docs.python.org/3/license.html |
 | PyInstaller | GPL-2.0-or-later com exceção para o bootloader; https://pyinstaller.org/en/stable/license.html |
 
 Qt e as bibliotecas nativas permanecem dinamicamente vinculadas em `_internal`. Não é usado um executável monolítico que impeça substituir bibliotecas. Código-fonte do aplicativo, instruções de build e dependências estão disponíveis neste repositório. As bibliotecas subjacentes de codecs também têm seus avisos de licença nos pacotes das dependências.
+
+Os textos de LGPL-3.0 e GPL-3.0 do projeto Qt acompanham o pacote em `licenses/`. Qt/PySide6 e Shiboken6 não foram modificados. Suas fontes estão em https://code.qt.io/qt/qtbase.git/ e https://code.qt.io/pyside/pyside-setup.git/ (versão 6.12.0); as versões exatas das dependências Python estão em `requirements.lock`. O uso de versões modificadas dessas bibliotecas e a engenharia reversa para depurar modificações são permitidos nos termos das licenças aplicáveis.
 
 FFmpeg e LibreOffice são executados separadamente, se instalados no sistema, e não são redistribuídos neste pacote. As respectivas licenças dependem da distribuição e dos codecs habilitados. Nenhum código, ícone, vídeo ou screenshot do Tangerine é redistribuído.

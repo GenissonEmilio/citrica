@@ -29,6 +29,8 @@ run(sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--name", "ci
 payload = ROOT / "dist/citrica"
 for name in ["README.md", "LICENSE", "THIRD_PARTY.md"]:
     shutil.copy2(ROOT / name, payload / name)
+shutil.copytree(ROOT / "licenses", payload / "licenses", dirs_exist_ok=True)
+shutil.copy2(ROOT / "requirements.lock", payload / "requirements.lock")
 shutil.copy2(ROOT / "packaging/install.sh", payload / "install.sh")
 (payload / "install.sh").chmod(0o755)
 run(str(payload / "citrica"), "--doctor")
