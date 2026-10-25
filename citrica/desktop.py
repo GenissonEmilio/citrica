@@ -13,6 +13,8 @@ from citrica.core import Options, common_formats, convert
 from citrica.runtime import external_environment
 
 UUID = "citrica@genissonemilio.github.io"
+SHELL_VERSION = 3
+SHELL_REVISION = 1
 DESKTOP_PATH = "/io/github/GenissonEmilio/Citrica/Desktop"
 DESKTOP_NAME = "io.github.GenissonEmilio.Citrica.Desktop"
 
@@ -71,7 +73,7 @@ if u not in v: s.set_strv('enabled-extensions',v+[u]); Gio.Settings.sync()
         subprocess.run(["/usr/bin/python3", "-c", script, json.dumps(UUID)], check=True,
                        env=external_environment())
     state = extension_status()
-    active = state.get('version') == 2 and state.get('revision') == 3
+    active = state.get('version') == SHELL_VERSION and state.get('revision') == SHELL_REVISION
     return {"path": str(destination), "active": active,
             "requires_login": result.returncode != 0 or not active}
 
@@ -80,15 +82,19 @@ def request(payload):
     paths = [Path(p).expanduser().resolve() for p in payload.get("paths", [])]
     if len(paths) > 1000:
         raise ValueError("Limite de 1000 arquivos por seleção.")
-    if payload["op"] == "capabilities":
+    if payload["op"] in {"capabilities", "palette"}:
+        from citrica.preview import selection_info
+        from citrica.tools import available_tools
+        def entries(mode):
+            if mode == 'convert':
+                return [{"id": f, "label": f.upper(), "kind": "format"} for f in common_formats(paths)]
+            return [{"id": t["id"], "label": t["label"], "kind": "tool"}
+                    for t in available_tools(paths, actions=mode == 'actions')]
+        if payload['op'] == 'palette':
+            return {'modes': {mode: entries(mode) for mode in ['convert', 'tools', 'actions']},
+                    'selection': selection_info(paths)}
         mode = payload.get("mode", "convert")
-        if mode == "convert":
-            items = [{"id": f, "label": f.upper(), "kind": "format"} for f in common_formats(paths)]
-        else:
-            from citrica.tools import available_tools
-            items = [{"id": t["id"], "label": t["label"], "kind": "tool"}
-                     for t in available_tools(paths, actions=mode == "actions")]
-        return {"items": items}
+        return {"items": entries(mode), "selection": selection_info(paths)}
     if payload["op"] == "convert":
         outputs, errors = [], []
         for path in paths:

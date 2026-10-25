@@ -18,7 +18,7 @@ HARNESS = 'citrica-test-harness@local'
 
 
 def main():
-    from PIL import Image
+    from PIL import Image, ImageOps
     STATE.mkdir(parents=True, exist_ok=True)
     for name, source in [(UUID, ROOT / 'gnome' / UUID), (HARNESS, ROOT / 'tests/desktop/harness')]:
         target = STATE / 'data/gnome-shell/extensions' / name
@@ -31,7 +31,8 @@ def main():
         sys.executable, '-m', 'citrica']
     config.write_text(json.dumps({'command': backend}))
     shutil.rmtree(STATE / 'config/dconf', ignore_errors=True)
-    Image.new('RGB', (320, 200), '#ed713d').save(STATE / 'sample.png')
+    with Image.open(ROOT / 'tests/fixtures/astronaut.png') as fixture:
+        ImageOps.fit(fixture.convert('RGB'), (320, 200)).save(STATE / 'sample.png')
     bus = STATE / 'bus'
     bus.unlink(missing_ok=True)
     env = dict(os.environ, XDG_DATA_HOME=str(STATE / 'data'), XDG_CONFIG_HOME=str(STATE / 'config'),

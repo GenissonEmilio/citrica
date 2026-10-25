@@ -1,6 +1,6 @@
 # Próximos passos
 
-A versão 0.2.0 implementa a roda nativa GNOME 50/Wayland com Shift/Alt/Ctrl globais, animação, atalho configurável, diálogos compactos e ferramentas de imagem/PDF/mídia.
+A versão 0.3.0 implementa a roda nativa GNOME 50/Wayland com Shift/Alt/Ctrl globais, animação, atalho configurável, diálogos compactos e ferramentas de imagem/PDF/mídia.
 
 - Validar outras versões de GNOME, KDE e configurações com múltiplos monitores/escalas.
 - Melhorar acessibilidade, tradução, feedback de progresso e seleção visual para vídeo.

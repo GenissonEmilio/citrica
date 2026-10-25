@@ -4,6 +4,6 @@
   "description": "Arraste um arquivo, pressione Shift e solte na roda para converter localmente.",
   "shell-version": ["50"],
   "url": "https://github.com/GenissonEmilio/citrica",
-  "version": 2,
+  "version": 3,
   "settings-schema": "org.gnome.shell.extensions.citrica"
 }

@@ -81,7 +81,7 @@ def main():
     step('Key', 65505, 'true')
     wheel = wait_for(lambda s: s['visible'] and s.get('items'))
     assert wheel['mode'] == 'convert'
-    time.sleep(.25)  # Wait for the actual 180ms opening animation to finish.
+    wait_for(lambda s: (s.get('motion') or {}).get('settled'))
     call('Test', 'Screenshot', str(STATE / 'shift-wheel.png'))
     assert any(i['id'] == 'jpg' for i in wheel['items'])
     point_at(wheel, 'jpg')
@@ -100,7 +100,10 @@ def main():
     step('Key', 99, 'false')
     step('Key', 65505, 'false')
     step('Key', 65515, 'false')
-    wait_for(lambda s: s['visible'])
+    empty = wait_for(lambda s: s['visible'] and (s.get('motion') or {}).get('settled'))
+    assert empty['paths'] == [] and empty['items'] == [] and empty['selection'] is None
+    assert empty['selected'] == -1 and not empty['cachedSelection']
+    call('Test', 'Screenshot', str(STATE / 'reopened-empty.png'))
     step('Key', 65307, 'true')
     step('Key', 65307, 'false')
     wait_for(lambda s: not s['visible'])
@@ -115,6 +118,7 @@ def main():
     step('Key', 65513, 'true')  # Alt
     tools = wait_for(lambda s: s['visible'] and s['mode'] == 'tools' and len(s.get('items', [])) > 1)
     assert any(i['id'] == 'crop' for i in tools['items'])
+    wait_for(lambda s: (s.get('motion') or {}).get('settled'))
     call('Test', 'Screenshot', str(STATE / 'tools-wheel.png'))
     step('Key', 65513, 'false')
     step('Key', 65507, 'true')  # Ctrl
@@ -209,6 +213,7 @@ def main():
         'shortcut': True, 'escape': True, 'animation': True, 'alt_tools': True, 'ctrl_actions': True,
         'copy_path': True, 'pagination': True, 'tool_dialog': True, 'cancel_drag': True, 'super_drag_setting': True,
         'keyboard_navigation': True, 'custom_shortcut': True, 'disable_animation': True,
+        'reopen_after_conversion_empty': True,
         'state': status()}, ensure_ascii=False, indent=2))
     print('GNOME 50 / Wayland: Shift, Alt, Ctrl, roda animada, conversão, atalho, Escape, '
           'clipboard, paginação e diálogo de recorte validados.')

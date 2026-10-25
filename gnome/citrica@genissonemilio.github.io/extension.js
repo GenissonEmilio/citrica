@@ -7,7 +7,7 @@ import St from 'gi://St';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import {WheelView, SIZE, pickSector} from './wheel.js';
 
 const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Desktop">
  <method name="Show"><arg type="as" direction="in"/><arg type="s" direction="in"/></method>
@@ -15,13 +15,17 @@ const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Desktop">
  <method name="Status"><arg type="s" direction="out"/></method>
  <method name="ReloadSettings"/>
 </interface></node>`;
-const R = 132, SIZE = 380;
 const DND_SELECTION = Meta.SelectionType.DND ?? Meta.SelectionType.SELECTION_DND ?? 2;
 
 export default class Citrica extends Extension {
     enable() {
+        this._enabled = true;
         this._settings = this.getSettings();
         this._paths = [];
+        this._items = [];
+        this._mode = 'convert';
+        this._viewToken = 0;
+        this._closingViews = new Set();
         this._drag = false;
         this._pending = null;
         this._seq = 0;
@@ -44,7 +48,7 @@ export default class Citrica extends Extension {
                 this._keyboardPointer = global.get_pointer().slice(0, 2);
                 this._selected = this._selected < 0 ? (key === 'Left' ? n - 1 : 0) :
                     (this._selected + (key === 'Left' ? n - 1 : 1)) % n;
-                this._buttons.forEach((b, i) => b.set_style(this._buttonStyle(i === this._selected)));
+                this._view.select(this._selected);
             }
         });
         this._selection = global.display.get_selection();
@@ -83,7 +87,8 @@ export default class Citrica extends Extension {
         Main.wm.removeKeybinding('toggle-wheel');
         Main.wm.addKeybinding('toggle-wheel', this._settings, Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW, () => {
-                if (this._wheel) this.Hide(); else this.Show(this._drag ? this._paths : [], 'convert');
+                const liveDrag = this._drag && (global.get_pointer()[2] & Clutter.ModifierType.BUTTON1_MASK);
+                if (this._wheel) this.Hide(); else this.Show(liveDrag ? this._paths : [], 'convert');
             });
     }
 
@@ -112,6 +117,7 @@ export default class Citrica extends Extension {
             proc.communicate_utf8_async(null, null, (p, result) => {
                 try {
                     const [, stdout, stderr] = p.communicate_utf8_finish(result);
+                    if (!this._enabled) return;
                     if (!p.get_successful()) throw new Error(stderr || stdout || 'Falha no motor local.');
                     callback(JSON.parse(stdout));
                 } catch (e) { callback({error: e.message}); }
@@ -120,12 +126,19 @@ export default class Citrica extends Extension {
     }
 
     _startDrag() {
+        if (!(global.get_pointer()[2] & Clutter.ModifierType.BUTTON1_MASK)) return;
         this._seq++;
+        this._viewToken++;
         this._drag = true;
         this._read = false;
         this._paths = [];
         this._lastMode = null;
         this._dropHandled = false;
+        this._selectionInfo = null;
+        this._palette = null;
+        this._palettePending = null;
+        this._view?.setInfo(null, true);
+        if (this._wheel) this._render([], 0, true);
         this._readDrag();
         this._ensurePoll();
     }
@@ -143,9 +156,11 @@ export default class Citrica extends Extension {
                 s.transfer_finish(result);
                 stream.close(null);
                 const text = new TextDecoder().decode(stream.steal_as_bytes().get_data());
-                if (seq !== this._seq) return;
+                if (seq !== this._seq || !this._drag ||
+                    !(global.get_pointer()[2] & Clutter.ModifierType.BUTTON1_MASK)) return;
                 this._paths = [...new Set(text.split(/[\r\n]+/).filter(x => x.startsWith('file://'))
                     .map(x => Gio.File.new_for_uri(x).get_path()).filter(Boolean))];
+                if (this._paths.length) this._prefetch();
                 if (this._paths.length && (this._pending || this._wheel)) {
                     const mode = this._pending || this._mode || 'convert';
                     this._pending = null;
@@ -155,12 +170,43 @@ export default class Citrica extends Extension {
         });
     }
 
+    _prefetch() {
+        const serial = this._seq, paths = [...this._paths], key = JSON.stringify(paths);
+        this._palettePending = key;
+        this._request({op: 'palette', paths}, result => {
+            if (serial !== this._seq || !this._drag || JSON.stringify(this._paths) !== key) return;
+            this._palettePending = null;
+            if (result.error) {
+                if (this._wheel && JSON.stringify(this._paths) === key) {
+                    Main.notifyError('Cítrica', result.error);
+                    this.Hide();
+                }
+                return;
+            }
+            this._palette = {key, ...result};
+            if (this._wheel && JSON.stringify(this._paths) === key) this._showPalette(result);
+        });
+    }
+
+    _showPalette(result) {
+        const items = result.modes ? result.modes[this._mode] : result.items;
+        if (!items?.length) {
+            Main.notify('Cítrica', 'Nenhuma operação disponível para esta seleção. Verifique formatos e dependências.');
+            this.Hide();
+            return;
+        }
+        this._selectionInfo = result.selection;
+        this._view.setInfo(result.selection);
+        this._render(items);
+    }
+
     _ensurePoll() {
         if (this._poll) return;
         this._lastButtons = global.get_pointer()[2];
         this._poll = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 16, () => {
             if (!this._drag && !this._wheel) { this._poll = 0; return GLib.SOURCE_REMOVE; }
             const [x, y, mods] = global.get_pointer();
+            if (this._drag && !(mods & Clutter.ModifierType.BUTTON1_MASK)) this._endDrag();
             if (this._drag) {
                 this._readDrag();
                 const configured = this._settings.get_string('drag-key');
@@ -195,23 +241,45 @@ export default class Citrica extends Extension {
         }
         this._drag = false;
         this._pending = null;
+        this._lastMode = null;
+        if (!this._wheel) this._paths = [];
         this._seq++;
     }
 
     Show(paths, mode) {
         if (this._busy) return;
-        this._paths = paths;
+        const samePaths = JSON.stringify(paths) === JSON.stringify(this._paths);
+        this._paths = [...paths];
+        if (!samePaths) {
+            this._selectionInfo = null;
+            this._palette = null;
+            this._palettePending = null;
+        }
+        const token = ++this._viewToken;
         this._mode = ['convert', 'tools', 'actions'].includes(mode) ? mode : 'convert';
         this._pending = null;
         if (!this._wheel) {
+            this._destroyClosing();
             const [x, y] = global.get_pointer();
             const monitor = Main.layoutManager.monitors.find(m =>
                 x >= m.x && x < m.x + m.width && y >= m.y && y < m.y + m.height)
                 ?? Main.layoutManager.primaryMonitor;
             this._origin = [Math.max(monitor.x, Math.min(x - SIZE / 2, monitor.x + monitor.width - SIZE)),
-                Math.max(monitor.y + 32, Math.min(y - SIZE / 2, monitor.y + monitor.height - SIZE))];
-            this._wheel = new St.Widget({layout_manager: new Clutter.FixedLayout(), width: SIZE, height: SIZE,
-                x: this._origin[0], y: this._origin[1], reactive: true, can_focus: true});
+                Math.max(monitor.y + 32, Math.min(y - SIZE / 2, monitor.y + monitor.height - SIZE - 24))];
+            this._view = new WheelView({animations: () => this._settings.get_boolean('animations'),
+                activate: (px, py) => {
+                    if (this._drag) return;
+                    this._highlight(px, py);
+                    const item = this._items[this._selected];
+                    if (item) this._apply(item);
+                },
+                pick: () => {
+                    const empty = !this._paths.length;
+                    this.Hide();
+                    if (empty) this._launch(['--pick']);
+                }});
+            this._wheel = this._view.actor;
+            this._wheel.set_position(...this._origin);
             Main.layoutManager.addTopChrome(this._wheel);
             for (const key of ['Escape', 'Left', 'Right', 'Return']) {
                 const action = global.display.grab_accelerator(key, Meta.KeyBindingFlags.NONE);
@@ -221,90 +289,41 @@ export default class Citrica extends Extension {
                 }
             }
             this._counts.opened++;
+            this._view.open();
         }
-        this._render([]);
+        this._view.setInfo(this._selectionInfo || (paths.length ? {count: paths.length, icon: 'text-x-generic'} : null),
+            paths.length > 0 && !this._selectionInfo);
+        this._render([], 0, paths.length > 0);
         this._ensurePoll();
         if (!paths.length) return;
-        const seq = JSON.stringify([paths, this._mode]);
-        this._query = seq;
+        const key = JSON.stringify(paths);
+        if (this._palette?.key === key) { this._showPalette(this._palette); return; }
+        if (this._palettePending === key) return;
         this._request({op: 'capabilities', paths, mode: this._mode}, result => {
-            if (!this._wheel || this._query !== seq) return;
+            if (!this._wheel || this._viewToken !== token) return;
             if (result.error) { Main.notifyError('Cítrica', result.error); this.Hide(); return; }
-            if (!result.items?.length) {
-                Main.notify('Cítrica', 'Nenhuma operação disponível para esta seleção. Verifique formatos e dependências.');
-                this.Hide();
-                return;
-            }
-            this._render(result.items);
+            this._showPalette(result);
         });
     }
 
-    _render(items, page = 0) {
+    _render(items, page = 0, loading = false) {
         this._allItems = items;
         const pages = Math.ceil(items.length / 7);
-        const shown = pages > 1 ? [...items.slice(page * 7, page * 7 + 7),
+        this._items = pages > 1 ? [...items.slice(page * 7, page * 7 + 7),
             {id: String((page + 1) % pages), label: `Mais · ${page + 1}/${pages}`, kind: 'page'}] : items;
-        this._items = shown;
         this._selected = -1;
         this._keyboardPointer = null;
-        this._buttons = [];
-        this._wheel.destroy_all_children();
-        const disk = new St.Widget({width: 326, height: 326, x: 27, y: 27,
-            style: 'background-color:rgba(25,28,31,0.96);border-radius:163px;border:1px solid rgba(255,255,255,0.18);'});
-        this._wheel.add_child(disk);
-        const center = new St.Button({width: 100, height: 100, x: 140, y: 140, reactive: true,
-            style: 'background-color:#ee753c;border-radius:50px;color:white;font-weight:bold;font-size:14px;'});
-        const names = {convert: 'CONVERTER', tools: 'FERRAMENTAS', actions: 'AÇÕES'};
-        center.set_child(new St.Label({text: this._paths.length ? `${names[this._mode]}\n${this._paths.length} arquivo(s)` :
-            'ARRASTE\nUM ARQUIVO', style: 'text-align:center;font-size:11px;'}));
-        center.connect('clicked', () => {
-            if (!this._paths.length) this._launch(['--pick']);
-            else this.Hide();
-        });
-        this._wheel.add_child(center);
-        for (let i = 0; i < shown.length; i++) {
-            const item = shown[i], angle = -Math.PI / 2 + i * 2 * Math.PI / shown.length;
-            const button = new St.Button({width: 88, height: 46, can_focus: true, reactive: true,
-                x: SIZE / 2 + R * Math.cos(angle) - 44, y: SIZE / 2 + R * Math.sin(angle) - 23,
-                style: this._buttonStyle(false)});
-            button.set_child(new St.Label({text: item.label, style: 'text-align:center;font-size:11px;'}));
-            button.connect('clicked', () => this._apply(item));
-            this._wheel.add_child(button);
-            this._buttons.push(button);
-        }
-        const triggerName = this._settings.get_string('drag-key') === 'super' ? 'Super' : 'Shift';
-        const hint = new St.Label({text: this._paths.length && !items.length ? 'Carregando…' :
-            `${triggerName}: converter  ·  Alt: ferramentas  ·  Ctrl: ações`,
-        style: 'color:#eee;font-size:10px;background-color:rgba(25,28,31,0.95);border-radius:10px;padding:7px;'});
-        hint.set_position(25, SIZE - 5);
-        this._wheel.add_child(hint);
-        if (!items.length && this._paths.length) this._wheel.opacity = 0;
-        else this._wheel.opacity = 255;
-        if ((items.length || !this._paths.length) && this._settings.get_boolean('animations')) {
-            this._wheel.set_pivot_point(0.5, 0.5);
-            this._wheel.scale_x = this._wheel.scale_y = 0.7;
-            this._wheel.opacity = 0;
-            this._wheel.ease({scale_x: 1, scale_y: 1, opacity: 255, duration: 180,
-                mode: Clutter.AnimationMode.EASE_OUT_BACK});
-        }
-    }
-
-    _buttonStyle(active) {
-        return `background-color:${active ? '#ee753c' : '#363c40'};color:white;border-radius:23px;` +
-            `border:1px solid ${active ? '#ffc198' : '#555b60'};padding:3px;`;
+        this._view.render(this._items, {hasFiles: !!this._paths.length, loading});
     }
 
     _highlight(x, y) {
         if (!this._wheel || !this._items?.length) return;
         if (this._keyboardPointer?.[0] === x && this._keyboardPointer?.[1] === y) return;
         this._keyboardPointer = null;
-        const dx = x - this._origin[0] - SIZE / 2, dy = y - this._origin[1] - SIZE / 2;
-        const radius = Math.hypot(dx, dy), n = Math.min(10, this._items.length);
-        const angle = (Math.atan2(dy, dx) + Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI);
-        const selected = radius > 76 && radius < 190 ? Math.round(angle / (2 * Math.PI) * n) % n : -1;
+        const selected = pickSector(x - this._origin[0], y - this._origin[1], this._items.length);
         if (selected === this._selected) return;
         this._selected = selected;
-        this._buttons.forEach((b, i) => b.set_style(this._buttonStyle(i === selected)));
+        this._view.select(selected);
     }
 
     _drop() {
@@ -354,26 +373,56 @@ export default class Citrica extends Extension {
     }
 
     Hide() {
-        this._query = null;
+        // Reset synchronously before the closing animation or any subprocess
+        // finishes. A new opening never inherits a previous file or reply.
+        this._viewToken++;
+        this._seq++;
+        this._paths = [];
+        this._items = [];
+        this._allItems = [];
+        this._selectionInfo = null;
+        this._palette = null;
+        this._palettePending = null;
+        this._pending = null;
+        this._drag = false;
+        this._lastMode = null;
+        this._keyboardPointer = null;
+        this._dropHandled = true;
+        this._selected = -1;
         for (const action of this._wheelKeys.keys()) global.display.ungrab_accelerator(action);
         this._wheelKeys.clear();
-        this._wheel?.destroy();
+        const view = this._view;
+        this._view = null;
         this._wheel = null;
-        this._selected = -1;
+        if (view) {
+            this._closingViews.add(view);
+            view.close(() => {
+                if (this._closingViews.delete(view)) view.destroy();
+            });
+        }
+    }
+
+    _destroyClosing() {
+        for (const view of this._closingViews) view.destroy();
+        this._closingViews.clear();
     }
 
     Status() {
-        return JSON.stringify({version: 2, revision: 3, visible: !!this._wheel, dragging: this._drag,
+        return JSON.stringify({version: 3, revision: 1, appearance: 'annular-sectors',
+            visible: !!this._wheel, dragging: this._drag, closing: this._closingViews.size,
             animation: this._wheel ? {opacity: this._wheel.opacity, scale: this._wheel.scale_x} : null,
+            motion: this._view?.motionState() ?? null, cachedSelection: !!this._palette,
             paths: this._paths, mode: this._mode, origin: this._origin, selected: this._selected,
-            items: this._items, busy: this._busy, counts: this._counts,
+            items: this._items, selection: this._selectionInfo, busy: this._busy, counts: this._counts,
             shortcut: this._settings.get_strv('toggle-wheel'), dragKey: this._settings.get_string('drag-key')});
     }
 
     ReloadSettings() { this._binding(); }
 
     disable() {
+        this._enabled = false;
         this.Hide();
+        this._destroyClosing();
         if (this._poll) GLib.source_remove(this._poll);
         this._poll = 0;
         global.stage.disconnect(this._keyId);

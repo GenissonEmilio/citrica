@@ -1,20 +1,22 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.2.0">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.3.0">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
-O Cítrica 0.2 usa uma extensão do GNOME Shell para mostrar uma roda animada perto do ponteiro durante o arraste de arquivos. Não abre a janela grande de conversão da versão anterior. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
+O Cítrica 0.3 usa uma extensão do GNOME Shell para mostrar uma roda animada perto do ponteiro durante o arraste de arquivos. Não abre a janela grande de conversão da versão anterior. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
+
+**Nesta versão:** a roda reabre vazia após converter ou cancelar, e usa setores claros com miniatura, destaque laranja e animações de abertura/seleção/fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
 Implementação independente inspirada no fluxo do [Tangerine](https://www.tangerineformac.com/), com código e identidade próprios. Não é afiliada ao produto comercial e não oferece todas as suas combinações de formatos.
 
 ## Fedora / GNOME 50 / Wayland
 
-Baixe o RPM da [release v0.2.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.2.0):
+Baixe o RPM da [release v0.3.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.3.0):
 
 ~~~bash
-sudo dnf install ./citrica-0.2.0-1.x86_64.rpm
+sudo dnf install ./citrica-0.3.0-1.x86_64.rpm
 citrica --install-gnome
 ~~~
 
@@ -37,9 +39,9 @@ A integração global desta versão suporta **GNOME Shell 50**. A CLI funciona e
 
 ~~~bash
 # DEB, para sistemas compatíveis com as bibliotecas indicadas acima
-sudo apt install ./citrica_0.2.0_amd64.deb
+sudo apt install ./citrica_0.3.0_amd64.deb
 # Portátil, sem precisar instalar Python
- tar -xzf citrica-0.2.0-linux-x86_64.tar.gz
+ tar -xzf citrica-0.3.0-linux-x86_64.tar.gz
  ./citrica/install.sh
 ~~~
 

@@ -9,6 +9,7 @@ from run_flow import ENV, STATE, call, point_at, status, step, wait_for
 
 
 def main():
+    before = status()['counts'].copy()
     folder = STATE / 'files'
     folder.mkdir(exist_ok=True)
     for output in folder.glob('sample*.jpg'):
@@ -42,10 +43,11 @@ def main():
         step('Key', 65505, 'false')
         call('Test', 'Screenshot', str(STATE / 'nautilus-wheel.png'))
         step('Button', 'false')
-        wait_for(lambda s: not s['visible'] and not s['busy'] and s['counts']['converted'] == 1)
+        wait_for(lambda s: not s['visible'] and not s['busy'] and
+                 s['counts']['converted'] == before['converted'] + 1)
         outputs = list(folder.glob('sample*.jpg'))
         assert len(outputs) == 1 and Image.open(outputs[0]).size == (320, 200)
-        assert not status()['counts']['errors']
+        assert status()['counts']['errors'] == before['errors']
         assert (folder / 'sample.png').is_file()
         call('Test', 'Screenshot', str(STATE / 'nautilus-result.png'))
         # Copy is owned by Shell, so Wayland does not require a hidden Qt client

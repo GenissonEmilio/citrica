@@ -1,14 +1,13 @@
-O **Cítrica 0.2.0** corrige o fluxo da prévia anterior: arraste um arquivo no desktop, toque **Shift** e solte no formato da **roda nativa animada**, sem abrir a janela grande de conversão.
+O **Cítrica 0.3.0** corrige a seleção que permanecia depois de converter e refaz a aparência da roda a partir do vídeo oficial do Tangerine.
 
-- Integração **GNOME Shell 50 / Wayland**: Shift para converter, Alt para ferramentas, Ctrl para ações; Esc para cancelar, setas/Enter para navegar.
-- Atalho padrão **Super+Shift+C**, configuração de atalho/modificador/animação e verificação de conflitos.
-- Diálogos específicos para recorte visual, ajustes, anotações, fundos, ocultação, metadados e ferramentas de PDF/áudio/vídeo.
-- Tamanho alvo para imagem, PDF, áudio e vídeo; detecção local de rostos/texto e leitura de QR. Modelos locais incluídos nos pacotes.
-- Originais preservados nas conversões/ferramentas; publicação atômica, sem sobrescrita.
-- RPM, DEB, portátil x86_64 e SHA256SUMS. glibc >= 2.39; Python/Qt/imagem/PDF incluídos. FFmpeg e LibreOffice são dependências opcionais do sistema.
+- A roda reabre **vazia** pelo atalho: sem arquivo anterior, miniatura, formato destacado ou cache do arraste. Fechamento, Escape, erro e respostas atrasadas também limpam a seleção.
+- Novo **anel de setores creme/pêssego**, com cantos arredondados, centro transparente, miniatura proporcional e cápsula de tamanho/ação. O setor sob o ponteiro fica laranja.
+- Abertura de 240 ms, expansão elástica dos setores, hover animado, troca com desvanecimento e fechamento de 130 ms. As capacidades são antecipadas durante o arraste.
+- **Shift** para formatos, **Alt** para ferramentas, **Ctrl** para ações; **Super+Shift+C** abre a roda. Configurações indicam quando o GNOME ainda executa uma revisão anterior.
+- Mantém as conversões locais e as ferramentas de imagem, PDF, áudio/vídeo. Originais preservados; publicação sem sobrescrita.
 
-**Fedora / GNOME 50:** instale o RPM e execute `citrica --install-gnome`. Saia e entre na sessão para o Shell carregar a extensão. O aplicativo do menu abre as configurações. O portátil tem `install.sh` para instalação no usuário.
+**Fedora / GNOME 50 / Wayland:** instale o RPM e execute `citrica --install-gnome`. O portátil inclui `install.sh`. Após atualizar, **saia e entre novamente na sessão do GNOME** para carregar o código novo da extensão. Fechar a janela de configurações não recarrega o Shell.
 
-**Validação:** suíte de conversões e interface, teste do executável empacotado e teste real em compositor GNOME 50/Wayland isolado no Fedora. Detalhes reproduzíveis, imagens e limites em [docs/VALIDACAO.md](https://github.com/GenissonEmilio/citrica/blob/main/docs/VALIDACAO.md).
+**Validação:** 88 testes do motor/interface; percursos nativos em GNOME 50/Wayland isolado no Fedora, incluindo regressões de reabertura, Nautilus, atalhos, ferramentas e gravação real da animação. A validação do executável empacotado e as evidências estão em [docs/VALIDACAO.md](https://github.com/GenissonEmilio/citrica/blob/main/docs/VALIDACAO.md). Veja a [captura nativa](https://github.com/GenissonEmilio/citrica/raw/refs/heads/main/docs/wheel-native.mp4).
 
-**Limites:** prévia para GNOME 50; não há roda global KDE/GNOME antigo. Não é paridade completa com os 275 formatos do Tangerine. Compartilhar exige LocalSend e envio confirmado nele; AirDrop não está implementado. Detecção automática pode omitir regiões e requer revisão. SVG/RAR/Pages/EPUB, PDF→Office e imagens animadas/multipágina continuam fora do escopo. Licença AGPL-3.0-or-later.
+RPM, DEB e portátil x86_64; glibc >= 2.39. FFmpeg e LibreOffice são dependências opcionais do sistema. Prévia específica para GNOME 50, sem roda global KDE/GNOME antigo. Compartilhamento exige LocalSend; AirDrop e paridade completa com todos os formatos/algoritmos comerciais não são oferecidos. Licença AGPL-3.0-or-later.

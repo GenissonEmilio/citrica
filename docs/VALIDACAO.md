@@ -1,6 +1,6 @@
-# Validação da versão 0.2.0
+# Validação da versão 0.3.0
 
-Ambiente desktop: Fedora 44, GNOME Shell 50.5, Mutter 50.6, Wayland, x86_64. Validação realizada em 24/10/2026 (horário de Fortaleza). O teste usa outro compositor GNOME real com monitor virtual, barramento DBus e configurações isolados. Não é uma simulação web e não injeta eventos na sessão de trabalho do usuário.
+Ambiente desktop: Fedora 44, GNOME Shell 50.5, Mutter 50.6, Wayland, x86_64. Validação realizada em 25/10/2026 (horário de Fortaleza). O teste usa outro compositor GNOME real com monitor virtual, barramento DBus e configurações isolados. Não é uma simulação web e não injeta eventos na sessão de trabalho do usuário.
 
 ## Percurso do desktop
 
@@ -10,7 +10,7 @@ Ambiente desktop: Fedora 44, GNOME Shell 50.5, Mutter 50.6, Wayland, x86_64. Val
 - Shift global abre os formatos; soltar Shift mantém a roda aberta.
 - Movimento seleciona o setor JPG; soltar o mouse publica uma imagem JPG real, sem erro.
 - Super+Shift+C abre a roda sem arraste; Escape fecha mesmo com foco em outro aplicativo.
-- Opacidade/escala reais variam durante a abertura de 180 ms e chegam ao estado final.
+- Opacidade/escala reais variam durante a abertura de 240 ms e chegam ao estado final.
 - Alt abre ferramentas durante um novo arraste; Ctrl troca para ações.
 - Soltar em Copiar caminho altera o clipboard do compositor de teste para o caminho exato.
 - Mais troca a página de ferramentas; Recortar abre somente o diálogo específico.
@@ -40,7 +40,7 @@ python tests/desktop/run_session.py tests/desktop/run_settings.py
 
 ## Motor e diálogos
 
-A suíte pytest concluiu **85 testes**, sem falhas (um aviso de depreciação da API de evento Qt usada no teste legado). Exercita conversões reais, preservação dos originais, colisões concorrentes, arquivos inseguros recusados, cancelamento, documentos Office, PDF multipágina, mídia, arraste Qt e recorte visual até o arquivo salvo. A prévia HEIC e a orientação EXIF também são verificadas. Mover é testado com um destino que já contém um arquivo de mesmo nome; ambos os conteúdos são preservados, e Esc durante o trabalho solicita cancelamento sem destruir a thread ativa.
+A suíte pytest concluiu **88 testes**, sem falhas (um aviso de depreciação da API de evento Qt usada no teste legado). Exercita conversões reais, preservação dos originais, colisões concorrentes, arquivos inseguros recusados, cancelamento, documentos Office, PDF multipágina, mídia, arraste Qt e recorte visual até o arquivo salvo. A prévia HEIC e a orientação EXIF também são verificadas. Mover é testado com um destino que já contém um arquivo de mesmo nome; ambos os conteúdos são preservados, e Esc durante o trabalho solicita cancelamento sem destruir a thread ativa.
 
 Todas as 26 entradas do catálogo de ferramentas têm execução real coberta nos testes de motor. Os testes conferem dimensões, páginas, duração/canais, pixels, metadados ou limites de bytes conforme a operação. Há casos positivos com imagem NASA para rosto, texto gerado localmente para Tesseract e QR gerado nos testes. Não se usa apenas uma lista simulada de capacidades.
 
@@ -64,22 +64,24 @@ No CI Ubuntu 24.04, `packaging/build.py` testa o executável congelado por subpr
 
 O teste automatizado cobre o fluxo e os motores com fixtures controlados. Não representa teste de todos os documentos, todos os codecs, todas as configurações de hardware ou todas as combinações de aplicativos. O estado da extensão na sessão do usuário é consultado separadamente; atualizações de código entram em vigor no próximo login do GNOME.
 
-## Portátil da release no Fedora
+## Regressões e visual da 0.3.0
 
-O TAR.GZ produzido pelo CI [40155427130](https://github.com/GenissonEmilio/citrica/actions/runs/40155427130), commit 03e63d6, foi baixado e conferido com SHA256SUMS. Esse executável foi testado no Fedora, sem usar os imports do código-fonte para processar os arquivos:
+`run_regressions.py` converte duas vezes, tenta uma imagem inválida, cancela com Escape e reabre pelo atalho depois de cada caso. Confere caminhos vazios, ausência de opções/miniatura/destaque e cache descartado. Um wrapper de teste atrasa o motor real: respostas que chegam depois de fechar, substituir por roda vazia ou terminar o arraste não podem restaurar a seleção anterior.
 
-- JPG, HEIC, AVIF, PDF e renderização multipágina.
-- Rostos/texto e fundo; FFmpeg/ffprobe e LibreOffice externos.
-- Os quatro percursos do compositor: roda, Nautilus, ações e configurações, passando CITRICA_TEST_EXECUTABLE aos scripts atuais do repositório.
-- Configuração de Super+F8 pela janela real do portátil e invocação global do atalho salvo.
+`run_visual.py` grava a saída do compositor de teste pelo gravador nativo do GNOME e observa estados em eventos de pintura do stage. Confere vários quadros intermediários de escala/opacidade durante a abertura e o estado final. A gravação não é uma maquete nem uma sequência de imagens geradas. As durações configuradas são 240 ms na abertura, 230 ms nos setores com defasagem de 8 ms, 140 ms no hover e 130 ms ao fechar. Isso não promete uma taxa fixa de quadros em todo hardware.
+
+[Gravação nativa da roda](wheel-native.mp4) · [Comparação com a referência](ANALISE.md)
+
+Para executar todos os percursos no mesmo compositor isolado:
 
 ~~~bash
-CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py
-CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_nautilus.py
-CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_actions.py
-CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_settings.py
+python tests/desktop/run_session.py tests/desktop/run_all.py
+# Para testar um pacote, mantendo as entradas e a extensão de teste isoladas:
+CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_all.py
 ~~~
 
-Resultados estruturados em [validation.json](validation.json). O harness usa identificadores estáveis de janela para não perder o foco quando o título do terminal muda durante a inicialização.
+A prévia recebe testes de orientação EXIF, proporção, limite de 128 px, reutilização/invalidação do cache, original intacto e seleção vazia/múltipla sem miniatura antiga. Uma falha de prévia não remove os formatos válidos.
 
-O portátil foi instalado no usuário, com o comando citrica, aplicativo no menu e atalho Super+Shift+C. A sessão principal ainda mantém o módulo anterior carregado pelo Looking Glass; a revisão 3 instalada entra em vigor no próximo login do GNOME. A validação do módulo novo foi feita no compositor isolado, sem encerrar a sessão de trabalho do usuário.
+## Portátil da release no Fedora
+
+Os resultados do pacote 0.3.0, hash e estado da instalação são registrados em [validation.json](validation.json), depois da execução dos mesmos percursos com o executável congelado. A revisão nativa exigida é versão 3, revisão 1. Se a sessão do usuário ainda carrega outra revisão, as configurações mostram a atualização pendente; o código novo entra em vigor no próximo login do GNOME.

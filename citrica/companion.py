@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPlainTextEdit, QPushButton, QVBoxLayout,
 )
 
-from citrica.desktop import desktop_call, extension_dir, extension_status, install_gnome
+from citrica.desktop import SHELL_REVISION, SHELL_VERSION, desktop_call, extension_dir, extension_status, install_gnome
 from citrica.gui import ICON, STYLE
 from citrica.runtime import external_environment
 from citrica.tools import TOOLS, execute
@@ -200,9 +200,10 @@ class Settings(QDialog):
 
     def refresh(self):
         state = extension_status()
-        active = state.get('version') == 2
-        if active and state.get('revision') != 3:
-            self.status.setText('● Roda ativa · há uma atualização instalada. Entre novamente no GNOME para carregá-la.')
+        active = state.get('version') == SHELL_VERSION and state.get('revision') == SHELL_REVISION
+        if state.get('version') and not active:
+            self.status.setText('● Atualização instalada · o GNOME ainda executa a revisão anterior. '
+                                'Saia e entre na sessão para carregar a roda nova.')
         else:
             self.status.setText('● Integração ativa · roda disponível no desktop' if active else
                                 '○ Integração ainda não carregada nesta sessão. Instale e entre novamente no GNOME.')

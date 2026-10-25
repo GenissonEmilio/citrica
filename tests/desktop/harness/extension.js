@@ -14,6 +14,10 @@ const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Test">
  <method name="Windows"><arg type="s" direction="out"/></method>
  <method name="State"><arg type="s" direction="out"/></method>
  <method name="Clipboard"><arg type="s" direction="out"/></method>
+ <method name="ObserveMotion"/>
+ <method name="Motion"><arg type="s" direction="out"/></method>
+ <method name="StartRecording"><arg type="s" direction="in"/><arg type="s" direction="out"/></method>
+ <method name="StopRecording"><arg type="b" direction="out"/></method>
  <method name="Prepare"/>
  <method name="PlaceWindow"><arg type="s" direction="in"/><arg type="i" direction="in"/><arg type="i" direction="in"/></method>
  <method name="Quit"/>
@@ -54,6 +58,45 @@ export default class Harness extends Extension {
             w.move_frame(false, x, y); Main.activateWindow(w);
         }
     }
+    ObserveMotion() {
+        if (this._paint) global.stage.disconnect(this._paint);
+        this._frames = [];
+        const start = GLib.get_monotonic_time();
+        this._paint = global.stage.connect('after-paint', () => {
+            if (this._frames.length >= 600) return;
+            const extension = Main.extensionManager.lookup('citrica@genissonemilio.github.io')?.stateObj;
+            if (!extension) return;
+            const state = JSON.parse(extension.Status());
+            this._frames.push({ms: (GLib.get_monotonic_time() - start) / 1000,
+                animation: state.animation, selected: state.selected, motion: state.motion,
+                closing: state.closing});
+        });
+    }
+    Motion() {
+        if (this._paint) global.stage.disconnect(this._paint);
+        this._paint = 0;
+        return JSON.stringify(this._frames ?? []);
+    }
+    StartRecordingAsync([path], invocation) {
+        Gio.DBus.session.call('org.gnome.Shell.Screencast', '/org/gnome/Shell/Screencast',
+            'org.gnome.Shell.Screencast', 'Screencast', new GLib.Variant('(sa{sv})',
+                [path, {'framerate': new GLib.Variant('i', 60), 'draw-cursor': new GLib.Variant('b', true)}]),
+            new GLib.VariantType('(bs)'), Gio.DBusCallFlags.NONE, 15000, null, (c, r) => {
+                try {
+                    const [ok, file] = c.call_finish(r).deep_unpack();
+                    if (!ok) throw new Error('Native recorder did not start');
+                    invocation.return_value(new GLib.Variant('(s)', [file]));
+                } catch (e) { invocation.return_dbus_error('io.github.GenissonEmilio.Citrica.Test.Error', e.message); }
+            });
+    }
+    StopRecordingAsync(_args, invocation) {
+        Gio.DBus.session.call('org.gnome.Shell.Screencast', '/org/gnome/Shell/Screencast',
+            'org.gnome.Shell.Screencast', 'StopScreencast', null, new GLib.VariantType('(b)'),
+            Gio.DBusCallFlags.NONE, 15000, null, (c, r) => {
+                try { invocation.return_value(c.call_finish(r)); }
+                catch (e) { invocation.return_dbus_error('io.github.GenissonEmilio.Citrica.Test.Error', e.message); }
+            });
+    }
     ScreenshotAsync([path], invocation) {
         const out = Gio.File.new_for_path(path).replace(null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
         const shot = new Shell.Screenshot();
@@ -63,5 +106,8 @@ export default class Harness extends Extension {
         });
     }
     Quit() { GLib.idle_add(GLib.PRIORITY_DEFAULT, () => { global.context.terminate(); return GLib.SOURCE_REMOVE; }); }
-    disable() { this.dbus.unexport(); Gio.bus_unown_name(this.bus); this.pointer = this.keyboard = null; }
+    disable() {
+        if (this._paint) global.stage.disconnect(this._paint);
+        this.dbus.unexport(); Gio.bus_unown_name(this.bus); this.pointer = this.keyboard = null;
+    }
 }

@@ -1,8 +1,8 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "environment": "Fedora 44 / GNOME Shell 50.5 / Mutter 50.6 / Wayland x86_64",
-  "date": "2026-10-24 America/Fortaleza",
-  "pytest_passed": 85,
+  "date": "2026-10-25 America/Fortaleza",
+  "pytest_passed": 88,
   "native": {
     "shift_drag": true,
     "drop_converts": true,
@@ -18,7 +18,8 @@
     "super_drag_setting": true,
     "keyboard_navigation": true,
     "custom_shortcut": true,
-    "disable_animation": true
+    "disable_animation": true,
+    "reopen_after_conversion_empty": true
   },
   "nautilus": {
     "nautilus_shift_drag": true,
@@ -34,51 +35,27 @@
     "terminal_cwd": true,
     "shelf_drag": true
   },
-  "sharing": "LocalSend unavailable; transfer between machines not tested",
   "settings_ui": {
     "settings_save": true,
     "saved_shortcut_invoked": true
   },
-  "packaged_fedora": {
-    "application_commit": "03e63d6",
-    "portable_sha256": "01fa1644da51c2bab24c6f8a75f0a59caf0b90a49c7ab7f689130706da2e5247",
-    "core_smoke": true,
-    "desktop": {
-      "shift_drag": true,
-      "drop_converts": true,
-      "shortcut": true,
-      "escape": true,
-      "animation": true,
-      "alt_tools": true,
-      "ctrl_actions": true,
-      "copy_path": true,
-      "pagination": true,
-      "tool_dialog": true,
-      "cancel_drag": true,
-      "super_drag_setting": true,
-      "keyboard_navigation": true,
-      "custom_shortcut": true,
-      "disable_animation": true
-    },
-    "nautilus": {
-      "nautilus_shift_drag": true,
-      "drop_converts": true,
-      "original_preserved": true,
-      "output_dimensions": [
-        320,
-        200
-      ],
-      "copy_paste_file": true
-    },
-    "actions": {
-      "terminal_cwd": true,
-      "shelf_drag": true
-    },
-    "settings_ui": {
-      "settings_save": true,
-      "saved_shortcut_invoked": true
-    },
-    "installed_user_version": "0.2.0",
-    "user_session": "Previous extension module still loaded; a new GNOME login is required for revision 3"
-  }
+  "regressions": {
+    "repeat_conversion_empty": true,
+    "failed_conversion_empty": true,
+    "escape_empty": true,
+    "late_reply_after_hide_ignored": true,
+    "late_reply_after_replace_ignored": true,
+    "late_drag_palette_ignored": true,
+    "shortcut_has_no_preview": true
+  },
+  "motion": {
+    "actual_paint_frames": 70,
+    "intermediate_opening_frames": 11,
+    "opening_ms": 240,
+    "sector_stagger_ms": 8,
+    "hover_ms": 140,
+    "closing_ms": 130,
+    "intermediate_states_observed": true
+  },
+  "sharing": "LocalSend unavailable; transfer between machines not tested"
 }
