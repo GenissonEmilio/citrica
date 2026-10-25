@@ -198,7 +198,17 @@ def test_office_real_roundtrip(tmp_path):
 
 
 @pytest.mark.skipif(not shutil.which("ffmpeg"), reason="FFmpeg not installed")
-def test_media_cannot_follow_remote_playlist(tmp_path):
+def test_media_cannot_follow_remote_playlist(tmp_path, monkeypatch):
+    import citrica.core as core
+    real_run = core.run_process
+
+    def force_hls_demuxer(args, cancel, timeout=1800):
+        # Newer FFmpeg rejects disguised playlists even before checking protocols.
+        # Force its playlist reader so this test specifically verifies our whitelist.
+        index = args.index("-i")
+        return real_run(args[:index] + ["-f", "hls"] + args[index:], cancel, timeout)
+
+    monkeypatch.setattr(core, "run_process", force_hls_demuxer)
     source = tmp_path / "disguised.mp4"
     source.write_text("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:1\n"
                       "#EXTINF:1,\nhttp://127.0.0.1:9/segment.ts\n#EXT-X-ENDLIST\n")
