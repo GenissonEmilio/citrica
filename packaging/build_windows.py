@@ -86,7 +86,8 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
                           'packaged_engine_smoke': True, 'interactive_explorer': 'pending external tester'}
     (OUT / 'citrica-windows-validation.json').write_text(json.dumps(data, ensure_ascii=False, indent=2),
                                                           encoding='utf-8')
-    run(payload / 'Citrica.exe', '--settings', '--screenshot', str(OUT / 'citrica-windows-preview.png'))
+    run(payload / 'Citrica.exe', '--settings', '--screenshot', str(OUT / 'citrica-windows-preview.png'),
+        env=dict(os.environ, QT_QPA_PLATFORM='windows'))
     shutil.make_archive(str(OUT / f'citrica-{__version__}-windows-x86_64-portable'), 'zip',
                         root_dir=ROOT / 'dist', base_dir='Citrica')
     compiler = shutil.which('ISCC.exe')

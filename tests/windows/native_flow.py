@@ -105,7 +105,7 @@ def main():
             hwnd = user.FindWindowW(None, 'Citrica · arquivo de teste')
             pause(.1)
         assert hwnd
-        user.SetWindowPos(hwnd, None, 80, 140, 390, 280, 0x40)
+        user.SetWindowPos(hwnd, None, 60, 60, 620, 560, 0x40)
         pause(.3)
         QCursor.setPos(QPoint(240, 260))
         pause()
@@ -121,11 +121,12 @@ def main():
         wheel = wait(lambda s: any(i['id'] == 'jpg' for i in s['items']))
         index = next(i for i, item in enumerate(wheel['items']) if item['id'] == 'jpg')
         angle = -math.pi / 2 + index * math.tau / len(wheel['items'])
-        # On this test position the wheel is centred at the activation point.
-        target = QPoint(int(310+122*math.cos(angle)), int(260+122*math.sin(angle)))
+        x, y = wheel['origin']
+        target = QPoint(int(x+190+122*math.cos(angle)), int(y+190+122*math.sin(angle)))
         QCursor.setPos(target)
         pause(.3)
-        app.primaryScreen().grabWindow(0).save(str(ROOT / 'release/citrica-windows-wheel.png'))
+        app.primaryScreen().grabWindow(0, x-12, y-12, 404, 440).save(
+            str(ROOT / 'release/citrica-windows-wheel.png'))
         key(0x10, False)
         pause(.1)
         button(False)

@@ -207,6 +207,7 @@ class Desktop(QObject):
 
     def status(self):
         return {'platform': 'windows', 'version': __version__, 'visible': self.active,
+                'origin': [self.wheel.x(), self.wheel.y()],
                 'paths': [str(p) for p in self.paths], 'items': self.wheel.items,
                 'selection': self.wheel.info, 'selected': self.wheel.selected,
                 'cachedSelection': self.palette is not None, 'dragging': self.dragging,

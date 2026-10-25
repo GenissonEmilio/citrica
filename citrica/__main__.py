@@ -10,6 +10,10 @@ from citrica import __version__
 
 
 def main():
+    if sys.platform == 'win32':
+        for stream in [sys.stdout, sys.stderr]:
+            if stream is not None and hasattr(stream, 'reconfigure'):
+                stream.reconfigure(encoding='utf-8', errors='replace')
     parser = argparse.ArgumentParser(description="Cítrica — conversor de arquivos local para Linux e Windows")
     parser.add_argument("files", type=Path, nargs="*")
     parser.add_argument("--version", action="version", version=f"Cítrica {__version__}")
@@ -33,10 +37,6 @@ def main():
     parser.add_argument("--background", action="store_true", help="Windows: inicia somente na bandeja")
     parser.add_argument("--quit", action="store_true", help="Windows: encerra a instância na bandeja")
     args = parser.parse_args()
-    if sys.platform == 'win32':
-        for stream in [sys.stdout, sys.stderr]:
-            if stream is not None and hasattr(stream, 'reconfigure'):
-                stream.reconfigure(encoding='utf-8', errors='replace')
     if args.desktop_request:
         from citrica.desktop import request
         try:

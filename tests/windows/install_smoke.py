@@ -27,7 +27,7 @@ def main():
     assert sendto.is_file(), 'Enviar para shortcut was not installed'
     (ROOT / 'release').mkdir(exist_ok=True)
     run(gui, '--settings', '--screenshot', ROOT / 'release/citrica-windows-installed-preview.png',
-        env=dict(os.environ, QT_QPA_PLATFORM='offscreen'))
+        env=dict(os.environ, QT_QPA_PLATFORM='windows'))
     # Simulate enabling startup through preferences after installation, then
     # check that uninstall removes that user-owned entry as well.
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Run') as key:

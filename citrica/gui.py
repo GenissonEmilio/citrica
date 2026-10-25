@@ -72,6 +72,8 @@ QProgressBar { border: none; border-radius: 4px; background: #e3e4dc; height: 7p
 QProgressBar::chunk { background: #90a875; border-radius: 4px; }
 QToolTip { color: #282e2a; background: #fffefa; border: 1px solid #dedfd6; padding: 5px; }
 """
+if sys.platform == 'win32':
+    STYLE = STYLE.replace("font-family: 'Noto Sans', 'DejaVu Sans';", "font-family: 'Segoe UI';")
 
 
 def label(text, name=None):
