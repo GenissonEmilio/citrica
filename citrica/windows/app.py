@@ -122,6 +122,7 @@ class Desktop(QObject):
         self.app, self.settings = app, config.load()
         self.paths, self.palette, self.mode, self.page = [], None, 'convert', 0
         self.generation, self.busy, self.active, self.dragging = 0, False, False, False
+        self.armed = False
         self.jobs, self.windows = set(), set()
         self.counts = {'converted': 0, 'errors': 0}
         self.last_message, self.hotkey_error = '', ''
@@ -206,7 +207,7 @@ class Desktop(QObject):
         return {'ok': True}
 
     def status(self):
-        return {'platform': 'windows', 'version': __version__, 'visible': self.active,
+        return {'platform': 'windows', 'version': __version__, 'visible': self.active, 'armed': self.armed,
                 'origin': [self.wheel.x(), self.wheel.y()],
                 'paths': [str(p) for p in self.paths], 'items': self.wheel.items,
                 'selection': self.wheel.info, 'selected': self.wheel.selected,
@@ -244,7 +245,7 @@ class Desktop(QObject):
         self.tray.showMessage(title, message, QSystemTrayIcon.MessageIcon.Information, 6000)
 
     def toggle(self):
-        if self.active:
+        if self.active or self.armed:
             self.hide_wheel()
         else:
             self.show_wheel([])
@@ -269,7 +270,8 @@ class Desktop(QObject):
             rect = screen.availableGeometry()
             position = QPoint(max(rect.left(), min(cursor.x()-CENTER, rect.right()-SIZE+1)),
                               max(rect.top(), min(cursor.y()-CENTER, rect.bottom()-SIZE-35)))
-            self.wheel.present(position)
+            self.wheel.present(self.wheel.pos() if self.armed else position)
+        self.armed = False
         self.active = self.native.visible = True
         if self.palette:
             self.render()
@@ -311,7 +313,22 @@ class Desktop(QObject):
 
     def drag_mode(self, mode):
         if not self.active:
-            self.show_wheel([], mode, dragging=True)
+            if self.busy or self._quitting:
+                return
+            self.mode = mode
+            if not self.armed:
+                self.generation += 1
+                self.paths, self.palette = [], None
+                self.wheel.clear()
+                cursor = QCursor.pos()
+                screen = self.app.screenAt(cursor) or self.app.primaryScreen()
+                rect = screen.availableGeometry()
+                position = QPoint(max(rect.left(), min(cursor.x()-CENTER, rect.right()-SIZE+1)),
+                                  max(rect.top(), min(cursor.y()-CENTER, rect.bottom()-SIZE-35)))
+                # Only reveal the ring once Qt receives a real local-file OLE
+                # offer. Text selection and moving windows stay invisible.
+                self.wheel.present(position, probing=True)
+                self.armed = self.dragging = self.native.visible = True
         elif mode != self.mode:
             self.mode, self.page = mode, 0
             self.render()
@@ -326,6 +343,7 @@ class Desktop(QObject):
     def hide_wheel(self):
         self.generation += 1
         self.paths, self.palette, self.dragging, self.active = [], None, False, False
+        self.armed = False
         self.page = 0
         self.native.visible = False
         self.native.reset_drag()

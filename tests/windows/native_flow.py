@@ -115,7 +115,7 @@ def main():
         pause(.3)
         assert not state()['visible']
         key(0x10, True)  # Shift observed globally while another process owns OLE.
-        wheel = wait(lambda s: s['visible'])
+        pause(.2)
         # Ensure OLE observes a mouse move over the newly exposed drop target.
         QCursor.setPos(QPoint(314, 264))
         wheel = wait(lambda s: any(i['id'] == 'jpg' for i in s['items']))

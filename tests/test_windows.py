@@ -224,3 +224,24 @@ def test_windows_ipc_rejects_invalid_request(desktop):
     with pytest.raises(ValueError):
         desktop.dispatch({'op': 'execute-arbitrary-command'})
     assert json.loads(json.dumps(desktop.dispatch({'op': 'status'})))['version']
+
+
+def test_windows_drag_probe_reveals_only_for_an_actual_file(desktop, tmp_path):
+    desktop.drag_mode('convert')
+    assert desktop.armed and not desktop.active and desktop.wheel.probing
+    assert desktop.wheel.grab().toImage().pixelColor(CENTER, 30).alpha() <= 2
+    text = QMimeData()
+    text.setText('This is a text selection, not a file')
+    enter = QDragEnterEvent(QPoint(CENTER, CENTER), Qt.DropAction.CopyAction,
+                            text, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.ShiftModifier)
+    QApplication.sendEvent(desktop.wheel, enter)
+    assert not enter.isAccepted() and not desktop.active and not desktop.armed
+    desktop.drag_mode('convert')
+    source = image_file(tmp_path)
+    files = QMimeData()
+    files.setUrls([QUrl.fromLocalFile(str(source))])
+    enter = QDragEnterEvent(QPoint(CENTER, CENTER), Qt.DropAction.CopyAction,
+                            files, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.ShiftModifier)
+    QApplication.sendEvent(desktop.wheel, enter)
+    spin_until(lambda: desktop.wheel.items)
+    assert desktop.active and not desktop.armed and not desktop.wheel.probing

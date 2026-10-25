@@ -92,6 +92,7 @@ class Wheel(QWidget):
         self.items, self.paths, self.info = [], [], None
         self.selected, self.progress, self._hover_value = -1, 1., {}
         self._closing, self._closing_frame = False, None
+        self.probing = False
         self._geometry, self._keyboard_point = [], None
         self._empty_geometry = [sector_path(i, 8) for i in range(8)]
         self._preview = QPixmap()
@@ -114,13 +115,14 @@ class Wheel(QWidget):
             self._closing_frame = None
             self._closing = False
 
-    def present(self, position):
+    def present(self, position, probing=False):
         self._motion.stop()
         self._closing, self._closing_frame = False, None
+        self.probing = probing
         self.move(position)
         self.show()
         self.raise_()
-        if self.animations():
+        if self.animations() and not probing:
             self._motion.setStartValue(0.)
             self._motion.setEndValue(1.)
             self._motion.setDuration(286)
@@ -140,6 +142,11 @@ class Wheel(QWidget):
 
     def dismiss(self):
         self._motion.stop()
+        if self.probing:
+            self.probing = False
+            self.clear()
+            self.hide()
+            return
         self._closing_frame = self.grab() if self.isVisible() and self.animations() else None
         self.clear()
         if not self.isVisible() or not self.animations():
@@ -208,6 +215,8 @@ class Wheel(QWidget):
         # One alpha unit makes the otherwise transparent centre a real OLE drop
         # target on Windows layered windows. It does not obscure the desktop.
         painter.fillRect(self.rect(), QColor(0, 0, 0, 1))
+        if self.probing:
+            return
         if self._closing_frame is not None:
             painter.setOpacity(self.progress)
             painter.drawPixmap(0, 0, self._closing_frame)
@@ -306,6 +315,8 @@ class Wheel(QWidget):
             self.filesOffered.emit(paths)
         else:
             event.ignore()
+            if self.probing:
+                self.cancelled.emit()
 
     def dragMoveEvent(self, event):
         if offered_paths(event.mimeData()) and not self._closing:
@@ -330,6 +341,9 @@ class Wheel(QWidget):
         self.select(hit_test(event.position().x(), event.position().y(), len(self.items)))
 
     def mouseReleaseEvent(self, event):
+        if self.probing:
+            self.cancelled.emit()
+            return
         if event.button() != Qt.MouseButton.LeftButton or self._closing:
             return
         p = event.position()
