@@ -55,7 +55,15 @@ python tests/desktop/run_session.py tests/desktop/run_all.py
 CITRICA_TEST_EXECUTABLE=/caminho/absoluto/citrica/citrica python tests/desktop/run_session.py tests/desktop/run_all.py
 ```
 
-No Linux a revisão da extensão permanece versão 3, revisão 1. O motor 0.4.0 mantém o mesmo protocolo da roda. KDE, Cinnamon, X11 e outras versões de GNOME não receberam validação de roda global.
+Nos pacotes Linux publicados da 0.4.0, a extensão usa a versão 3, revisão 1. O motor 0.4.0 mantém o mesmo protocolo da roda. KDE, Cinnamon, X11 e outras versões de GNOME não receberam validação de roda global.
+
+### Correção de camadas posterior à release 0.4.0
+
+Na branch `main`, a extensão passa à revisão 2: a roda fica abaixo da camada de feedback do compositor, mantendo a miniatura nativa do arquivo acima dos setores. A revisão 1 continua nos pacotes já publicados da 0.4.0.
+
+O teste `run_stacking.py` compara os pixels da miniatura durante um arraste Wayland real antes e depois de abrir a roda com Ctrl, Alt e Shift. Ele reproduziu a miniatura coberta na revisão anterior e passou após a correção, incluindo conversão por drop e reabertura vazia. O percurso do Nautilus também verifica a ordem das camadas com sua miniatura nativa. Esses testes integram `run_all.py`.
+
+Para ativar a nova revisão em uma sessão que já carregou a extensão, é necessário sair e entrar novamente no GNOME.
 
 ## Pacotes e evidências
 

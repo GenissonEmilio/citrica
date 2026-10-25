@@ -13,6 +13,7 @@ const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Test">
  <method name="Screenshot"><arg type="s" direction="in"/><arg type="b" direction="out"/></method>
  <method name="Windows"><arg type="s" direction="out"/></method>
  <method name="State"><arg type="s" direction="out"/></method>
+ <method name="DragLayers"><arg type="s" direction="out"/></method>
  <method name="Clipboard"><arg type="s" direction="out"/></method>
  <method name="ObserveMotion"/>
  <method name="Motion"><arg type="s" direction="out"/></method>
@@ -45,6 +46,20 @@ export default class Harness extends Extension {
     Prepare() { Main.welcomeDialog?.close(); Main.overview.hide(); }
     State() { return JSON.stringify({pointer:global.get_pointer(),
         focus:global.display.focus_window?.get_stable_sequence(),overview:Main.overview.visible}); }
+    DragLayers() {
+        const feedback = global.compositor.get_feedback_group();
+        const extension = Main.extensionManager.lookup('citrica@genissonemilio.github.io')?.stateObj;
+        const wheel = extension?._wheel;
+        const parent = feedback.get_parent();
+        const siblings = parent.get_children();
+        return JSON.stringify({feedbackAboveWheel: !!wheel && wheel.get_parent() === parent &&
+            siblings.indexOf(feedback) > siblings.indexOf(wheel),
+            icons: feedback.get_children().filter(a => a.is_visible()).map(a => {
+                const [x, y] = a.get_transformed_position();
+                const [width, height] = a.get_transformed_size();
+                return {x, y, width, height};
+            })});
+    }
     ClipboardAsync(_args, invocation) {
         St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_c, text) =>
             invocation.return_value(new GLib.Variant('(s)', [text ?? ''])));

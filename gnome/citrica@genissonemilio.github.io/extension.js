@@ -281,6 +281,12 @@ export default class Citrica extends Extension {
             this._wheel = this._view.actor;
             this._wheel.set_position(...this._origin);
             Main.layoutManager.addTopChrome(this._wheel);
+            // Keep the compositor's native drag thumbnail above the sectors.
+            // Lower only our actor; leave Shell's feedback layer untouched.
+            const parent = this._wheel.get_parent();
+            const feedback = global.compositor.get_feedback_group();
+            if (feedback.get_parent() === parent)
+                parent.set_child_below_sibling(this._wheel, feedback);
             for (const key of ['Escape', 'Left', 'Right', 'Return']) {
                 const action = global.display.grab_accelerator(key, Meta.KeyBindingFlags.NONE);
                 if (action) {
@@ -408,7 +414,7 @@ export default class Citrica extends Extension {
     }
 
     Status() {
-        return JSON.stringify({version: 3, revision: 1, appearance: 'annular-sectors',
+        return JSON.stringify({version: 3, revision: 2, appearance: 'annular-sectors',
             visible: !!this._wheel, dragging: this._drag, closing: this._closingViews.size,
             animation: this._wheel ? {opacity: this._wheel.opacity, scale: this._wheel.scale_x} : null,
             motion: this._view?.motionState() ?? null, cachedSelection: !!this._palette,

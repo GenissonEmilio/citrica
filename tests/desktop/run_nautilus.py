@@ -41,6 +41,8 @@ def main():
         wheel = wait_for(lambda s: s['visible'] and s.get('items'))
         point_at(wheel, 'jpg')
         step('Key', 65505, 'false')
+        layers = json.loads(call('Test', 'DragLayers')[0])
+        assert layers['feedbackAboveWheel'] and layers['icons'], layers
         call('Test', 'Screenshot', str(STATE / 'nautilus-wheel.png'))
         step('Button', 'false')
         wait_for(lambda s: not s['visible'] and not s['busy'] and
@@ -79,7 +81,7 @@ def main():
         assert (destination / 'sample.png').read_bytes() == (folder / 'sample.png').read_bytes()
         (STATE / 'nautilus-result.json').write_text(json.dumps({'nautilus_shift_drag': True,
             'drop_converts': True, 'original_preserved': True, 'output_dimensions': [320, 200],
-            'copy_paste_file': True}))
+            'copy_paste_file': True, 'native_thumbnail_above_wheel': True}))
         print('Nautilus / GNOME 50 / Wayland: arraste, Shift global, roda, drop, JPG e copiar/colar validados.')
     finally:
         call('Test', 'Key', 65505, 'false')

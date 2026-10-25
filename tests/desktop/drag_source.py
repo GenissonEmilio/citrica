@@ -2,8 +2,8 @@
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QMimeData, Qt, QUrl
-from PySide6.QtGui import QDrag
+from PySide6.QtCore import QMimeData, QPoint, Qt, QUrl
+from PySide6.QtGui import QDrag, QPixmap
 from PySide6.QtWidgets import QApplication, QLabel
 
 
@@ -19,6 +19,9 @@ class Source(QLabel):
             mime.setUrls([QUrl.fromLocalFile(str(Path(sys.argv[1]).resolve()))])
             drag = QDrag(self)
             drag.setMimeData(mime)
+            drag.setPixmap(QPixmap(str(Path(sys.argv[1]).resolve())).scaled(
+                72, 72, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            drag.setHotSpot(QPoint(8, 8))
             drag.exec(Qt.DropAction.CopyAction)
             print('drag-ended', flush=True)
 
