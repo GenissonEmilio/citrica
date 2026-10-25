@@ -48,9 +48,37 @@ def main():
         assert not status()['counts']['errors']
         assert (folder / 'sample.png').is_file()
         call('Test', 'Screenshot', str(STATE / 'nautilus-result.png'))
+        # Copy is owned by Shell, so Wayland does not require a hidden Qt client
+        # to obtain an input serial. Paste into another real Nautilus window.
+        call('Desktop', 'Show', json.dumps([str(folder / 'sample.png')]), 'actions')
+        actions = wait_for(lambda s: s['visible'] and s['mode'] == 'actions' and
+                           any(i['id'] == 'copy' for i in s.get('items', [])))
+        point_at(actions, 'copy')
+        step('Button', 'true')
+        step('Button', 'false')
+        wait_for(lambda s: not s['visible'])
+        destination = STATE / 'paste-target'
+        destination.mkdir(exist_ok=True)
+        (destination / 'sample.png').unlink(missing_ok=True)
+        subprocess.run(['nautilus', '--new-window', str(destination)], env=env, check=True)
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            if any(w['title'] == 'paste-target' for w in json.loads(call('Test', 'Windows')[0])):
+                break
+            time.sleep(.1)
+        step('PlaceWindow', 'paste-target', 320, 200)
+        step('Key', 65507, 'true')
+        step('Key', 118, 'true')  # Ctrl+V
+        step('Key', 118, 'false')
+        step('Key', 65507, 'false')
+        deadline = time.monotonic() + 5
+        while not (destination / 'sample.png').exists() and time.monotonic() < deadline:
+            time.sleep(.1)
+        assert (destination / 'sample.png').read_bytes() == (folder / 'sample.png').read_bytes()
         (STATE / 'nautilus-result.json').write_text(json.dumps({'nautilus_shift_drag': True,
-            'drop_converts': True, 'original_preserved': True, 'output_dimensions': [320, 200]}))
-        print('Nautilus / GNOME 50 / Wayland: arraste, Shift global, roda, drop e JPG validados.')
+            'drop_converts': True, 'original_preserved': True, 'output_dimensions': [320, 200],
+            'copy_paste_file': True}))
+        print('Nautilus / GNOME 50 / Wayland: arraste, Shift global, roda, drop, JPG e copiar/colar validados.')
     finally:
         call('Test', 'Key', 65505, 'false')
         call('Test', 'Button', 'false')

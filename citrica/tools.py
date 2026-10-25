@@ -92,6 +92,8 @@ def available_tools(paths, actions=False):
             continue
         if not actions and not kinds.issubset(tool['families']):
             continue
+        if not actions and len(kinds) > 1 and name not in {'compress', 'strip', 'metadata', 'target_size'}:
+            continue
         if kinds & {'video', 'audio'} and not actions and not shutil.which('ffmpeg'):
             continue
         if name == 'qr' and importlib.util.find_spec('zxingcpp') is None:
@@ -405,6 +407,8 @@ def execute(tool, paths, params=None, output_dir=None, cancel=None):
             for path in paths:
                 check_cancel(cancel)
                 with Image.open(path) as raw:
+                    if getattr(raw, 'n_frames', 1) > 1:
+                        raise ConversionError('Imagens animadas/multipágina não são suportadas nesta ferramenta.')
                     image = ImageOps.exif_transpose(raw).convert('RGBA')
                     bg = Image.new('RGB', image.size, 'white')
                     bg.paste(image, mask=image.getchannel('A'))
@@ -438,7 +442,14 @@ def execute(tool, paths, params=None, output_dir=None, cancel=None):
                 fit(path, target, limit, cancel)
                 staged.append(target)
         elif family(paths[0]) in {'video', 'audio'}:
-            staged = _media_tool(tool, paths, params, staging, cancel)
+            if tool == 'join_media':
+                staged = _media_tool(tool, paths, params, staging, cancel)
+            else:
+                for index, path in enumerate(paths):
+                    check_cancel(cancel)
+                    item_folder = staging / str(index)
+                    item_folder.mkdir()
+                    staged += _media_tool(tool, [path], params, item_folder, cancel)
         elif family(paths[0]) == 'pdf':
             from pypdf import PdfReader, PdfWriter
             for path in paths:

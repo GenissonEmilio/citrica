@@ -1,7 +1,7 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/latest">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.2.0">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 

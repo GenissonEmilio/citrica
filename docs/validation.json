@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "environment": "Fedora 44 / GNOME Shell 50.5 / Mutter 50.6 / Wayland x86_64",
+  "date": "2026-10-24 America/Fortaleza",
+  "pytest_passed": 85,
+  "native": {
+    "shift_drag": true,
+    "drop_converts": true,
+    "shortcut": true,
+    "escape": true,
+    "animation": true,
+    "alt_tools": true,
+    "ctrl_actions": true,
+    "copy_path": true,
+    "pagination": true,
+    "tool_dialog": true,
+    "cancel_drag": true,
+    "super_drag_setting": true,
+    "keyboard_navigation": true,
+    "custom_shortcut": true,
+    "disable_animation": true
+  },
+  "nautilus": {
+    "nautilus_shift_drag": true,
+    "drop_converts": true,
+    "original_preserved": true,
+    "output_dimensions": [
+      320,
+      200
+    ],
+    "copy_paste_file": true
+  },
+  "actions": {
+    "terminal_cwd": true,
+    "shelf_drag": true
+  },
+  "sharing": "LocalSend unavailable; transfer between machines not tested"
+}

@@ -214,7 +214,7 @@ class Settings(QDialog):
     def test(self):
         try:
             show_wheel([])
-            self.hide()
+            self.close()
         except Exception as e:
             QMessageBox.information(self, 'Roda indisponível', str(e))
 
@@ -343,6 +343,15 @@ class ToolDialog(QDialog):
         else:
             event.accept()
 
+    def reject(self):
+        # QDialog handles Escape through reject(), bypassing closeEvent(). Keep
+        # the worker alive until it has stopped and cleaned up its temporary data.
+        if self.worker and self.worker.isRunning():
+            self.worker.cancel.set()
+            self.message.setText('Cancelando…')
+            return
+        super().reject()
+
 
 def file_action(tool, paths):
     app = QApplication.instance()
@@ -363,7 +372,7 @@ def file_action(tool, paths):
     elif tool == 'terminal':
         directory = str(paths[0] if paths[0].is_dir() else paths[0].parent)
         if shutil.which('ptyxis'):
-            subprocess.Popen(['ptyxis', '--new-window', '--working-directory', directory])
+            subprocess.Popen(['ptyxis', '--standalone', '--new-window', '--working-directory', directory])
         elif shutil.which('gnome-terminal'):
             subprocess.Popen(['gnome-terminal', '--working-directory', directory])
         else:

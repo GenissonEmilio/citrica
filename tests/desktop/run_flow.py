@@ -161,9 +161,54 @@ def main():
     step('Button', 'false')
     wait_for(lambda s: not s['visible'] and not s['dragging'])
     assert status()['counts']['converted'] == before
+    # The optional Super drag trigger is configured through the real schema.
+    settings_env = dict(ENV, GSETTINGS_SCHEMA_DIR=str(STATE /
+                        'data/gnome-shell/extensions/citrica@genissonemilio.github.io/schemas'))
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'drag-key', 'super'],
+                   env=settings_env, check=True)
+    start_drag()
+    step('Key', 65515, 'true')
+    wheel = wait_for(lambda s: s['visible'] and s.get('items') and s['dragKey'] == 'super')
+    point_at(wheel, 'jpg')
+    step('Key', 65515, 'false')
+    step('Button', 'false')
+    wait_for(lambda s: not s['visible'] and not s['busy'] and s['counts']['converted'] == before+1)
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'drag-key', 'shift'],
+                   env=settings_env, check=True)
+    # Keyboard selection survives the pointer polling until the mouse moves.
+    before = status()['counts']['converted']
+    call('Desktop', 'Show', json.dumps([str(STATE / 'sample.png')]), 'convert')
+    wait_for(lambda s: s['visible'] and s.get('items'))
+    step('Key', 65363, 'true')  # Right
+    step('Key', 65363, 'false')
+    assert status()['selected'] == 0
+    step('Key', 65293, 'true')  # Return
+    step('Key', 65293, 'false')
+    wait_for(lambda s: not s['visible'] and not s['busy'] and s['counts']['converted'] == before+1)
+    # Apply a different global chord, then restore the default for subsequent runs.
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'toggle-wheel',
+                    "['<Super><Shift>v']"], env=settings_env, check=True)
+    time.sleep(.2)
+    for key in [65515, 65505, 118]:
+        step('Key', key, 'true')
+    for key in [118, 65505, 65515]:
+        step('Key', key, 'false')
+    wait_for(lambda s: s['visible'] and s['shortcut'] == ['<Super><Shift>v'])
+    call('Desktop', 'Hide')
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'toggle-wheel',
+                    "['<Super><Shift>c']"], env=settings_env, check=True)
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'animations', 'false'],
+                   env=settings_env, check=True)
+    time.sleep(.1)
+    call('Desktop', 'Show', '[]', 'convert')
+    assert status()['animation'] == {'opacity': 255, 'scale': 1}
+    call('Desktop', 'Hide')
+    subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'animations', 'true'],
+                   env=settings_env, check=True)
     (STATE / 'result.json').write_text(json.dumps({'shift_drag': True, 'drop_converts': True,
         'shortcut': True, 'escape': True, 'animation': True, 'alt_tools': True, 'ctrl_actions': True,
-        'copy_path': True, 'pagination': True, 'tool_dialog': True, 'cancel_drag': True,
+        'copy_path': True, 'pagination': True, 'tool_dialog': True, 'cancel_drag': True, 'super_drag_setting': True,
+        'keyboard_navigation': True, 'custom_shortcut': True, 'disable_animation': True,
         'state': status()}, ensure_ascii=False, indent=2))
     print('GNOME 50 / Wayland: Shift, Alt, Ctrl, roda animada, conversão, atalho, Escape, '
           'clipboard, paginação e diálogo de recorte validados.')

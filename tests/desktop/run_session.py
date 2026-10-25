@@ -27,12 +27,18 @@ def main():
                    check=True)
     config = STATE / 'config/citrica/desktop.json'
     config.parent.mkdir(parents=True, exist_ok=True)
-    config.write_text(json.dumps({'command': [sys.executable, '-m', 'citrica']}))
+    backend = [os.environ['CITRICA_TEST_EXECUTABLE']] if os.environ.get('CITRICA_TEST_EXECUTABLE') else [
+        sys.executable, '-m', 'citrica']
+    config.write_text(json.dumps({'command': backend}))
+    shutil.rmtree(STATE / 'config/dconf', ignore_errors=True)
     Image.new('RGB', (320, 200), '#ed713d').save(STATE / 'sample.png')
     bus = STATE / 'bus'
     bus.unlink(missing_ok=True)
     env = dict(os.environ, XDG_DATA_HOME=str(STATE / 'data'), XDG_CONFIG_HOME=str(STATE / 'config'),
-               XDG_CACHE_HOME=str(STATE / 'cache'), GSETTINGS_BACKEND='memory')
+               XDG_CACHE_HOME=str(STATE / 'cache'), GSETTINGS_BACKEND='dconf',
+               GTK_A11Y='none', GSK_RENDERER='cairo', GDK_BACKEND='wayland',
+               WAYLAND_DISPLAY='citrica-validation')
+    env.pop('DISPLAY', None)  # Test clients must never fall back to the host Xwayland.
     shell_log = (STATE / 'shell.log').open('w')
     server = subprocess.Popen(['dbus-run-session', '--', 'sh', '-c',
         'printf "%s" "$DBUS_SESSION_BUS_ADDRESS" > "$1"; shift; exec "$@"', 'sh', str(bus),
@@ -66,7 +72,7 @@ def main():
         time.sleep(1)
         flow = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT / 'tests/desktop/run_flow.py'
         subprocess.run([sys.executable, str(flow)], env=env, cwd=ROOT, check=True)
-        subprocess.run([sys.executable, '-m', 'citrica', '--settings', '--screenshot',
+        subprocess.run([*backend, '--settings', '--screenshot',
                         str(STATE / 'settings.png')], env=dict(env, QT_QPA_PLATFORM='offscreen'),
                        cwd=ROOT, check=True)
     finally:

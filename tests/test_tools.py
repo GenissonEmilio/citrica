@@ -140,6 +140,35 @@ def test_tools_match_selection(photos, tmp_path):
         execute('merge_pdf', photos)
 
 
+def test_mixed_families_do_not_offer_single_family_editors(photos, media):
+    _, video = media
+    tools = {t['id'] for t in available_tools([photos[0], video])}
+    assert 'crop' not in tools and 'edit_metadata' not in tools
+    assert {'compress', 'metadata', 'target_size'}.issubset(tools)
+
+
+def test_media_batch_processes_every_selected_file(media):
+    _, video = media
+    second = video.with_name('second.mp4')
+    second.write_bytes(video.read_bytes())
+    outputs = execute('speed', [video, second], {'factor': 2})['outputs']
+    assert len(outputs) == 2
+    assert {p.stem.split('-')[0] for p in outputs} == {'video', 'second'}
+    for output in outputs:
+        assert float(media_info(output)['format']['duration']) == pytest.approx(1, abs=.15)
+    assert video.is_file() and second.is_file()
+
+
+@pytest.mark.parametrize('tool', ['images_pdf', 'collage'])
+def test_image_collections_reject_animation(tmp_path, tool):
+    source = tmp_path / 'animated.gif'
+    Image.new('RGB', (20, 20), 'red').save(source, save_all=True,
+        append_images=[Image.new('RGB', (20, 20), 'blue')], duration=100, loop=0)
+    with pytest.raises(ConversionError, match='animadas'):
+        execute(tool, [source])
+    assert source.is_file() and not list(tmp_path.glob('.citrica-*'))
+
+
 @pytest.mark.parametrize('shape', ['arrow', 'rectangle', 'ellipse', 'number'])
 def test_annotation_shapes(photos, shape):
     output = execute('annotate', [photos[0]], {'shape': shape, 'text': '1', 'rect': '20,20,100,80'})['outputs'][0]

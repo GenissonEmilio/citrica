@@ -27,6 +27,7 @@ export default class Citrica extends Extension {
         this._seq = 0;
         this._read = false;
         this._lastMode = null;
+        this._dropHandled = false;
         this._selected = -1;
         this._busy = false;
         this._counts = {opened: 0, dropped: 0, converted: 0, errors: 0};
@@ -40,7 +41,9 @@ export default class Citrica extends Extension {
             } else {
                 const n = this._items?.length ?? 0;
                 if (!n) return;
-                this._selected = (this._selected + (key === 'Left' ? n - 1 : 1) + n) % n;
+                this._keyboardPointer = global.get_pointer().slice(0, 2);
+                this._selected = this._selected < 0 ? (key === 'Left' ? n - 1 : 0) :
+                    (this._selected + (key === 'Left' ? n - 1 : 1)) % n;
                 this._buttons.forEach((b, i) => b.set_style(this._buttonStyle(i === this._selected)));
             }
         });
@@ -65,7 +68,7 @@ export default class Citrica extends Extension {
         this._settingsId = this._settings.connect('changed', () => this._binding());
         this._indicator = new PanelMenu.Button(0, 'Cítrica');
         this._indicator.add_child(new St.Icon({icon_name: 'view-refresh-symbolic', style_class: 'system-status-icon'}));
-        this._indicator.menu.addAction('Mostrar roda · Super+Shift+C', () => this.Show([], 'convert'));
+        this._indicator.menu.addAction('Mostrar roda', () => this.Show([], 'convert'));
         this._indicator.menu.addAction('Configurações e atalhos', () => this._launch(['--settings']));
         this._indicator.menu.addAction('Sobre o fluxo', () => Main.notify('Cítrica',
             'Arraste um arquivo e pressione Shift. Alt: ferramentas. Ctrl: ações. Solte no setor desejado.'));
@@ -80,7 +83,7 @@ export default class Citrica extends Extension {
         Main.wm.removeKeybinding('toggle-wheel');
         Main.wm.addKeybinding('toggle-wheel', this._settings, Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW, () => {
-                if (this._wheel) this.Hide(); else this.Show(this._paths, 'convert');
+                if (this._wheel) this.Hide(); else this.Show(this._drag ? this._paths : [], 'convert');
             });
     }
 
@@ -122,6 +125,7 @@ export default class Citrica extends Extension {
         this._read = false;
         this._paths = [];
         this._lastMode = null;
+        this._dropHandled = false;
         this._readDrag();
         this._ensurePoll();
     }
@@ -242,6 +246,7 @@ export default class Citrica extends Extension {
             {id: String((page + 1) % pages), label: `Mais · ${page + 1}/${pages}`, kind: 'page'}] : items;
         this._items = shown;
         this._selected = -1;
+        this._keyboardPointer = null;
         this._buttons = [];
         this._wheel.destroy_all_children();
         const disk = new St.Widget({width: 326, height: 326, x: 27, y: 27,
@@ -267,8 +272,9 @@ export default class Citrica extends Extension {
             this._wheel.add_child(button);
             this._buttons.push(button);
         }
+        const triggerName = this._settings.get_string('drag-key') === 'super' ? 'Super' : 'Shift';
         const hint = new St.Label({text: this._paths.length && !items.length ? 'Carregando…' :
-            'Shift: converter  ·  Alt: ferramentas  ·  Ctrl: ações',
+            `${triggerName}: converter  ·  Alt: ferramentas  ·  Ctrl: ações`,
         style: 'color:#eee;font-size:10px;background-color:rgba(25,28,31,0.95);border-radius:10px;padding:7px;'});
         hint.set_position(25, SIZE - 5);
         this._wheel.add_child(hint);
@@ -290,6 +296,8 @@ export default class Citrica extends Extension {
 
     _highlight(x, y) {
         if (!this._wheel || !this._items?.length) return;
+        if (this._keyboardPointer?.[0] === x && this._keyboardPointer?.[1] === y) return;
+        this._keyboardPointer = null;
         const dx = x - this._origin[0] - SIZE / 2, dy = y - this._origin[1] - SIZE / 2;
         const radius = Math.hypot(dx, dy), n = Math.min(10, this._items.length);
         const angle = (Math.atan2(dy, dx) + Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI);
@@ -300,7 +308,8 @@ export default class Citrica extends Extension {
     }
 
     _drop() {
-        if (this._busy || !this._wheel) return;
+        if (this._busy || !this._wheel || this._dropHandled) return;
+        this._dropHandled = true;
         const item = this._items?.[this._selected];
         this._counts.dropped++;
         if (item) this._apply(item); else this.Hide();
@@ -314,6 +323,13 @@ export default class Citrica extends Extension {
         const paths = [...this._paths];
         this.Hide();
         if (!paths.length) return;
+        if (item.kind === 'tool' && item.id === 'copy') {
+            const uris = paths.map(p => Gio.File.new_for_path(p).get_uri());
+            const bytes = new GLib.Bytes(new TextEncoder().encode('copy\n' + uris.join('\n')));
+            St.Clipboard.get_default().set_content(St.ClipboardType.CLIPBOARD, 'x-special/gnome-copied-files', bytes);
+            Main.notify('Cítrica', 'Arquivos copiados. Cole na pasta de destino.');
+            return;
+        }
         if (item.kind === 'tool' && item.id === 'copy_path') {
             St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, paths.join('\n'));
             Main.notify('Cítrica', 'Caminhos copiados.');

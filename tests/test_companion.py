@@ -11,7 +11,7 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialogButtonBox
 
-from citrica.companion import ImageSelection, ToolDialog, validate_shortcut
+from citrica.companion import ImageSelection, ToolDialog, file_action, validate_shortcut
 from citrica.desktop import request
 
 
@@ -76,3 +76,43 @@ def test_desktop_protocol_uses_real_engine(tmp_path):
     result = request({'op': 'convert', 'paths': [str(source)], 'format': 'jpg'})
     assert not result['errors']
     assert Path(result['outputs'][0]).is_file()
+
+
+def test_move_action_preserves_existing_destination(tmp_path):
+    app = QApplication.instance() or QApplication([])
+    source = tmp_path / 'file.txt'
+    source.write_text('moving data')
+    target = tmp_path / 'destination'
+    target.mkdir()
+    existing = target / source.name
+    existing.write_text('existing data')
+    with patch('citrica.companion.QFileDialog.getExistingDirectory', return_value=str(target)):
+        file_action('move', [source])
+    assert not source.exists()
+    assert existing.read_text() == 'existing data'
+    assert any(p.read_text() == 'moving data' for p in target.iterdir())
+    app.processEvents()
+
+
+def test_escape_during_tool_work_requests_cancel_without_destroying_thread(tmp_path):
+    import threading
+    app = QApplication.instance() or QApplication([])
+    source = tmp_path / 'photo.png'
+    Image.new('RGB', (40, 40), 'orange').save(source)
+    entered = threading.Event()
+    def controlled_work(_tool, _paths, _params, cancel):
+        entered.set()
+        cancel.wait(5)
+        return {'outputs': []}
+    with patch('citrica.companion.execute', side_effect=controlled_work):
+        dialog = ToolDialog('compress', [source])
+        dialog.show()
+        dialog.apply()
+        assert entered.wait(2)
+        QTest.keyClick(dialog, Qt.Key.Key_Escape)
+        assert dialog.worker.cancel.is_set()
+        assert dialog.isVisible()
+        assert dialog.worker.wait(2000)
+        app.processEvents()
+        QTest.keyClick(dialog, Qt.Key.Key_Escape)
+        assert not dialog.isVisible()
