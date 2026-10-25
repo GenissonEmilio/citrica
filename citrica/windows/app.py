@@ -367,7 +367,7 @@ class Desktop(QObject):
                 if item['id'] == 'float':
                     self.keep_window(Shelf(paths))
                 elif item['id'] in {'copy', 'copy_path', 'terminal', 'move', 'share'}:
-                    file_action(item['id'], paths)
+                    file_action(item['id'], paths, resident=True)
                 else:
                     self.keep_window(ToolDialog(item['id'], paths))
             except Exception as error:

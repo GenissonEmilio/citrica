@@ -8,7 +8,7 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
 import pytest
 from PIL import Image
-from PySide6.QtCore import QMimeData, QObject, QPoint, QPointF, Qt, QUrl, Signal
+from PySide6.QtCore import QMimeData, QObject, QPoint, QPointF, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -245,3 +245,20 @@ def test_windows_drag_probe_reveals_only_for_an_actual_file(desktop, tmp_path):
     QApplication.sendEvent(desktop.wheel, enter)
     spin_until(lambda: desktop.wheel.items)
     assert desktop.active and not desktop.armed and not desktop.wheel.probing
+
+
+def test_windows_copy_keeps_resident_alive_after_clipboard_changes(desktop, tmp_path):
+    source = image_file(tmp_path)
+    desktop.show_wheel([source], 'actions')
+    spin_until(lambda: desktop.wheel.items)
+    copy = next(i for i in desktop.wheel.items if i['id'] == 'copy')
+    desktop.apply(copy)
+    assert desktop.app.clipboard().mimeData().urls() == [QUrl.fromLocalFile(str(source))]
+    desktop.app.clipboard().setText('The user copied something else')
+    previous = desktop.app.quitOnLastWindowClosed()
+    desktop.app.setQuitOnLastWindowClosed(False)
+    started = time.monotonic()
+    QTimer.singleShot(1300, desktop.app.quit)
+    desktop.app.exec()
+    desktop.app.setQuitOnLastWindowClosed(previous)
+    assert time.monotonic() - started >= 1.2, 'Clipboard changes must not terminate the resident app'

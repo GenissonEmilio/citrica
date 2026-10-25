@@ -381,7 +381,7 @@ class ToolDialog(QDialog):
         super().reject()
 
 
-def file_action(tool, paths):
+def file_action(tool, paths, *, resident=False):
     app = QApplication.instance()
     if tool == 'copy_path':
         app.clipboard().setText('\n'.join(str(p) for p in paths))
@@ -394,6 +394,8 @@ def file_action(tool, paths):
         else:
             mime.setData('x-special/gnome-copied-files', ('copy\n' + '\n'.join(u.toString() for u in urls)).encode())
         app.clipboard().setMimeData(mime)
+        if resident:
+            return None
         # Clipboard ownership must remain alive until the user pastes or replaces it.
         from PySide6.QtCore import QTimer
         timer = QTimer(app)
