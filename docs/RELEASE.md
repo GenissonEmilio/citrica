@@ -12,7 +12,7 @@ O **Cítrica 0.4.0** adiciona disponibilidade para **Windows x64**, com instalad
 
 **Dependências Windows:** imagens, PDF, QR e detecção de rostos acompanham o pacote. FFmpeg com ffprobe, LibreOffice e Tesseract x64 com modelo eng são opcionais externos, necessários para mídia, Office e detecção de texto, respectivamente. LocalSend é opcional para compartilhar.
 
-**Validação:** testes automatizados do motor/interface e do executável empacotado; a validação manual no Explorer do Windows do usuário **está pendente do teste externo combinado**. Isso não é declarado concluído por uma compilação bem-sucedida. O [guia para o teste no Windows](https://github.com/GenissonEmilio/citrica/blob/main/docs/WINDOWS.md) inclui instalação, roteiro, diagnóstico e limitações. Resultados em [docs/VALIDACAO.md](https://github.com/GenissonEmilio/citrica/blob/main/docs/VALIDACAO.md).
+**Validação:** 99 testes aprovados no Windows e 98 no Linux, além de testes do executável empacotado, arraste nativo e instalação/desinstalação Windows; a validação manual no Explorer do Windows do usuário **está pendente do teste externo combinado**. Isso não é declarado concluído por uma compilação bem-sucedida. O [guia para o teste no Windows](https://github.com/GenissonEmilio/citrica/blob/main/docs/WINDOWS.md) inclui instalação, roteiro, diagnóstico e limitações. Resultados em [docs/VALIDACAO.md](https://github.com/GenissonEmilio/citrica/blob/main/docs/VALIDACAO.md).
 
 **Fedora:** instale o RPM e execute `citrica --install-gnome`. Se o GNOME ainda estiver executando uma extensão anterior, saia e entre novamente na sessão para carregar a roda instalada.
 

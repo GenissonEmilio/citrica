@@ -36,3 +36,9 @@ A implementação é específica de GNOME 50. KDE e outras versões de GNOME pre
 Conversões usam staging na pasta de destino e publicação atômica sem sobrescrita. Ferramentas produzem cópias; somente a ação explícita Mover remove a origem depois de publicar a cópia no destino. Imagens com orientação EXIF são apresentadas e processadas na mesma orientação.
 
 O catálogo implementa operações de imagem, PDF, áudio e vídeo, incluindo detecção local de regiões de rosto/texto e compressão por tamanho. A qualidade visual e a detecção não são declaradas equivalentes aos algoritmos comerciais. AirDrop não é oferecido; LocalSend é uma integração opcional. Limites e provas estão em [VALIDACAO.md](VALIDACAO.md).
+
+## Windows na versão 0.4.0
+
+A integração Windows reutiliza o motor e os diálogos de ferramentas, com uma roda Qt própria que reproduz a geometria, paleta e movimento descritos nesta análise. O aplicativo permanece na bandeja. RegisterHotKey fornece o atalho configurável; uma oferta OLE de arquivos locais valida o arraste antes de revelar a roda. O efeito de cópia preserva a origem, inclusive com Shift pressionado.
+
+As capacidades e conversões executam em workers, com resultados entregues à thread da interface. Aberturas adicionais usam um named pipe restrito ao usuário. O pacote inclui inicializadores gráfico e CLI, instalador no usuário e opção portátil. O guia e os limites estão em [WINDOWS.md](WINDOWS.md); os testes nativos e o teste externo ainda pendente estão em [VALIDACAO.md](VALIDACAO.md).

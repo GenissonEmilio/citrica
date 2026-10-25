@@ -60,3 +60,11 @@ No Linux a revisão da extensão permanece versão 3, revisão 1. O motor 0.4.0 
 ## Pacotes e evidências
 
 Resultados estruturados, referências do CI e checksums estão em [validation.json](validation.json). Cada release disponibiliza SHA256SUMS; o pacote Windows inclui um guia de teste. Os relatórios automáticos do Windows distinguem o teste do motor empacotado e o teste nativo do desktop, sem declarar a validação manual como concluída.
+
+## Release publicada
+
+O [CI da tag v0.4.0](https://github.com/GenissonEmilio/citrica/actions/runs/40217795312) concluiu os builds Linux/Windows, os testes do executável congelado, o arraste nativo entre processos no Windows e a instalação/desinstalação. Os checksums do instalador Windows e das evidências foram conferidos após baixar os anexos. As imagens Windows acima são dessa execução da tag.
+
+No Fedora, o portátil do CI candidato d3a6ee1 passou nos testes reais de motor e em todos os percursos GNOME. O executável da release é idêntico em bytes ao candidato testado. Todos os 762 arquivos de runtime também coincidem, exceto os metadados do arquivo base_library.zip: seus arquivos internos são idênticos. O TAR.GZ final foi conferido com SHA256SUMS. Assim, a validação no Fedora usa o mesmo código e runtime distribuídos na release.
+
+O teste manual no Explorer do computador do usuário continua pendente. Nenhuma validação externa foi atribuída ao amigo antes de ele realizar o roteiro.

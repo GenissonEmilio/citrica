@@ -1,6 +1,6 @@
 # Próximos passos
 
-A versão 0.3.0 implementa a roda nativa GNOME 50/Wayland com Shift/Alt/Ctrl globais, animação, atalho configurável, diálogos compactos e ferramentas de imagem/PDF/mídia.
+A versão 0.4.0 mantém a roda GNOME 50/Wayland e acrescenta uma integração Qt/Win32, instalador e portátil Windows x64. Os testes automatizados do Windows passaram; a validação manual no Explorer está pendente do teste externo combinado.
 
 - Validar outras versões de GNOME, KDE e configurações com múltiplos monitores/escalas.
 - Melhorar acessibilidade, tradução, feedback de progresso e seleção visual para vídeo.

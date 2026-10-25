@@ -59,6 +59,74 @@
       "hover_ms": 140,
       "closing_ms": 130,
       "intermediate_states_observed": true
+    },
+    "packaged_fedora": {
+      "application_commit": "d3a6ee1",
+      "candidate_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217201144",
+      "release_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217795312",
+      "core_smoke": true,
+      "release_tar_sha256_verified": true,
+      "portable_sha256": "8dcd7d6d80eb6739109cbee96156f61c694625a6e10de5b0ab091abc6b6f8599",
+      "binary_comparison": {
+        "matches_fedora_tested_candidate": true,
+        "runtime_files_checked": 762,
+        "runtime_matches_tested_candidate": false,
+        "stdlib_zip_contents_match": true
+      },
+      "native": {
+        "shift_drag": true,
+        "drop_converts": true,
+        "shortcut": true,
+        "escape": true,
+        "animation": true,
+        "alt_tools": true,
+        "ctrl_actions": true,
+        "copy_path": true,
+        "pagination": true,
+        "tool_dialog": true,
+        "cancel_drag": true,
+        "super_drag_setting": true,
+        "keyboard_navigation": true,
+        "custom_shortcut": true,
+        "disable_animation": true,
+        "reopen_after_conversion_empty": true
+      },
+      "nautilus": {
+        "nautilus_shift_drag": true,
+        "drop_converts": true,
+        "original_preserved": true,
+        "output_dimensions": [
+          320,
+          200
+        ],
+        "copy_paste_file": true
+      },
+      "actions": {
+        "terminal_cwd": true,
+        "shelf_drag": true
+      },
+      "settings_ui": {
+        "settings_save": true,
+        "saved_shortcut_invoked": true
+      },
+      "regressions": {
+        "repeat_conversion_empty": true,
+        "failed_conversion_empty": true,
+        "escape_empty": true,
+        "late_reply_after_hide_ignored": true,
+        "late_reply_after_replace_ignored": true,
+        "late_drag_palette_ignored": true,
+        "shortcut_has_no_preview": true
+      },
+      "motion": {
+        "actual_paint_frames": 70,
+        "intermediate_opening_frames": 14,
+        "opening_ms": 240,
+        "sector_stagger_ms": 8,
+        "hover_ms": 140,
+        "closing_ms": 130,
+        "intermediate_states_observed": true
+      }
     }
   },
   "windows": {
@@ -79,8 +147,72 @@
     "installed_gui_launch": true,
     "uninstall": true,
     "startup_entry_removed": true,
-    "screenshots_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40216465845",
-    "packaged_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217201144",
-    "packaged_application_commit": "d3a6ee1"
+    "screenshots_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217795312",
+    "packaged_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217795312",
+    "packaged_application_commit": "dfc049d",
+    "native": {
+      "native_input_test": "passed",
+      "cross_process_qt_ole_drag": true,
+      "global_shift": true,
+      "real_conversion": true,
+      "original_preserved": true,
+      "global_hotkey": true,
+      "reopened_empty": true,
+      "global_escape": true,
+      "manual_explorer": "pending external tester"
+    },
+    "installer": {
+      "per_user_install": true,
+      "installed_cli_version": "Cítrica 0.4.0",
+      "sendto_shortcut": true,
+      "installed_gui_launch": true,
+      "uninstall": true,
+      "startup_entry_removed": true
+    },
+    "packaged": {
+      "version": "0.4.0",
+      "platform": "Windows-2022Server-10.0.20348-SP0",
+      "dependencies": {
+        "ffmpeg": "C:\\ProgramData\\Chocolatey\\bin\\ffmpeg.EXE",
+        "libreoffice": "C:\\Program Files\\LibreOffice\\program\\soffice.com"
+      },
+      "tools": {
+        "faces": true,
+        "text": true,
+        "qr": true,
+        "share": false
+      },
+      "desktop": {
+        "platform": "windows",
+        "active": false
+      },
+      "validation": {
+        "runner": "Windows Server 2022 x64 / GitHub Actions",
+        "packaged_engine_smoke": true,
+        "interactive_explorer": "pending external tester"
+      }
+    },
+    "installer_sha256_verified": true
+  },
+  "release": {
+    "tag": "v0.4.0",
+    "commit": "dfc049d",
+    "ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40217795312",
+    "normal_release": true,
+    "asset_checksums": {
+      "citrica-0.4.0-1.x86_64.rpm": "9162ca7986417c9eb7568e4b47f4a49c3a2b08dc8b2958f2ace859c97ecee3b3",
+      "citrica-0.4.0-linux-x86_64.tar.gz": "8dcd7d6d80eb6739109cbee96156f61c694625a6e10de5b0ab091abc6b6f8599",
+      "citrica-0.4.0-windows-x86_64-portable.zip": "4306122f7d0796c39bbb03821a21886eceb6cca989ad61d0dd10f630c682cf33",
+      "citrica-0.4.0-windows-x86_64-setup.exe": "f31a2180bb901c5777b76b4203cd039725f3b4b6081ba804e4a5d580310d4fe2",
+      "citrica-preview.png": "509bdd7c45b6be84c124619b483c482020277318b093969ad3508320bb2ead8d",
+      "citrica-wheel.png": "19714ec3bea5e2a69a54830497f82f24216af825540182aadb05515503dbf44f",
+      "citrica-windows-installed-preview.png": "0a76e09d600ead6bd64e4e3c94de8a5f8645dc7b4734159597067ebdf0ecbf53",
+      "citrica-windows-installer-validation.json": "6c0a2cb9fe3fddaa63769cb4173648d407568e388e965a6a84f4ce57d80a6842",
+      "citrica-windows-native-validation.json": "9a041e90f5ce3bd6f5a44f2c2c8c59dda74cae31eb0f42e7cc64d5fd570293a0",
+      "citrica-windows-preview.png": "f30de2d58b5f2b7aea630989f87aac2067c07b3526f67c80d25be4574842e87b",
+      "citrica-windows-validation.json": "035eb0322985bc174ea646667f45a4c6e8e619aa02d07340bcaf088dafb67e5e",
+      "citrica-windows-wheel.png": "236fb1700b24bf0ecdf051698b192d8a81ef4351d7b891fada7c2f6971a5a2e0",
+      "citrica_0.4.0_amd64.deb": "a605e6e6a06ee22ba121a3cb1d1d73a6b98e950b101cb9200d3ec8fc0eeedc9e"
+    }
   }
 }
