@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "citrica"
 version = "0.4.0"
-description = "Conversão de arquivos local e radial para Linux"
+description = "Conversão de arquivos local e radial para Linux e Windows"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "AGPL-3.0-or-later"
@@ -28,7 +28,7 @@ Homepage = "https://github.com/GenissonEmilio/citrica"
 Issues = "https://github.com/GenissonEmilio/citrica/issues"
 
 [tool.setuptools.package-data]
-citrica = ["assets/*.svg"]
+citrica = ["assets/*.svg", "assets/*.ico"]
 
 [tool.setuptools.packages.find]
 include = ["citrica*"]

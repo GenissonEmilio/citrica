@@ -51,8 +51,12 @@ def spin_until(predicate, timeout=5000):
         QApplication.processEvents()
         if predicate():
             return
-        QTest.qWait(10)
-    raise AssertionError('Qt operation did not finish')
+        # Yield Python's GIL explicitly as well as pumping Qt. This matters for
+        # Python QThread workers on the Windows Qt test backend.
+        time.sleep(.01)
+    controller = getattr(QApplication.instance(), '_windows_test_controller', None)
+    raise AssertionError({'state': controller.status() if controller else None,
+                          'jobs': [(j.isRunning(), j.isFinished()) for j in controller.jobs] if controller else []})
 
 
 @pytest.fixture
@@ -62,6 +66,7 @@ def desktop(tmp_path, monkeypatch):
     monkeypatch.setenv('APPDATA', str(tmp_path / 'settings'))
     monkeypatch.setenv('XDG_CACHE_HOME', str(tmp_path / 'cache'))
     controller = Desktop(app, FakeNative, listen=False)
+    app._windows_test_controller = controller
     # Unit tests must not let an unrelated real cursor override synthetic drops.
     controller.pointer_timer.stop()
     yield controller
@@ -71,6 +76,7 @@ def desktop(tmp_path, monkeypatch):
         job.wait(5000)
     QApplication.processEvents()
     controller.close()
+    app._windows_test_controller = None
 
 
 def image_file(tmp_path):
@@ -182,6 +188,9 @@ def test_windows_tools_actions_pages_keyboard_and_conflict(desktop, tmp_path):
     assert any(i['id'] == 'crop' for i in desktop.wheel.items)
     more = next(i for i in desktop.wheel.items if i['kind'] == 'page')
     desktop.apply(more)
+    desktop.release()
+    QTest.qWait(300)
+    assert desktop.active and desktop.paths == [source]
     assert any(i['id'] == 'redact_faces' for i in desktop.wheel.items)
     desktop.drag_mode('actions')
     copy = next(i for i in desktop.wheel.items if i['id'] == 'copy_path')

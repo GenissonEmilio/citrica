@@ -6,7 +6,7 @@ import sys
 import threading
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QPoint, QThread, QTimer, Signal
+from PySide6.QtCore import QObject, QPoint, QThread, QTimer, Signal, Slot
 from PySide6.QtGui import QAction, QCursor, QIcon
 from PySide6.QtNetwork import QLocalServer
 from PySide6.QtWidgets import (
@@ -216,12 +216,27 @@ class Desktop(QObject):
 
     def job(self, operation, done, failed=None):
         job = Job(operation)
+        job.on_done = done
+        job.on_failed = failed or (lambda error: self.notify('Cítrica · falha', error))
         self.jobs.add(job)
-        job.result.connect(done)
-        job.failed.connect(failed or (lambda error: self.notify('Cítrica · falha', error)))
-        job.finished.connect(lambda: self.jobs.discard(job))
-        job.finished.connect(job.deleteLater)
+        job.result.connect(self._job_result)
+        job.failed.connect(self._job_error)
+        job.finished.connect(self._job_finished)
         job.start()
+
+    @Slot(object)
+    def _job_result(self, result):
+        self.sender().on_done(result)
+
+    @Slot(str)
+    def _job_error(self, error):
+        self.sender().on_failed(error)
+
+    @Slot()
+    def _job_finished(self):
+        job = self.sender()
+        self.jobs.discard(job)
+        job.deleteLater()
 
     def notify(self, title, message):
         self.last_message = message
@@ -317,6 +332,10 @@ class Desktop(QObject):
 
     def apply(self, item):
         if item['kind'] == 'page':
+            # Dropping on More ends OLE, but keeps this selection available for
+            # the next click. A subsequent fresh opening still clears it.
+            self.dragging = False
+            self.native.reset_drag()
             self.page = int(item['id'])
             self.render()
             return
