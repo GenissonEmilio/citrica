@@ -29,15 +29,20 @@ def preview_files(hwnd):
     # synchronously call our GUI while a COM call holds Python's GIL. A child
     # process breaks that cycle and has a strict, enforceable deadline.
     from citrica.desktop import backend_command
-    from citrica.runtime import run_external
-    try:
-        result = run_external([*backend_command(), '--internal-explorer-selection', str(int(hwnd))],
-                              capture_output=True, text=True, encoding='utf-8', timeout=2.5)
-    except subprocess.TimeoutExpired:
-        raise RuntimeError('A prévia do Explorer excedeu 2,5 segundos; aguardando a oferta OLE.') from None
-    if result.returncode:
-        raise RuntimeError(result.stderr[-1000:] or 'Prévia do Explorer indisponível.')
-    paths = json.loads(result.stdout)
+    from citrica.runtime import popen_external
+    # Restore the parent's bundled DLL search immediately after process creation,
+    # rather than leaving it reset while Explorer processes the request.
+    with popen_external([*backend_command(), '--internal-explorer-selection', str(int(hwnd))],
+                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8') as process:
+        try:
+            output, error = process.communicate(timeout=2.5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.communicate()
+            raise RuntimeError('A prévia do Explorer excedeu 2,5 segundos; aguardando a oferta OLE.') from None
+        if process.returncode:
+            raise RuntimeError(error[-1000:] or 'Prévia do Explorer indisponível.')
+    paths = json.loads(output)
     if not isinstance(paths, list) or len(paths) > 1000 or not all(isinstance(p, str) for p in paths):
         raise ValueError('Prévia de seleção inválida.')
     return [Path(p) for p in paths]

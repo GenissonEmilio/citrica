@@ -115,20 +115,32 @@ def main():
             print(f'Explorer: selecionar {path.name}; modo {mode}.', flush=True)
             # Select through Explorer's own view, then perform a physical drag
             # starting at the file's actual UI Automation rectangle.
-            window.Document.SelectItem(window.Document.Folder.ParseName(path.name), 1|4|8|16)
-            pause(.3)
-            info = subprocess.run(['powershell', '-NoProfile', '-File',
-                str(ROOT/'tests/windows/explorer_item.ps1'), str(hwnd), path.name, path.stem],
-                check=True, capture_output=True, text=True, timeout=20)
-            rect = json.loads(info.stdout)
-            print(f'Explorer: ícone localizado: {rect}.', flush=True)
-            x = round(rect['x']+min(rect['width']/2, 30))
-            y = round(rect['y']+rect['height']/2)
-            user.SetForegroundWindow(hwnd)
-            user.SetCursorPos(x, y)
-            pause()
-            button(True)
-            pause()
+            for attempt in range(3):
+                window.Document.SelectItem(window.Document.Folder.ParseName(path.name), 1|4|8|16)
+                pause(.3)
+                info = subprocess.run(['powershell', '-NoProfile', '-File',
+                    str(ROOT/'tests/windows/explorer_item.ps1'), str(hwnd), path.name, path.stem],
+                    check=True, capture_output=True, text=True, timeout=20)
+                rect = json.loads(info.stdout)
+                print(f'Explorer: ícone localizado: {rect}.', flush=True)
+                x = round(rect['x']+min(rect['width']/2, 30))
+                y = round(rect['y']+rect['height']/2)
+                user.SetForegroundWindow(hwnd)
+                user.SetCursorPos(x, y)
+                pause()
+                button(True)
+                pause()
+                # New conversion outputs can asynchronously reorder Details
+                # rows after UI Automation returns a rectangle. Confirm the
+                # actual item under the click before initiating OLE.
+                selected = [Path(item.Path) for item in window.Document.SelectedItems()]
+                if selected == [path]:
+                    break
+                button(False)
+                print(f'Explorer: linhas reordenadas; repetindo seleção ({attempt+1}).', flush=True)
+                pause(.6)
+            else:
+                raise AssertionError(f'O Explorer não selecionou o arquivo solicitado: {selected}')
             user.SetCursorPos(x+55, y+12)
             pause(.3)
             key(vk, True)
