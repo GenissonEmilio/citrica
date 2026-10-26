@@ -20,7 +20,13 @@ DESKTOP_NAME = "io.github.GenissonEmilio.Citrica.Desktop"
 
 
 def backend_command():
-    return [sys.executable] if getattr(sys, "frozen", False) else [sys.executable, "-m", "citrica"]
+    if getattr(sys, 'frozen', False):
+        executable = Path(sys.executable)
+        cli = executable.with_name('citrica-cli.exe')
+        if sys.platform == 'win32' and cli.is_file():
+            executable = cli  # GUI launchers have no stdout/stderr for worker diagnostics.
+        return [str(executable)]
+    return [sys.executable, '-m', 'citrica']
 
 
 def desktop_call(method, *args):

@@ -274,6 +274,22 @@ def test_windows_explorer_filenamew_offer(tmp_path):
     assert offered_paths(mime) == [source]
     mime.setData(name, b'odd')
     assert offered_paths(mime) == []
+    import struct
+    drop = QMimeData()
+    data = struct.pack('<IiiII', 20, 0, 0, 0, 1) + (str(source)+'\0\0').encode('utf-16-le')
+    drop.setData('application/x-qt-windows-mime;value="CF_HDROP"', data)
+    assert offered_paths(drop) == [source]
+
+
+def test_windows_repeated_probe_tracks_the_new_pointer(desktop, monkeypatch):
+    point = QPoint(200, 200)
+    monkeypatch.setattr('citrica.windows.app.QCursor.pos', lambda: QPoint(point))
+    desktop.drag_mode('actions')
+    first = desktop.wheel.pos()
+    point.setX(500)
+    desktop.drag_mode('actions')
+    assert desktop.armed and desktop.wheel.probing
+    assert desktop.wheel.pos() != first
 
 
 def test_windows_explorer_preview_populates_before_ole_but_requires_real_offer(desktop, tmp_path, monkeypatch):

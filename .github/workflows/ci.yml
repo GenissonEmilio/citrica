@@ -89,7 +89,9 @@ jobs:
       - name: Motores externos para os testes Windows
         shell: pwsh
         run: |
-          choco install ffmpeg libreoffice-fresh tesseract --yes --no-progress
+          # Keep this runner free of Office: missing LibreOffice was one of the
+          # reported failures. Optional LibreOffice paths remain covered on Linux.
+          choco install ffmpeg tesseract --yes --no-progress --execution-timeout=600
           if ($LASTEXITCODE -notin @(0, 1641, 3010)) { throw "Falha nas dependências Windows: $LASTEXITCODE" }
       - name: Dependências Python
         run: |

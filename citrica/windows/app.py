@@ -364,6 +364,7 @@ class Desktop(QObject):
                 self.generation += 1
                 self.paths, self.palette = [], None
                 self.wheel.clear()
+            if not self.armed or self.wheel.probing:
                 cursor = QCursor.pos()
                 screen = self.app.screenAt(cursor) or self.app.primaryScreen()
                 rect = screen.availableGeometry()

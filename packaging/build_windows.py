@@ -85,7 +85,8 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
     doctor = run(cli, '--doctor', capture_output=True, text=True, encoding='utf-8')
     data = json.loads(doctor.stdout)
     data['validation'] = {'runner': 'Windows Server 2022 x64 / GitHub Actions',
-                          'packaged_engine_smoke': True, 'interactive_explorer': 'pending external tester'}
+                          'packaged_engine_smoke': True,
+                          'explorer': 'see separate citrica-windows-explorer-*-validation.json reports'}
     (OUT / 'citrica-windows-validation.json').write_text(json.dumps(data, ensure_ascii=False, indent=2),
                                                           encoding='utf-8')
     run(payload / 'Citrica.exe', '--settings', '--screenshot', str(OUT / 'citrica-windows-preview.png'),
