@@ -1,0 +1,37 @@
+name: Validar Explorer Windows por código-fonte
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  explorer:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Dependências incluídas no aplicativo, sem instalar Office
+        run: |
+          python -m pip install -r requirements.lock
+          python -m pip install -e . --no-deps
+      - name: Explorer real, Ctrl, Alt e DOCX/PDF
+        run: python tests/windows/explorer_flow.py --source
+      - name: Explorer real com escala Qt de 150%
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py --source
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-explorer-source-evidence
+          path: |
+            release/*.json
+            release/*.png
+            build/windows-explorer-*/**/*.json
+            build/windows-explorer-*/**/*.log
+          retention-days: 7

@@ -415,15 +415,21 @@ class Desktop(QObject):
         if not paths:
             return
         if item['kind'] == 'tool':
-            try:
-                if item['id'] == 'float':
-                    self.keep_window(Shelf(paths))
-                elif item['id'] in {'copy', 'copy_path', 'terminal', 'move', 'share'}:
-                    file_action(item['id'], paths, resident=True)
-                else:
-                    self.keep_window(ToolDialog(item['id'], paths))
-            except Exception as error:
-                self.notify('Cítrica · falha', str(error))
+            # Return to OLE before touching the clipboard or opening a dialog.
+            # Explorer can still own its data object while Drop is on our stack.
+            def action():
+                if self._quitting:
+                    return
+                try:
+                    if item['id'] == 'float':
+                        self.keep_window(Shelf(paths))
+                    elif item['id'] in {'copy', 'copy_path', 'terminal', 'move', 'share'}:
+                        file_action(item['id'], paths, resident=True)
+                    else:
+                        self.keep_window(ToolDialog(item['id'], paths))
+                except Exception as error:
+                    self.notify('Cítrica · falha', str(error))
+            QTimer.singleShot(0, action)
             return
         self.busy = True
         self.notify('Cítrica', f"Convertendo {len(paths)} arquivo(s) para {item['label']}…")

@@ -196,7 +196,7 @@ def test_windows_tools_actions_pages_keyboard_and_conflict(desktop, tmp_path):
     desktop.drag_mode('actions')
     copy = next(i for i in desktop.wheel.items if i['id'] == 'copy_path')
     desktop.apply(copy)
-    assert desktop.app.clipboard().text() == str(source)
+    spin_until(lambda: desktop.app.clipboard().text() == str(source))
     assert_empty(desktop)
     desktop.show_wheel([source])
     spin_until(lambda: desktop.wheel.items)
@@ -254,6 +254,7 @@ def test_windows_copy_keeps_resident_alive_after_clipboard_changes(desktop, tmp_
     spin_until(lambda: desktop.wheel.items)
     copy = next(i for i in desktop.wheel.items if i['id'] == 'copy')
     desktop.apply(copy)
+    spin_until(lambda: desktop.app.clipboard().mimeData().urls() == [QUrl.fromLocalFile(str(source))])
     assert desktop.app.clipboard().mimeData().urls() == [QUrl.fromLocalFile(str(source))]
     desktop.app.clipboard().setText('The user copied something else')
     previous = desktop.app.quitOnLastWindowClosed()
@@ -308,7 +309,7 @@ def test_windows_explorer_preview_populates_before_ole_but_requires_real_offer(d
     desktop.offer([source])
     assert desktop.drag_verified
     desktop.apply(copy)
-    assert desktop.app.clipboard().text() == str(source)
+    spin_until(lambda: desktop.app.clipboard().text() == str(source))
     assert_empty(desktop)
 
 

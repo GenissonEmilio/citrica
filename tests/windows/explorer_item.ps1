@@ -1,8 +1,12 @@
 param([long]$WindowHandle, [string]$FileName, [string]$FileStem)
 Add-Type -AssemblyName UIAutomationClient
 $elementRoot = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]$WindowHandle)
-$elements = $elementRoot.FindAll([System.Windows.Automation.TreeScope]::Descendants,
-    [System.Windows.Automation.Condition]::TrueCondition)
+$fileCondition = [System.Windows.Automation.PropertyCondition]::new(
+    [System.Windows.Automation.AutomationElement]::NameProperty, $FileName)
+$stemCondition = [System.Windows.Automation.PropertyCondition]::new(
+    [System.Windows.Automation.AutomationElement]::NameProperty, $FileStem)
+$nameCondition = [System.Windows.Automation.OrCondition]::new($fileCondition, $stemCondition)
+$elements = $elementRoot.FindAll([System.Windows.Automation.TreeScope]::Descendants, $nameCondition)
 $candidates = @()
 foreach ($element in $elements) {
     try {
