@@ -20,8 +20,20 @@ jobs:
           cache: pip
       - name: Dependências Linux
         run: |
+          # The runner's Azure mirror can throttle large Office downloads.
+          # Use Ubuntu's main archive for reproducible package preparation.
+          sudo python3 - <<'PY'
+          from pathlib import Path
+          for path in [Path('/etc/apt/sources.list'), *Path('/etc/apt/sources.list.d').glob('*')]:
+              if path.is_file() and path.suffix in {'.list', '.sources'}:
+                  source = path.read_text()
+                  updated = source.replace('http://azure.archive.ubuntu.com/ubuntu',
+                                           'https://archive.ubuntu.com/ubuntu')
+                  if source != updated:
+                      path.write_text(updated)
+          PY
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libreoffice-writer libreoffice-calc libreoffice-impress rpm libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0 libxcb-render-util0 libxcb-xfixes0 libfontconfig1 libdbus-1-3 tesseract-ocr-eng libtesseract5
+          sudo apt-get install --no-install-recommends -y ffmpeg libreoffice-writer libreoffice-calc libreoffice-impress rpm libegl1 libgl1 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0 libxcb-render-util0 libxcb-xfixes0 libfontconfig1 libdbus-1-3 tesseract-ocr-eng libtesseract5
       - name: Dependências Python
         run: |
           python -m pip install -r requirements.lock

@@ -1,7 +1,7 @@
 O **Cítrica 0.5.0** corrige o fluxo da roda no Windows e adiciona **PDF→DOCX em Linux e Windows**, com motores incluídos no aplicativo.
 
-- **Windows / Ctrl, Alt e Shift:** a seleção da janela de origem do Explorer antecipa a prévia enquanto o arraste OLE é negociado. A operação exige a oferta real do arquivo; não utiliza apenas uma seleção presumida.
-- Ofertas nativas FileNameW/CF_HDROP são reconhecidas quando o Qt não fornece URLs. Revele a roda sem recriar/elevar novamente a janela durante DragEnter.
+- **Windows / Ctrl, Alt e Shift:** a seleção da janela de origem do Explorer antecipa a prévia enquanto o arraste OLE é negociado. A leitura do Explorer roda em processo separado com limite de tempo, mantendo a interface livre. A operação exige a oferta real do arquivo.
+- Ofertas nativas FileNameW/CF_HDROP são reconhecidas quando o Qt não fornece URLs. A roda aparece sem recriar/elevar novamente a janela durante DragEnter.
 - Drops feitos antes de as opções carregarem são mantidos até o motor ficar pronto. Soltar e tocar novamente o mesmo modificador permite nova tentativa.
 - **DOCX→PDF/TXT sem instalar Office**, além de TXT→PDF/DOCX. LibreOffice continua opcional para maior fidelidade e necessário para outros formatos Office.
 - **PDF→DOCX editável**, com texto, tabelas e imagens conforme o layout. O motor usa um processo separado para permitir cancelamento sem publicar arquivo parcial.

@@ -1,13 +1,13 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux e Windows.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0">Baixar para Linux e Windows</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
 O Cítrica 0.5 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
 
-**Nesta versão:** a roda reabre vazia após converter ou cancelar, e usa setores claros com miniatura, destaque laranja e animações de abertura/seleção/fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
+**Na 0.5.0:** correções da roda no Explorer, DOCX→PDF/TXT sem Office, PDF→DOCX em ambas as plataformas e miniatura do arraste acima da roda no GNOME. A roda reabre vazia após converter ou cancelar e mantém as animações de abertura, seleção e fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
 Implementação independente inspirada no fluxo do [Tangerine](https://www.tangerineformac.com/), com código e identidade próprios. Não é afiliada ao produto comercial e não oferece todas as suas combinações de formatos.
 
