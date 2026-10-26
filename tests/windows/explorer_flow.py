@@ -2,6 +2,7 @@
 
 Runs only on the CI's input desktop. No input is sent to a user's computer.
 """
+import argparse
 import ctypes
 import faulthandler
 import hashlib
@@ -27,15 +28,19 @@ from citrica.windows.ipc import send
 
 ROOT = Path(__file__).resolve().parents[2]
 SCALE = os.environ.get('QT_SCALE_FACTOR', '1')
-STATE = ROOT / f'build/windows-explorer-{SCALE}'
-STATE.mkdir(parents=True, exist_ok=True)
-(ROOT/'release').mkdir(exist_ok=True)
-os.environ['APPDATA'] = str(STATE/'config')
-os.environ['LOCALAPPDATA'] = str(STATE/'local')
-os.environ['CITRICA_OFFICE_ENGINE'] = 'builtin'
-
-
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('executable', help='Packaged executable or --source')
+    parser.add_argument('--same-folder', action='store_true')
+    # Keep the existing --source invocation accepted as a positional value.
+    arguments = parser.parse_args(['source' if arg == '--source' else arg for arg in sys.argv[1:]])
+    run_id = SCALE + ('-same-folder' if arguments.same_folder else '')
+    STATE = ROOT / f'build/windows-explorer-{run_id}'
+    STATE.mkdir(parents=True, exist_ok=True)
+    (ROOT/'release').mkdir(exist_ok=True)
+    os.environ['APPDATA'] = str(STATE/'config')
+    os.environ['LOCALAPPDATA'] = str(STATE/'local')
+    os.environ['CITRICA_OFFICE_ENGINE'] = 'builtin'
     faulthandler.dump_traceback_later(100, exit=True)
     app = QApplication([])
     user = ctypes.WinDLL('user32', use_last_error=True)
@@ -68,28 +73,31 @@ def main():
         raise AssertionError(current)
     folder = (STATE/'Citrica-explorer-validation').resolve()
     folder.mkdir(exist_ok=True)
-    for case in ['document', 'pdf', 'image', 'tools']:
-        (folder/case).mkdir(exist_ok=True)
-    source_docx = folder/'document/Citrica-document.docx'
+    def fixture(case, name):
+        parent = folder if arguments.same_folder else folder/case
+        parent.mkdir(exist_ok=True)
+        return parent/name
+    source_docx = fixture('document', 'Citrica-document.docx')
     doc = Document()
     doc.add_paragraph('Citrica real Explorer without LibreOffice')
     doc.save(source_docx)
-    source_pdf = folder/'pdf/Citrica-page.pdf'
+    source_pdf = fixture('pdf', 'Citrica-page.pdf')
     with pymupdf.open() as pdf:
         pdf.new_page().insert_text((50, 60), 'Citrica Explorer PDF to editable DOCX')
         pdf.save(source_pdf)
-    source_tools = folder/'tools/Citrica-tool.pdf'
+    source_tools = fixture('tools', 'Citrica-tool.pdf')
     source_tools.write_bytes(source_pdf.read_bytes())
-    source_image = folder/'image/Citrica-image.png'
+    source_image = fixture('image', 'Citrica-image.png')
     Image.new('RGB', (320, 200), 'orange').save(source_image)
     originals = {p: hashlib.sha256(p.read_bytes()).digest()
                  for p in [source_docx, source_pdf, source_image, source_tools]}
-    command = ([sys.executable, '-m', 'citrica'] if sys.argv[1] == '--source' else
-               [str(Path(sys.argv[1]).resolve())])
+    command = ([sys.executable, '-m', 'citrica'] if arguments.executable == 'source' else
+               [str(Path(arguments.executable).resolve())])
     resident_log = (STATE/'resident.log').open('w', encoding='utf-8')
     resident = subprocess.Popen([*command, '--background'], stdout=resident_log, stderr=subprocess.STDOUT)
     hwnd = None
-    report = {'real_explorer': True, 'qt_scale_factor': SCALE, 'office_engine': 'builtin', 'cases': {}}
+    report = {'real_explorer': True, 'qt_scale_factor': SCALE, 'office_engine': 'builtin',
+              'same_folder': arguments.same_folder, 'cases': {}}
     try:
         wait(lambda s: s['hotkey_active'])
         print('Explorer: aplicativo residente pronto.', flush=True)
@@ -118,9 +126,10 @@ def main():
 
         def drag(path, mode, vk, target):
             print(f'Explorer: selecionar {path.name}; modo {mode}.', flush=True)
-            # Use a separate source directory for each conversion. A new output
-            # must not asynchronously reshuffle the next test's input row.
-            window.Navigate(str(path.parent))
+            # In the shared-folder regression, stay in the same view while
+            # conversion outputs arrive and Explorer asynchronously sorts them.
+            if Path(window.Document.Folder.Self.Path) != path.parent:
+                window.Navigate(str(path.parent))
             until = time.monotonic()+10
             while time.monotonic() < until:
                 try:
@@ -180,7 +189,7 @@ def main():
             print('Explorer: oferta OLE confirmada.', flush=True)
             pause(.3)
             app.primaryScreen().grabWindow(0, ox-10, oy-10, 400, 435).save(
-                str(ROOT/f'release/citrica-windows-explorer-{mode}-{path.suffix[1:]}-{SCALE}.png'))
+                str(ROOT/f'release/citrica-windows-explorer-{mode}-{path.suffix[1:]}-{run_id}.png'))
             key(vk, False)
             button(False)
             print('Explorer: botão liberado.', flush=True)
@@ -212,9 +221,9 @@ def main():
             assert hashlib.sha256(path.read_bytes()).digest() == digest
         report['originals_preserved'] = True
         report['result'] = 'passed'
-        (ROOT/f'release/citrica-windows-explorer-{SCALE}-validation.json').write_text(
+        (ROOT/f'release/citrica-windows-explorer-{run_id}-validation.json').write_text(
             json.dumps(report, indent=2), encoding='utf-8')
-        print(f'Explorer real: Ctrl, Alt, Shift, DOCX/PDF sem Office e PDF→DOCX passaram (escala {SCALE}).')
+        print(f'Explorer real: Ctrl, Alt, Shift, DOCX/PDF sem Office e PDF→DOCX passaram ({run_id}).')
         faulthandler.cancel_dump_traceback_later()
     except Exception:
         try:
@@ -222,7 +231,7 @@ def main():
         except Exception as error:
             snapshot = {'ipc_error': str(error)}
         (STATE/'failed-state.json').write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
-        app.primaryScreen().grabWindow(0).save(str(ROOT/f'release/citrica-windows-explorer-failure-{SCALE}.png'))
+        app.primaryScreen().grabWindow(0).save(str(ROOT/f'release/citrica-windows-explorer-failure-{run_id}.png'))
         raise
     finally:
         for vk in [0x10, 0x11, 0x12, 0x1b]:

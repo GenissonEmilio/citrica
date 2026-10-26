@@ -121,6 +121,11 @@ jobs:
         env:
           QT_SCALE_FACTOR: '1.5'
         run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Conversões seguidas na mesma pasta do Explorer
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --same-folder
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
