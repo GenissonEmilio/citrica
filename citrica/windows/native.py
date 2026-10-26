@@ -94,11 +94,16 @@ class NativeDesktop(QObject):
             self._anchor, self._mode, self._suppressed = point, None, False
             self._drag_started = False
             self._source_window = self.user.GetForegroundWindow()
+            # Prefetch on press, before Explorer enters its modal OLE loop.
+            self.dragStarted.emit(self._source_window)
         moved = abs(point.x() - self._anchor.x()) >= 6 or abs(point.y() - self._anchor.y()) >= 6
         if left and moved and not self._suppressed:
             if not self._drag_started:
                 self._drag_started = True
-                self.dragStarted.emit(self._source_window)
+                foreground = self.user.GetForegroundWindow()
+                if foreground != self._source_window:
+                    self._source_window = foreground
+                    self.dragStarted.emit(foreground)
             trigger = self.down(0x10) if self.settings['drag_key'] == 'Shift' else self.down(0x5b) or self.down(0x5c)
             mode = 'actions' if self.down(0x11) else 'tools' if self.down(0x12) else 'convert' if trigger else None
             if mode and mode != self._mode:

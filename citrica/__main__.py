@@ -19,6 +19,7 @@ def main():
     parser.add_argument("--version", action="version", version=f"Cítrica {__version__}")
     parser.add_argument("--to", metavar="FORMATO", help="converte sem abrir a interface")
     parser.add_argument('--internal-pdf-docx', nargs=2, type=Path, help=argparse.SUPPRESS)
+    parser.add_argument('--internal-explorer-selection', type=int, help=argparse.SUPPRESS)
     parser.add_argument("--output", type=Path, help="pasta de saída; padrão: junto ao original")
     parser.add_argument("--quality", type=int, default=85)
     parser.add_argument("--max-width", type=int, default=0)
@@ -38,6 +39,14 @@ def main():
     parser.add_argument("--background", action="store_true", help="Windows: inicia somente na bandeja")
     parser.add_argument("--quit", action="store_true", help="Windows: encerra a instância na bandeja")
     args = parser.parse_args()
+    if args.internal_explorer_selection is not None:
+        from citrica.windows.explorer import selected_files
+        try:
+            print(json.dumps([str(p) for p in selected_files(args.internal_explorer_selection)], ensure_ascii=False))
+            return 0
+        except Exception as error:
+            print(str(error), file=sys.stderr)
+            return 1
     if args.desktop_request:
         from citrica.desktop import request
         try:

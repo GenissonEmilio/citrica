@@ -81,7 +81,8 @@ def main():
     originals = {p: hashlib.sha256(p.read_bytes()).digest() for p in [source_docx, source_pdf, source_image]}
     command = ([sys.executable, '-m', 'citrica'] if sys.argv[1] == '--source' else
                [str(Path(sys.argv[1]).resolve())])
-    resident = subprocess.Popen([*command, '--background'])
+    resident_log = (STATE/'resident.log').open('w', encoding='utf-8')
+    resident = subprocess.Popen([*command, '--background'], stdout=resident_log, stderr=subprocess.STDOUT)
     hwnd = None
     report = {'real_explorer': True, 'qt_scale_factor': SCALE, 'office_engine': 'builtin', 'cases': {}}
     try:
@@ -181,7 +182,11 @@ def main():
         print(f'Explorer real: Ctrl, Alt, Shift, DOCX/PDF sem Office e PDF→DOCX passaram (escala {SCALE}).')
         faulthandler.cancel_dump_traceback_later()
     except Exception:
-        (STATE/'failed-state.json').write_text(json.dumps(send({'op': 'status'}), indent=2), encoding='utf-8')
+        try:
+            snapshot = send({'op': 'status'})
+        except Exception as error:
+            snapshot = {'ipc_error': str(error)}
+        (STATE/'failed-state.json').write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
         app.primaryScreen().grabWindow(0).save(str(ROOT/f'release/citrica-windows-explorer-failure-{SCALE}.png'))
         raise
     finally:
@@ -190,12 +195,21 @@ def main():
         button(False)
         if hwnd:
             user.PostMessageW(hwnd, 0x10, 0, 0)  # Close only our controlled Explorer window.
-        send({'op': 'quit'})
         try:
+            try:
+                send({'op': 'quit'})
+            except RuntimeError:
+                pass
             resident.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            resident.terminate()
+            resident.wait(timeout=5)
         finally:
             if resident.poll() is None:
                 resident.terminate()
+                resident.wait(timeout=5)
+            resident_log.close()
+            faulthandler.cancel_dump_traceback_later()
 
 
 if __name__ == '__main__':

@@ -129,6 +129,7 @@ class Desktop(QObject):
         self.drag_epoch, self.drag_candidates, self.drag_verified = 0, [], False
         self.pending_drop = None
         self.offer_formats = []
+        self.preview_error = ''
         self.jobs, self.windows = set(), set()
         self.counts = {'converted': 0, 'errors': 0}
         self.last_message, self.hotkey_error = '', ''
@@ -225,6 +226,7 @@ class Desktop(QObject):
                 'busy': self.busy, 'mode': self.mode, 'counts': dict(self.counts),
                 'offer_verified': self.drag_verified, 'offer_formats': self.offer_formats,
                 'elevated': getattr(self.native, 'elevated', False),
+                'preview_error': self.preview_error,
                 'shortcut': self.settings['shortcut'], 'hotkey_active': not bool(self.hotkey_error),
                 'hotkey_error': self.hotkey_error, 'last_message': self.last_message}
 
@@ -331,15 +333,19 @@ class Desktop(QObject):
         self.drag_epoch += 1
         epoch = self.drag_epoch
         self.drag_candidates = []
-        from citrica.windows.explorer import selected_files
+        self.preview_error = ''
+        from citrica.windows.explorer import preview_files
         def done(paths):
             if epoch != self.drag_epoch or not self.native.left_down():
                 return
             self.drag_candidates = paths
             if paths and self.armed:
                 self.show_wheel(paths, self.mode, dragging=True, verified=False)
-        self.job(lambda _cancel: selected_files(hwnd), done,
-                 lambda error: logging.getLogger('citrica').info('Prévia Explorer indisponível: %s', error))
+        def failed(error):
+            if epoch == self.drag_epoch:
+                self.preview_error = error
+            logging.getLogger('citrica').info('Prévia Explorer indisponível: %s', error)
+        self.job(lambda _cancel: preview_files(hwnd), done, failed)
 
     def offer(self, paths):
         if paths != self.paths or not self.active:
@@ -529,6 +535,7 @@ def launch(args):
     handler = RotatingFileHandler(log_dir / 'citrica.log', maxBytes=1024*1024, backupCount=2, encoding='utf-8')
     handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
     logging.getLogger('citrica').addHandler(handler)
+    logging.getLogger('citrica').setLevel(logging.INFO)
     def report_exception(kind, error, traceback):
         logging.getLogger('citrica').error('Falha na interface', exc_info=(kind, error, traceback))
         QMessageBox.warning(None, 'Cítrica · falha', str(error) + '\nUse as configurações para salvar um diagnóstico.')

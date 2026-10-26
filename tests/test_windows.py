@@ -295,7 +295,7 @@ def test_windows_repeated_probe_tracks_the_new_pointer(desktop, monkeypatch):
 
 def test_windows_explorer_preview_populates_before_ole_but_requires_real_offer(desktop, tmp_path, monkeypatch):
     source = image_file(tmp_path)
-    monkeypatch.setattr('citrica.windows.explorer.selected_files', lambda hwnd: [source])
+    monkeypatch.setattr('citrica.windows.explorer.preview_files', lambda hwnd: [source])
     monkeypatch.setattr(desktop.native, 'left_down', lambda: True)
     desktop.prepare_drag(123)
     spin_until(lambda: desktop.drag_candidates)
