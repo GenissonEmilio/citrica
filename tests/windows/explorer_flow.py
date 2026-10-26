@@ -68,17 +68,22 @@ def main():
         raise AssertionError(current)
     folder = (STATE/'Citrica-explorer-validation').resolve()
     folder.mkdir(exist_ok=True)
-    source_docx = folder/'Citrica-document.docx'
+    for case in ['document', 'pdf', 'image', 'tools']:
+        (folder/case).mkdir(exist_ok=True)
+    source_docx = folder/'document/Citrica-document.docx'
     doc = Document()
     doc.add_paragraph('Citrica real Explorer without LibreOffice')
     doc.save(source_docx)
-    source_pdf = folder/'Citrica-page.pdf'
+    source_pdf = folder/'pdf/Citrica-page.pdf'
     with pymupdf.open() as pdf:
         pdf.new_page().insert_text((50, 60), 'Citrica Explorer PDF to editable DOCX')
         pdf.save(source_pdf)
-    source_image = folder/'Citrica-image.png'
+    source_tools = folder/'tools/Citrica-tool.pdf'
+    source_tools.write_bytes(source_pdf.read_bytes())
+    source_image = folder/'image/Citrica-image.png'
     Image.new('RGB', (320, 200), 'orange').save(source_image)
-    originals = {p: hashlib.sha256(p.read_bytes()).digest() for p in [source_docx, source_pdf, source_image]}
+    originals = {p: hashlib.sha256(p.read_bytes()).digest()
+                 for p in [source_docx, source_pdf, source_image, source_tools]}
     command = ([sys.executable, '-m', 'citrica'] if sys.argv[1] == '--source' else
                [str(Path(sys.argv[1]).resolve())])
     resident_log = (STATE/'resident.log').open('w', encoding='utf-8')
@@ -113,14 +118,32 @@ def main():
 
         def drag(path, mode, vk, target):
             print(f'Explorer: selecionar {path.name}; modo {mode}.', flush=True)
+            # Use a separate source directory for each conversion. A new output
+            # must not asynchronously reshuffle the next test's input row.
+            window.Navigate(str(path.parent))
+            until = time.monotonic()+10
+            while time.monotonic() < until:
+                try:
+                    if Path(window.Document.Folder.Self.Path) == path.parent:
+                        break
+                except (AttributeError, pythoncom.com_error):
+                    pass
+                pause(.1)
+            else:
+                raise AssertionError('Explorer não navegou para a pasta do arquivo de teste')
+            pause(.4)
             # Select through Explorer's own view, then perform a physical drag
             # starting at the file's actual UI Automation rectangle.
-            for attempt in range(3):
+            for attempt in range(6):
                 window.Document.SelectItem(window.Document.Folder.ParseName(path.name), 1|4|8|16)
                 pause(.3)
                 info = subprocess.run(['powershell', '-NoProfile', '-File',
                     str(ROOT/'tests/windows/explorer_item.ps1'), str(hwnd), path.name, path.stem],
-                    check=True, capture_output=True, text=True, timeout=20)
+                    capture_output=True, text=True, timeout=20)
+                if info.returncode:
+                    print('Explorer: aguardando a visualização de arquivos terminar de atualizar.', flush=True)
+                    pause(.5)
+                    continue
                 rect = json.loads(info.stdout)
                 print(f'Explorer: ícone localizado: {rect}.', flush=True)
                 x = round(rect['x']+min(rect['width']/2, 30))
@@ -140,7 +163,7 @@ def main():
                 print(f'Explorer: linhas reordenadas; repetindo seleção ({attempt+1}).', flush=True)
                 pause(.6)
             else:
-                raise AssertionError(f'O Explorer não selecionou o arquivo solicitado: {selected}')
+                raise AssertionError('O Explorer não selecionou o arquivo solicitado')
             user.SetCursorPos(x+55, y+12)
             pause(.3)
             key(vk, True)
@@ -178,7 +201,7 @@ def main():
         assert any('Citrica Explorer PDF to editable DOCX' in p.text
                    for p in Document(source_pdf.with_suffix('.docx')).paragraphs)
         report['cases']['pdf_docx_editable'] = True
-        drag(source_pdf, 'tools', 0x12, 'metadata')
+        drag(source_tools, 'tools', 0x12, 'metadata')
         # The metadata tool opens a dialog; close it through normal Escape.
         wait(lambda s: not s['visible'])
         pause(.5)
