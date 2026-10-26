@@ -32,6 +32,7 @@ class NativeDesktop(QObject):
     mode = Signal(str)
     released = Signal()
     key = Signal(str)
+    dragStarted = Signal(object)
 
     def __init__(self, app, settings):
         super().__init__()
@@ -46,6 +47,8 @@ class NativeDesktop(QObject):
         self.user.GetAsyncKeyState.restype = ctypes.c_short
         self.user.GetSystemMetrics.argtypes = [ctypes.c_int]
         self.user.GetSystemMetrics.restype = ctypes.c_int
+        self.user.GetForegroundWindow.restype = wintypes.HWND
+        self.elevated = bool(ctypes.WinDLL('shell32').IsUserAnAdmin())
         self.hotkey_id = 0
         self.shortcut = None
         self._next_id = 0x4c00
@@ -57,6 +60,7 @@ class NativeDesktop(QObject):
         self._mode = None
         self._suppressed = False
         self._keys = set()
+        self._drag_started, self._source_window = False, 0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.poll)
         self.timer.start(20)
@@ -88,13 +92,20 @@ class NativeDesktop(QObject):
         left, point = self.left_down(), QCursor.pos()
         if left and not self._left:
             self._anchor, self._mode, self._suppressed = point, None, False
+            self._drag_started = False
+            self._source_window = self.user.GetForegroundWindow()
         moved = abs(point.x() - self._anchor.x()) >= 6 or abs(point.y() - self._anchor.y()) >= 6
         if left and moved and not self._suppressed:
+            if not self._drag_started:
+                self._drag_started = True
+                self.dragStarted.emit(self._source_window)
             trigger = self.down(0x10) if self.settings['drag_key'] == 'Shift' else self.down(0x5b) or self.down(0x5c)
             mode = 'actions' if self.down(0x11) else 'tools' if self.down(0x12) else 'convert' if trigger else None
             if mode and mode != self._mode:
                 self._mode = mode
                 self.mode.emit(mode)
+            elif mode is None:
+                self._mode = None  # Releasing/repressing the same modifier can retry an offer.
         if self.visible:
             keys = {name for vk, name in [(0x1b, 'Escape'), (0x25, 'Left'), (0x27, 'Right'), (0x0d, 'Return')]
                     if self.down(vk)}

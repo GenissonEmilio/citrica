@@ -12,6 +12,8 @@ _spawn_lock = threading.RLock()
 
 def program(name):
     """Locate bundled tools, PATH programs and standard Windows installations."""
+    if name == 'libreoffice' and os.environ.get('CITRICA_OFFICE_ENGINE') == 'builtin':
+        return None
     if sys.platform != 'win32':
         return shutil.which(name)
     root = Path(getattr(sys, '_MEIPASS', Path(__file__).parent.parent))

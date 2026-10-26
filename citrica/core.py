@@ -76,7 +76,7 @@ def formats(path: Path) -> list[str]:
                    "tiff": "TIFF", "bmp": "BMP", "gif": "GIF", "pdf": "PDF"}
         return [ext for ext, codec in choices.items() if codec in available]
     if kind == "pdf":
-        return ["png", "jpg", "txt", "pdf"]
+        return ["png", "jpg", "docx", "txt", "pdf"]
     if kind in {"video", "audio"}:
         if not dependencies()["ffmpeg"]:
             return []
@@ -90,7 +90,7 @@ def formats(path: Path) -> list[str]:
         if dependencies()["libreoffice"]:
             return {"document": ["pdf", "docx", "odt", "txt"], "sheet": ["pdf", "xlsx", "ods", "csv"],
                     "slides": ["pdf", "pptx", "odp"]}[kind]
-        return ["pdf"] if path.suffix.lower() == ".txt" else []
+        return {'.docx': ['pdf', 'txt'], '.txt': ['pdf', 'docx']}.get(path.suffix.lower(), [])
     return []
 
 
@@ -225,6 +225,12 @@ def _pdf(source: Path, target: Path, opts: Options, cancel: threading.Event) -> 
     import pymupdf
     from pypdf import PdfReader, PdfWriter
 
+    if target.suffix == '.docx':
+        # Isolate the layout engine so cancellation can stop a difficult page,
+        # and its PDF libraries never share mutable state with GUI threads.
+        from citrica.desktop import backend_command
+        run_process([*backend_command(), '--internal-pdf-docx', str(source), str(target)], cancel)
+        return [target]
     if target.suffix == ".pdf":
         reader = PdfReader(source)
         writer = PdfWriter()
@@ -283,6 +289,9 @@ def _document(source: Path, target: Path, cancel: threading.Event):
         return
     executable = dependencies()["libreoffice"]
     if not executable:
+        from citrica.documents import basic_document
+        if basic_document(source, target, cancel):
+            return
         raise ConversionError("Instale LibreOffice para converter documentos de escritório.")
     with tempfile.TemporaryDirectory(prefix="citrica-office-") as folder:
         root = Path(folder)

@@ -1,5 +1,6 @@
 """Transparent Qt/Win32 drop target with the same annular design as GNOME."""
 import math
+import struct
 from pathlib import Path
 
 from PySide6.QtCore import QEasingCurve, QPointF, QRectF, Qt, QVariantAnimation, Signal
@@ -25,10 +26,40 @@ def hit_test(x, y, count):
 
 
 def offered_paths(mime):
-    if not mime.hasUrls() or len(mime.urls()) > 1000:
+    urls = mime.urls() if mime.hasUrls() else []
+    if not urls:
+        # Explorer and shell extensions may expose CF_HDROP/FileNameW without
+        # Qt synthesizing text/uri-list. Read only these filesystem formats.
+        for name in mime.formats():
+            if 'value="FileNameW"' in name:
+                data = bytes(mime.data(name))
+                if len(data) > 1024*1024 or len(data) % 2:
+                    return []
+                try:
+                    names = [s for s in data.decode('utf-16-le').split('\0') if s]
+                except UnicodeError:
+                    return []
+                from PySide6.QtCore import QUrl
+                urls = [QUrl.fromLocalFile(s) for s in names]
+                break
+            if 'value="CF_HDROP"' in name:
+                data = bytes(mime.data(name))
+                if not 20 <= len(data) <= 1024*1024:
+                    return []
+                offset, _x, _y, _nonclient, wide = struct.unpack_from('<IiiII', data)
+                if not wide or offset < 20 or offset > len(data) or (len(data)-offset) % 2:
+                    return []
+                try:
+                    names = [s for s in data[offset:].decode('utf-16-le').split('\0') if s]
+                except UnicodeError:
+                    return []
+                from PySide6.QtCore import QUrl
+                urls = [QUrl.fromLocalFile(s) for s in names]
+                break
+    if not urls or len(urls) > 1000:
         return []
     paths = []
-    for url in mime.urls():
+    for url in urls:
         if not url.isLocalFile():
             return []
         path = Path(url.toLocalFile()).resolve()
@@ -77,6 +108,8 @@ class Wheel(QWidget):
     chosen = Signal(object)
     cancelled = Signal()
     pickFiles = Signal()
+    dropped = Signal(object, object)
+    offerObserved = Signal(object)
 
     def __init__(self, animations=lambda: True):
         super().__init__(None, Qt.WindowType.Tool | Qt.WindowType.FramelessWindowHint |
@@ -120,8 +153,11 @@ class Wheel(QWidget):
         self._closing, self._closing_frame = False, None
         self.probing = probing
         self.move(position)
-        self.show()
-        self.raise_()
+        # Revealing an already mapped probe during DragEnter must not remap or
+        # raise its HWND: that can invalidate Explorer's current OLE target.
+        if not self.isVisible():
+            self.show()
+            self.raise_()
         if self.animations() and not probing:
             self._motion.setStartValue(0.)
             self._motion.setEndValue(1.)
@@ -308,6 +344,7 @@ class Wheel(QWidget):
             painter.drawText(hint, Qt.AlignmentFlag.AlignCenter, 'Solte um arquivo aqui · Esc para fechar')
 
     def dragEnterEvent(self, event):
+        self.offerObserved.emit(list(event.mimeData().formats()))
         paths = offered_paths(event.mimeData())
         if paths and not self._closing:
             event.setDropAction(Qt.DropAction.CopyAction)
@@ -319,7 +356,10 @@ class Wheel(QWidget):
                 self.cancelled.emit()
 
     def dragMoveEvent(self, event):
-        if offered_paths(event.mimeData()) and not self._closing:
+        paths = offered_paths(event.mimeData())
+        if paths and not self._closing:
+            if paths != self.paths:
+                self.filesOffered.emit(paths)
             self.select(hit_test(event.position().x(), event.position().y(), len(self.items)))
             event.setDropAction(Qt.DropAction.CopyAction)
             event.accept()
@@ -328,11 +368,10 @@ class Wheel(QWidget):
 
     def dropEvent(self, event):
         paths = offered_paths(event.mimeData())
-        if paths and paths == self.paths and self.selected >= 0 and not self._closing:
-            item = self.items[self.selected]
+        if paths and not self._closing:
             event.setDropAction(Qt.DropAction.CopyAction)
             event.accept()
-            self.chosen.emit(item)
+            self.dropped.emit(paths, event.position().toPoint())
         else:
             event.ignore()
             self.cancelled.emit()

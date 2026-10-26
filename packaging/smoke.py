@@ -4,6 +4,7 @@ import subprocess
 import json
 import tempfile
 import shutil
+import os
 from pathlib import Path
 
 from PIL import Image
@@ -37,6 +38,23 @@ def verify(executable: Path):
         for output in outputs:
             with Image.open(output) as image:
                 assert image.width > 0
+        import pymupdf
+        from docx import Document
+        text_pdf = root / 'editable.pdf'
+        with pymupdf.open() as pdf:
+            pdf.new_page().insert_text((50, 60), 'Citrica PDF to editable DOCX')
+            pdf.save(text_pdf)
+        proc = subprocess.run([str(executable), str(text_pdf), '--to', 'docx'],
+                              check=True, capture_output=True, text=True)
+        editable = Path(proc.stdout.strip())
+        assert 'Citrica PDF to editable DOCX' in '\n'.join(p.text for p in Document(editable).paragraphs)
+        builtin_env = dict(os.environ, CITRICA_OFFICE_ENGINE='builtin')
+        for fmt in ['pdf', 'txt']:
+            proc = subprocess.run([str(executable), str(editable), '--to', fmt], env=builtin_env,
+                                  check=True, capture_output=True, text=True)
+            output = Path(proc.stdout.strip())
+            text = PdfReader(output).pages[0].extract_text() if fmt == 'pdf' else output.read_text(encoding='utf-8')
+            assert 'Citrica PDF to editable DOCX' in text
         face = root / 'face.png'
         fixture = Path(__file__).resolve().parents[1] / 'tests/fixtures/astronaut.png'
         face.write_bytes(fixture.read_bytes())
@@ -70,3 +88,4 @@ def verify(executable: Path):
         print('Binário empacotado: FFmpeg/ffprobe e LibreOffice externos verificados quando instalados.')
         print('Binário empacotado: detecção local de rostos/texto e ferramentas verificadas.')
         print("Binário empacotado: JPG, HEIC, AVIF, PDF e renderização multipágina verificados.")
+        print('Binário empacotado: PDF→DOCX editável e DOCX→PDF/TXT sem LibreOffice verificados.')

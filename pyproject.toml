@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "citrica"
-version = "0.4.0"
+version = "0.5.0"
 description = "Conversão de arquivos local e radial para Linux e Windows"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -15,6 +15,8 @@ dependencies = [
   "pypdf>=5,<7", "PyMuPDF>=1.25,<2",
   "zxing-cpp>=3.1,<4",
   "opencv-python-headless>=4.10,<5",
+  "python-docx>=1.2,<2", "pdf2docx>=0.5.13,<0.6",
+  "pywin32>=312; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]

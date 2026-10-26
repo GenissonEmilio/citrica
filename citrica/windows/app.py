@@ -21,7 +21,7 @@ from citrica.desktop import request
 from citrica.gui import ICON, STYLE
 from citrica.windows import config
 from citrica.windows.ipc import MAX_REQUEST, send, server_name
-from citrica.windows.wheel import CENTER, SIZE, Wheel
+from citrica.windows.wheel import CENTER, SIZE, Wheel, hit_test
 
 
 class Job(QThread):
@@ -55,6 +55,9 @@ class Settings(QDialog):
         note.setWordWrap(True)
         layout.addWidget(note)
         self.status = QLabel('O Cítrica continua na bandeja ao fechar esta janela.')
+        if getattr(desktop.native, 'elevated', False):
+            self.status.setText('Executando como administrador: o Windows pode bloquear arrastes do Explorer. '
+                                'Feche pela bandeja e abra o Cítrica com permissões normais.')
         self.status.setWordWrap(True)
         layout.addWidget(self.status)
         form = QFormLayout()
@@ -123,12 +126,17 @@ class Desktop(QObject):
         self.paths, self.palette, self.mode, self.page = [], None, 'convert', 0
         self.generation, self.busy, self.active, self.dragging = 0, False, False, False
         self.armed = False
+        self.drag_epoch, self.drag_candidates, self.drag_verified = 0, [], False
+        self.pending_drop = None
+        self.offer_formats = []
         self.jobs, self.windows = set(), set()
         self.counts = {'converted': 0, 'errors': 0}
         self.last_message, self.hotkey_error = '', ''
         self._quitting = False
         self.wheel = Wheel(lambda: self.settings['animations'])
         self.wheel.filesOffered.connect(self.offer)
+        self.wheel.dropped.connect(self.drop)
+        self.wheel.offerObserved.connect(self.observe_offer)
         self.wheel.chosen.connect(self.apply)
         self.wheel.cancelled.connect(self.hide_wheel)
         self.wheel.pickFiles.connect(self.pick)
@@ -140,6 +148,8 @@ class Desktop(QObject):
         self.native.mode.connect(self.drag_mode)
         self.native.released.connect(self.release)
         self.native.key.connect(lambda key: self.wheel.keyboard(key, QCursor.pos()))
+        if hasattr(self.native, 'dragStarted'):
+            self.native.dragStarted.connect(self.prepare_drag)
         try:
             self.native.register(self.settings['shortcut'])
         except ValueError as error:
@@ -213,6 +223,8 @@ class Desktop(QObject):
                 'selection': self.wheel.info, 'selected': self.wheel.selected,
                 'cachedSelection': self.palette is not None, 'dragging': self.dragging,
                 'busy': self.busy, 'mode': self.mode, 'counts': dict(self.counts),
+                'offer_verified': self.drag_verified, 'offer_formats': self.offer_formats,
+                'elevated': getattr(self.native, 'elevated', False),
                 'shortcut': self.settings['shortcut'], 'hotkey_active': not bool(self.hotkey_error),
                 'hotkey_error': self.hotkey_error, 'last_message': self.last_message}
 
@@ -250,7 +262,7 @@ class Desktop(QObject):
         else:
             self.show_wheel([])
 
-    def show_wheel(self, paths, mode='convert', dragging=False):
+    def show_wheel(self, paths, mode='convert', dragging=False, verified=True):
         if self.busy or self._quitting:
             self.notify('Cítrica', 'Aguarde a conversão em andamento.')
             return
@@ -264,6 +276,7 @@ class Desktop(QObject):
             self.palette = None
             self.wheel.clear()
         self.paths, self.mode, self.dragging, self.page = paths, mode, dragging, 0
+        self.drag_verified = verified
         if not self.active:
             cursor = QCursor.pos()
             screen = self.app.screenAt(cursor) or self.app.primaryScreen()
@@ -304,12 +317,43 @@ class Desktop(QObject):
         self.wheel.set_palette(self.paths, current, self.palette['selection'])
         if not items:
             self.notify('Cítrica', 'Nenhuma operação disponível para este tipo de arquivo.')
+        if self.pending_drop and self.pending_drop[0] == self.generation:
+            _token, point = self.pending_drop
+            self.pending_drop = None
+            selected = hit_test(point.x(), point.y(), len(current))
+            if selected >= 0:
+                self.apply(current[selected])
+
+    def observe_offer(self, formats):
+        self.offer_formats = [str(f)[:200] for f in formats[:64]]
+
+    def prepare_drag(self, hwnd):
+        self.drag_epoch += 1
+        epoch = self.drag_epoch
+        self.drag_candidates = []
+        from citrica.windows.explorer import selected_files
+        def done(paths):
+            if epoch != self.drag_epoch or not self.native.left_down():
+                return
+            self.drag_candidates = paths
+            if paths and self.armed:
+                self.show_wheel(paths, self.mode, dragging=True, verified=False)
+        self.job(lambda _cancel: selected_files(hwnd), done,
+                 lambda error: logging.getLogger('citrica').info('Prévia Explorer indisponível: %s', error))
 
     def offer(self, paths):
-        if paths != self.paths:
+        if paths != self.paths or not self.active:
             self.show_wheel(paths, self.mode, dragging=True)
         else:
             self.dragging = True
+        self.drag_verified = True
+
+    def drop(self, paths, point):
+        self.offer(paths)  # An actual OLE drop always supersedes a selection preview.
+        self.dragging = False
+        self.pending_drop = (self.generation, point)
+        if self.palette:
+            self.render()
 
     def drag_mode(self, mode):
         if not self.active:
@@ -329,6 +373,8 @@ class Desktop(QObject):
                 # offer. Text selection and moving windows stay invisible.
                 self.wheel.present(position, probing=True)
                 self.armed = self.dragging = self.native.visible = True
+            if self.drag_candidates:
+                self.show_wheel(self.drag_candidates, mode, dragging=True, verified=False)
         elif mode != self.mode:
             self.mode, self.page = mode, 0
             self.render()
@@ -344,12 +390,17 @@ class Desktop(QObject):
         self.generation += 1
         self.paths, self.palette, self.dragging, self.active = [], None, False, False
         self.armed = False
+        self.drag_epoch += 1
+        self.drag_candidates, self.drag_verified, self.pending_drop = [], False, None
         self.page = 0
         self.native.visible = False
         self.native.reset_drag()
         self.wheel.dismiss()
 
     def apply(self, item):
+        if self.dragging and not self.drag_verified:
+            self.notify('Cítrica', 'Mova o arquivo sobre a opção e solte para confirmar o arraste.')
+            return
         if item['kind'] == 'page':
             # Dropping on More ends OLE, but keeps this selection available for
             # the next click. A subsequent fresh opening still clears it.

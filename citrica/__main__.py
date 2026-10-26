@@ -18,6 +18,7 @@ def main():
     parser.add_argument("files", type=Path, nargs="*")
     parser.add_argument("--version", action="version", version=f"Cítrica {__version__}")
     parser.add_argument("--to", metavar="FORMATO", help="converte sem abrir a interface")
+    parser.add_argument('--internal-pdf-docx', nargs=2, type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--output", type=Path, help="pasta de saída; padrão: junto ao original")
     parser.add_argument("--quality", type=int, default=85)
     parser.add_argument("--max-width", type=int, default=0)
@@ -65,6 +66,14 @@ def main():
             print(path)
         return 0
     from citrica.core import Options, common_formats, convert, dependencies, merge_pdfs
+    if args.internal_pdf_docx:
+        from citrica.documents import pdf_to_docx
+        try:
+            pdf_to_docx(*args.internal_pdf_docx)
+            return 0
+        except Exception as error:
+            print(str(error), file=sys.stderr)
+            return 1
     if args.doctor:
         import importlib.util
         import platform

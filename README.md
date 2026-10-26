@@ -1,11 +1,11 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux e Windows.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.4.0">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0">Baixar para Linux</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
-O Cítrica 0.4 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
+O Cítrica 0.5 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
 
 **Nesta versão:** a roda reabre vazia após converter ou cancelar, e usa setores claros com miniatura, destaque laranja e animações de abertura/seleção/fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
@@ -13,11 +13,11 @@ Implementação independente inspirada no fluxo do [Tangerine](https://www.tange
 
 ## Windows x64
 
-Baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.4.0/citrica-0.4.0-windows-x86_64-setup.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.4.0/citrica-0.4.0-windows-x86_64-portable.zip). O instalador usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
+Baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.5.0/citrica-0.5.0-windows-x86_64-setup.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.5.0/citrica-0.5.0-windows-x86_64-portable.zip). O instalador usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
 
 Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferramentas; **Ctrl**, ações. **Ctrl+Alt+C** abre/fecha a roda. O aplicativo permanece na bandeja ao fechar as configurações. O atalho e a inicialização automática são configuráveis.
 
-Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **FFmpeg/ffprobe, LibreOffice e Tesseract são opcionais externos no Windows.** O instalador ainda não tem assinatura digital. A validação manual do fluxo no Explorer está pendente do teste externo combinado; os resultados automatizados estão na documentação.
+Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **PDF→DOCX e DOCX→PDF/TXT funcionam sem instalar Office. FFmpeg/ffprobe, LibreOffice e Tesseract são opcionais externos no Windows.** O instalador ainda não tem assinatura digital. Os resultados e limites dos testes do Explorer estão na documentação de validação.
 
 ![Roda em execução nativa no Windows do CI](docs/windows-wheel.png)
 
@@ -29,10 +29,10 @@ Demonstração no Fedora: arraste o arquivo, escolha o formato na roda e receba 
 
 https://github.com/user-attachments/assets/812f2703-e781-4b44-a544-3829eae95688
 
-Baixe o RPM da [release v0.4.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.4.0):
+Baixe o RPM da [release v0.5.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0):
 
 ~~~bash
-sudo dnf install ./citrica-0.4.0-1.x86_64.rpm
+sudo dnf install ./citrica-0.5.0-1.x86_64.rpm
 citrica --install-gnome
 ~~~
 
@@ -55,9 +55,9 @@ No Linux, a integração global desta versão suporta **GNOME Shell 50**. A CLI 
 
 ~~~bash
 # DEB, para sistemas compatíveis com as bibliotecas indicadas acima
-sudo apt install ./citrica_0.4.0_amd64.deb
+sudo apt install ./citrica_0.5.0_amd64.deb
 # Portátil, sem precisar instalar Python
- tar -xzf citrica-0.4.0-linux-x86_64.tar.gz
+ tar -xzf citrica-0.5.0-linux-x86_64.tar.gz
  ./citrica/install.sh
 ~~~
 
@@ -98,16 +98,17 @@ O tamanho alvo publica somente resultados que respeitam o limite solicitado; se 
 | Entrada | Saída | Motor |
 | --- | --- | --- |
 | JPG, PNG, WebP, TIFF, BMP, GIF, AVIF, HEIC/HEIF | PNG, JPG, WebP, AVIF, HEIC, TIFF, BMP, GIF, PDF | Pillow + pillow-heif |
-| PDF | PNG/JPG por página, TXT, PDF | PyMuPDF + pypdf |
+| PDF | DOCX editável, PNG/JPG por página, TXT, PDF | pdf2docx + PyMuPDF + pypdf |
 | MP4, MOV, MKV, AVI, WebM, WMV, M4V, MPEG | MP4, WebM, MKV, MOV, GIF, MP3, WAV | FFmpeg |
 | MP3, WAV, FLAC, OGG, Opus, M4A, MKA, AAC, AIFF, WMA | MP3, WAV, FLAC, OGG, Opus, M4A, AIFF | FFmpeg |
-| DOC/DOCX, ODT, RTF, TXT | PDF, DOCX, ODT, TXT | LibreOffice; TXT→PDF interno |
+| DOCX | PDF, TXT | Motor incluído; LibreOffice opcional para maior fidelidade e ODT |
+| DOC, ODT, RTF, TXT | PDF, DOCX, ODT, TXT | LibreOffice; TXT→PDF/DOCX interno |
 | XLS/XLSX, ODS, CSV, TSV | PDF, XLSX, ODS, CSV | LibreOffice |
 | PPT/PPTX, ODP | PDF, PPTX, ODP | LibreOffice |
 | SRT, VTT | SRT, VTT, TXT | Interno |
 | ZIP, TAR, TAR.GZ, TGZ | ZIP, TAR, TAR.GZ | Python |
 
-Saídas são publicadas atomicamente, junto ao original por padrão; nomes repetidos recebem sufixos. Imagens animadas/multipágina são recusadas para evitar perda de quadros. SVG, RAR, Pages, EPUB e PDF→Office não estão implementados. Office depende do LibreOffice e seus filtros; a limpeza de metadados não cobre documentos Office. Legendas preservam texto e tempos básicos, sem estilos específicos. Arquivos compactados são reempacotados, sem extração pública; links, nomes inseguros e entradas duplicadas são recusados (10.000 entradas / 2 GiB descompactados).
+Saídas são publicadas atomicamente, junto ao original por padrão; nomes repetidos recebem sufixos. Imagens animadas/multipágina são recusadas para evitar perda de quadros. SVG, RAR, Pages, EPUB e PDF→XLSX/PPTX não estão implementados. PDF→DOCX preserva texto/tabelas/imagens conforme o layout; PDFs escaneados mantêm as páginas como imagens, sem OCR automático. O motor básico de DOCX→PDF preserva conteúdo e pode alterar layouts avançados; LibreOffice é recomendado nesses casos e continua necessário para DOC/ODT/RTF, planilhas e apresentações; a limpeza de metadados não cobre documentos Office. Legendas preservam texto e tempos básicos, sem estilos específicos. Arquivos compactados são reempacotados, sem extração pública; links, nomes inseguros e entradas duplicadas são recusados (10.000 entradas / 2 GiB descompactados).
 
 ## Terminal e desenvolvimento
 

@@ -3,6 +3,7 @@ import json
 import math
 import os
 import time
+import unicodedata
 
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
@@ -262,3 +263,84 @@ def test_windows_copy_keeps_resident_alive_after_clipboard_changes(desktop, tmp_
     desktop.app.exec()
     desktop.app.setQuitOnLastWindowClosed(previous)
     assert time.monotonic() - started >= 1.2, 'Clipboard changes must not terminate the resident app'
+
+
+def test_windows_explorer_filenamew_offer(tmp_path):
+    source = image_file(tmp_path)
+    mime = QMimeData()
+    name = 'application/x-qt-windows-mime;value="FileNameW"'
+    mime.setData(name, (str(source)+'\0\0').encode('utf-16-le'))
+    assert not mime.hasUrls()
+    assert offered_paths(mime) == [source]
+    mime.setData(name, b'odd')
+    assert offered_paths(mime) == []
+
+
+def test_windows_explorer_preview_populates_before_ole_but_requires_real_offer(desktop, tmp_path, monkeypatch):
+    source = image_file(tmp_path)
+    monkeypatch.setattr('citrica.windows.explorer.selected_files', lambda hwnd: [source])
+    monkeypatch.setattr(desktop.native, 'left_down', lambda: True)
+    desktop.prepare_drag(123)
+    spin_until(lambda: desktop.drag_candidates)
+    desktop.drag_mode('actions')
+    spin_until(lambda: desktop.wheel.items)
+    assert desktop.active and not desktop.drag_verified
+    before = desktop.app.clipboard().text()
+    copy = next(i for i in desktop.wheel.items if i['id'] == 'copy_path')
+    desktop.apply(copy)
+    assert desktop.active and desktop.app.clipboard().text() == before
+    desktop.offer([source])
+    assert desktop.drag_verified
+    desktop.apply(copy)
+    assert desktop.app.clipboard().text() == str(source)
+    assert_empty(desktop)
+
+
+def test_windows_fast_drop_waits_for_slow_palette(desktop, tmp_path, monkeypatch):
+    from citrica.desktop import request
+    def delayed(payload):
+        time.sleep(.7)
+        return request(payload)
+    monkeypatch.setattr('citrica.windows.app.request', delayed)
+    source = image_file(tmp_path)
+    desktop.show_wheel([])
+    mime = QMimeData()
+    mime.setUrls([QUrl.fromLocalFile(str(source))])
+    enter = QDragEnterEvent(QPoint(CENTER, CENTER), Qt.DropAction.CopyAction,
+                            mime, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.ShiftModifier)
+    QApplication.sendEvent(desktop.wheel, enter)
+    angle = -math.pi/2 + math.tau/8  # JPG is sector 1 on image page 1.
+    point = QPointF(CENTER+LABEL_RADIUS*math.cos(angle), CENTER+LABEL_RADIUS*math.sin(angle))
+    drop = QDropEvent(point, Qt.DropAction.CopyAction, mime,
+                     Qt.MouseButton.LeftButton, Qt.KeyboardModifier.ShiftModifier)
+    QApplication.sendEvent(desktop.wheel, drop)
+    assert drop.isAccepted() and desktop.pending_drop and not desktop.dragging
+    desktop.release()
+    spin_until(lambda: desktop.counts['converted'] == 1 and not desktop.busy)
+    assert Image.open(next(tmp_path.glob('*.jpg'))).size == (320, 200)
+    assert_empty(desktop)
+
+
+def test_windows_docx_and_pdf_options_without_libreoffice(desktop, tmp_path, monkeypatch):
+    from docx import Document
+    import pymupdf
+    monkeypatch.setenv('CITRICA_OFFICE_ENGINE', 'builtin')
+    source = tmp_path/'document.docx'
+    doc = Document()
+    doc.add_paragraph('Citrica without LibreOffice')
+    doc.save(source)
+    desktop.show_wheel([source])
+    spin_until(lambda: desktop.wheel.items)
+    assert {i['id'] for i in desktop.wheel.items} == {'pdf', 'txt'}
+    desktop.apply(next(i for i in desktop.wheel.items if i['id'] == 'pdf'))
+    spin_until(lambda: desktop.counts['converted'] == 1 and not desktop.busy)
+    pdf = next(tmp_path.glob('*.pdf'))
+    with pymupdf.open(pdf) as result:
+        assert 'Citrica without LibreOffice' in unicodedata.normalize('NFKC', result[0].get_text())
+    desktop.show_wheel([pdf])
+    spin_until(lambda: desktop.wheel.items)
+    assert any(i['id'] == 'docx' for i in desktop.wheel.items)
+    desktop.apply(next(i for i in desktop.wheel.items if i['id'] == 'docx'))
+    spin_until(lambda: desktop.counts['converted'] == 2 and not desktop.busy)
+    assert any('Citrica without LibreOffice' in unicodedata.normalize('NFKC', p.text)
+               for p in Document(tmp_path/'document (1).docx').paragraphs)

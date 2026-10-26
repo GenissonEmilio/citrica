@@ -107,7 +107,18 @@ jobs:
         run: python tests/windows/native_flow.py dist/Citrica/Citrica.exe
       - name: Instalar, abrir e desinstalar o pacote Windows
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-        run: python tests/windows/install_smoke.py release/citrica-0.4.0-windows-x86_64-setup.exe
+        shell: pwsh
+        run: |
+          $version = python -c "from citrica import __version__; print(__version__)"
+          python tests/windows/install_smoke.py "release/citrica-$version-windows-x86_64-setup.exe"
+      - name: Explorer real, Ctrl, Alt e documentos sem LibreOffice
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Explorer real com escala Qt de 150%
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
@@ -122,6 +133,8 @@ jobs:
             build/windows-native/**/*.json
             build/windows-native/**/*.log
             build/windows-installer/*.log
+            build/windows-explorer-*/**/*.json
+            build/windows-explorer-*/**/*.log
             release/*.png
             release/*validation.json
           retention-days: 7

@@ -36,6 +36,10 @@ run(sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--name", "ci
     "--add-data", "gnome:gnome",
     "--collect-data", "cv2", "--copy-metadata", "opencv-python-headless",
     "--collect-all", "pymupdf", "--copy-metadata", "Pillow", "--copy-metadata", "pypdf",
+    "--collect-all", "pdf2docx", "--collect-data", "docx",
+    "--copy-metadata", "python-docx", "--copy-metadata", "pdf2docx",
+    "--copy-metadata", "fonttools", "--copy-metadata", "lxml",
+    "--copy-metadata", "fire", "--copy-metadata", "termcolor", "--copy-metadata", "typing_extensions",
     "--copy-metadata", "PyMuPDF", "--copy-metadata", "PySide6-Essentials",
     "--copy-metadata", "zxing-cpp", "--copy-metadata", "numpy",
     "--copy-metadata", "shiboken6", *ocr, "packaging/entry.py")

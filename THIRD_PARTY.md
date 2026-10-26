@@ -35,3 +35,9 @@ A distribuição Windows 0.4.0 também usa Tesseract como dependência opcional 
 O pacote inclui a biblioteca Tesseract da distribuição de build, suas dependências nativas e eng.traineddata. Textos de licença, autores e avisos acompanham licenses/; no build Ubuntu os arquivos copyright dos pacotes libtesseract5, liblept5 e tesseract-ocr-eng também são copiados. As versões concretas são as do ambiente de build registrado no CI (Ubuntu 24.04); a execução por código-fonte usa as bibliotecas do sistema. A biblioteca OpenCV do wheel pode conter componentes FFmpeg, usados internamente pelo próprio OpenCV, com avisos preservados. O programa de linha de comando FFmpeg usado para conversões de mídia continua sendo instalado separadamente.
 
 O metadado completo dos wheels OpenCV, NumPy e zxing-cpp é copiado para _internal, incluindo seus avisos de terceiros. A imagem NASA astronaut.png é somente um fixture de testes e não faz parte do aplicativo; a origem está em tests/fixtures/README.md. qrcode é uma dependência exclusiva dos testes (BSD-3-Clause), sem uso no executável.
+
+## Documentos e integração Windows (0.5.0)
+
+PDF→DOCX utiliza pdf2docx 0.5.13 (MIT), PyMuPDF e python-docx 1.2.0 (MIT). O projeto upstream pdf2docx informa que não recebe manutenção ativa da Artifex; a versão é fixada e validada pelos testes de conversão do Cítrica. FontTools (MIT), lxml/libxml2/libxslt (BSD/MIT), fire (Apache-2.0), termcolor (MIT) e typing_extensions (PSF) acompanham seus metadados/avisos no pacote. Textos de licença também estão em `licenses/`.
+
+No Windows, pywin32 (licença PSF e avisos próprios) oferece a automação COM de leitura da seleção do Explorer. Não há redistribuição de Microsoft Word ou LibreOffice. A seleção antecipada é somente uma prévia; o arraste real confirma a operação. O código DOCX básico do Cítrica usa python-docx e o renderizador PyMuPDF.

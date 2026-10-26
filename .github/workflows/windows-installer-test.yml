@@ -26,7 +26,10 @@ jobs:
           github-token: ${{ github.token }}
           path: candidate
       - name: Instalar, abrir e desinstalar
-        run: python tests/windows/install_smoke.py candidate/citrica-0.4.0-windows-x86_64-setup.exe
+        shell: pwsh
+        run: |
+          $setup = (Get-ChildItem candidate/citrica-*-windows-x86_64-setup.exe | Select-Object -First 1).FullName
+          python tests/windows/install_smoke.py $setup
       - uses: actions/upload-artifact@v4
         if: always()
         with:

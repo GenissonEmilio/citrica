@@ -51,14 +51,16 @@ def build():
 from PyInstaller.utils.hooks import collect_all, collect_data_files, copy_metadata
 datas = [(r"{ROOT / 'citrica/assets'}", 'citrica/assets'), (r"{TEMP / 'citrica.ico'}", 'citrica/assets')]
 binaries, hiddenimports = [], []
-for package in ['pillow_heif', 'pymupdf']:
+for package in ['pillow_heif', 'pymupdf', 'pdf2docx']:
     d, b, h = collect_all(package)
     datas += d
     binaries += b
     hiddenimports += h
 datas += collect_data_files('cv2')
+datas += collect_data_files('docx')
 for package in ['Pillow', 'pypdf', 'PyMuPDF', 'PySide6-Essentials', 'shiboken6',
-                'zxing-cpp', 'numpy', 'opencv-python-headless']:
+                'zxing-cpp', 'numpy', 'opencv-python-headless', 'python-docx', 'pdf2docx',
+                'fonttools', 'lxml', 'fire', 'termcolor', 'typing_extensions', 'pywin32']:
     datas += copy_metadata(package)
 a = Analysis([r"{ROOT / 'packaging/entry.py'}"], pathex=[r"{ROOT}"],
     binaries=binaries, datas=datas, hiddenimports=hiddenimports)

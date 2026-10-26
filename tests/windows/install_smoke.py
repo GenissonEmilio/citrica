@@ -3,9 +3,11 @@ import json
 import os
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+VERSION = tomllib.loads((ROOT / 'pyproject.toml').read_text(encoding='utf-8'))['project']['version']
 
 
 def run(*args, **kwargs):
@@ -22,7 +24,7 @@ def main():
     cli, gui = target / 'citrica-cli.exe', target / 'Citrica.exe'
     assert cli.is_file() and gui.is_file() and (target / '_internal').is_dir()
     version = run(cli, '--version', capture_output=True, text=True, encoding='utf-8').stdout.strip()
-    assert version == 'Cítrica 0.4.0', version
+    assert version == f'Cítrica {VERSION}', version
     sendto = Path(os.environ['APPDATA']) / 'Microsoft/Windows/SendTo/Cítrica.lnk'
     assert sendto.is_file(), 'Enviar para shortcut was not installed'
     (ROOT / 'release').mkdir(exist_ok=True)
