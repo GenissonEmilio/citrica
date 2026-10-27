@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "ffmpeg": {
+    "version": "9.0.2-essentials_build",
+    "url": "https://github.com/GyanD/codexffmpeg/releases/download/9.0.2/ffmpeg-9.0.2-essentials_build.zip",
+    "fallback_url": "https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-9.0.2-essentials_build.zip",
+    "sha256": "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba",
+    "license": "GPL-3.0-or-later; third-party notices in the original archive",
+    "source": "https://github.com/FFmpeg/FFmpeg/tree/946fcce07b",
+    "provider": "https://www.gyan.dev/ffmpeg/builds/"
+  },
+  "libreoffice": {
+    "version": "26.2.6",
+    "url": "https://download.documentfoundation.org/libreoffice/stable/26.2.6/win/x86_64/LibreOffice_26.2.6_Win_x86-64.msi",
+    "sha256": "f9877032fd908beb9c0ddf06df4af5c2e85f419c42e14876c4cce5aae5fb2660",
+    "license": "MPL-2.0; third-party notices in the original distribution",
+    "source": "https://download.documentfoundation.org/libreoffice/src/26.2.6/",
+    "provider": "https://www.libreoffice.org/download/download-libreoffice/"
+  },
+  "tesseract": {
+    "version": "5.5.3.20260724",
+    "url": "https://github.com/tesseract-ocr/tesseract/releases/download/5.5.3/tesseract-ocr-w64-setup-5.5.3.20260724.exe",
+    "sha256": "bee9e3434bd94fd65387d9be28cd467a41f61b1275383b55b0f59a1331270ae4",
+    "license": "Apache-2.0; dependent DLLs have their own licenses",
+    "source": "https://github.com/UB-Mannheim/tesseract/tree/v5.5.3.20260724",
+    "provider": "https://github.com/UB-Mannheim/tesseract/wiki"
+  },
+  "ocr_eng": {
+    "version": "tessdata_fast-87416418657359cb625c412a48b6e1d6d41c29bd",
+    "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/eng.traineddata",
+    "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+    "license": "Apache-2.0",
+    "source": "https://github.com/tesseract-ocr/tessdata_fast/tree/87416418657359cb625c412a48b6e1d6d41c29bd"
+  },
+  "ocr_license": {
+    "version": "tessdata_fast-87416418657359cb625c412a48b6e1d6d41c29bd",
+    "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "license": "Apache-2.0"
+  }
+}

@@ -16,7 +16,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPlainTextEdit, QPushButton, QVBoxLayout,
 )
 
-from citrica.desktop import SHELL_REVISION, SHELL_VERSION, desktop_call, extension_dir, extension_status, install_gnome
+from citrica.desktop import (
+    SHELL_REVISION, SHELL_VERSION, desktop_call, extension_dir, extension_status, gnome_environment, install_gnome,
+)
 from citrica.gui import ICON, STYLE
 from citrica.runtime import external_environment
 from citrica.tools import TOOLS, execute
@@ -194,15 +196,22 @@ class Settings(QDialog):
         row.addWidget(test)
         layout.addLayout(row)
         details = QLabel('As conversões acontecem no desktop. Esta janela serve apenas para configurar.\n'
-                         'A integração global desta versão é para GNOME 50 / Wayland.')
+                         'A roda global é para GNOME 46, 50 ou 51 com Wayland, incluindo Ubuntu e Fedora.')
         details.setWordWrap(True)
         layout.addWidget(details)
         self.refresh()
 
     def refresh(self):
         state = extension_status()
+        environment = gnome_environment()
         active = state.get('version') == SHELL_VERSION and state.get('revision') == SHELL_REVISION
-        if state.get('version') and not active:
+        self.install.setEnabled(environment['supported'])
+        if not environment['supported']:
+            found = environment['shell'] or 'não encontrado'
+            self.status.setText(f'○ GNOME atual: {found}. A roda requer GNOME 46, 50 ou 51 com Wayland. '
+                                'No Ubuntu 24.04, escolha Ubuntu na tela de login, sem a opção Xorg. '
+                                'A conversão pela linha de comando continua disponível.')
+        elif state.get('version') and not active:
             self.status.setText('● Atualização instalada · o GNOME ainda executa a revisão anterior. '
                                 'Saia e entre na sessão para carregar a roda nova.')
         else:

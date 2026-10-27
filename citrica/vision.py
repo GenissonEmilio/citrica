@@ -16,13 +16,18 @@ def ocr_paths():
     if sys.platform == 'win32':
         folders = [root / 'ocr', Path(os.environ.get('CITRICA_OCR_DIR', root / 'ocr')),
                    Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Tesseract-OCR']
+        if os.environ.get('CITRICA_WINDOWS_ENGINES'):
+            folders.insert(1, Path(os.environ['CITRICA_WINDOWS_ENGINES']) / 'ocr')
         bundled = next((p for folder in folders for p in folder.glob('*tesseract*.dll')), None)
     library = str(bundled) if bundled else ctypes.util.find_library('tesseract')
-    model = next((p for p in [root / 'ocr-data',
+    model_paths = [root / 'ocr-data', root / 'ocr/tessdata',
                               Path(os.environ.get('CITRICA_OCR_DIR', root / 'ocr')) / 'tessdata',
                               Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Tesseract-OCR/tessdata',
                               Path('/usr/share/tesseract/tessdata'),
                               Path('/usr/share/tesseract-ocr/5/tessdata')]
+    if sys.platform == 'win32' and os.environ.get('CITRICA_WINDOWS_ENGINES'):
+        model_paths.insert(2, Path(os.environ['CITRICA_WINDOWS_ENGINES']) / 'ocr/tessdata')
+    model = next((p for p in model_paths
                   if (p / 'eng.traineddata').is_file()), None)
     return library, model
 

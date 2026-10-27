@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.GenissonEmilio.citrica</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+  <name>Cítrica</name>
+  <summary>Converta arquivos localmente pela roda do desktop</summary>
+  <description>
+    <p>Arraste um arquivo, pressione Shift e solte no formato desejado. Cítrica converte imagens, PDF, documentos, áudio, vídeo, legendas e arquivos sem enviar seus dados a um servidor.</p>
+    <p>Alt mostra ferramentas e Ctrl mostra ações. A roda global funciona no GNOME com Wayland. As configurações apresentam a compatibilidade e preparam a integração na primeira abertura.</p>
+    <p>PDF para DOCX e conversões básicas de DOCX funcionam sem Office. FFmpeg e LibreOffice habilitam formatos adicionais quando instalados.</p>
+  </description>
+  <launchable type="desktop-id">io.github.GenissonEmilio.citrica.desktop</launchable>
+  <url type="homepage">https://github.com/GenissonEmilio/citrica</url>
+  <url type="bugtracker">https://github.com/GenissonEmilio/citrica/issues</url>
+  <developer id="io.github.genissonemilio">
+    <name>GenissonEmilio</name>
+  </developer>
+  <provides>
+    <binary>citrica</binary>
+  </provides>
+  <categories>
+    <category>Utility</category>
+    <category>Graphics</category>
+  </categories>
+  <content_rating type="oars-1.1"/>
+</component>

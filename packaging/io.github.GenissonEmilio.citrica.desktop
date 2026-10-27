@@ -2,7 +2,7 @@
 Type=Application
 Name=Cítrica
 Comment=Roda de conversão local no desktop Linux
-Exec=citrica %F
+Exec=/opt/citrica/citrica --setup %F
 Icon=io.github.GenissonEmilio.citrica
 Terminal=false
 Categories=Utility;Graphics;AudioVideo;
@@ -12,4 +12,4 @@ Actions=Dock;
 
 [Desktop Action Dock]
 Name=Mostrar roda
-Exec=citrica --dock
+Exec=/opt/citrica/citrica --dock

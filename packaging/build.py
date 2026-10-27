@@ -9,6 +9,7 @@ from pathlib import Path
 
 from citrica import __version__
 from smoke import verify
+from linux_package import build_deb, glibc_floor
 
 ROOT = Path(__file__).resolve().parent.parent
 os.chdir(ROOT)
@@ -65,31 +66,7 @@ shutil.copy2(ROOT / 'docs/wheel.png', OUT / 'citrica-wheel.png')
 run("tar", "-czf", str(OUT / f"citrica-{__version__}-linux-x86_64.tar.gz"), "-C", str(ROOT / "dist"), "citrica")
 
 if shutil.which("dpkg-deb"):
-    deb = ROOT / "build/deb"
-    if deb.exists():
-        shutil.rmtree(deb)
-    shutil.copytree(payload, deb / "opt/citrica")
-    (deb / "usr/bin").mkdir(parents=True)
-    (deb / "usr/bin/citrica").symlink_to("/opt/citrica/citrica")
-    desktop = deb / "usr/share/applications"
-    desktop.mkdir(parents=True)
-    shutil.copy2(ROOT / "packaging/io.github.GenissonEmilio.citrica.desktop", desktop)
-    icons = deb / "usr/share/icons/hicolor/scalable/apps"
-    icons.mkdir(parents=True)
-    shutil.copy2(ROOT / "citrica/assets/citrica.svg", icons / "io.github.GenissonEmilio.citrica.svg")
-    control = deb / "DEBIAN"
-    control.mkdir()
-    (control / "control").write_text(
-        f"Package: citrica\nVersion: {__version__}\nArchitecture: amd64\n"
-        "Maintainer: GenissonEmilio <GenissonEmilio@users.noreply.github.com>\nSection: utils\nPriority: optional\n"
-        "Depends: libc6 (>= 2.39), libgl1, libegl1, libxkbcommon0, libxcb-cursor0, libdbus-1-3, "
-        "libxcb-icccm4, libxcb-keysyms1, libxcb-shape0, libxcb-xinerama0, libxcb-randr0, "
-        "libxcb-render-util0, libxcb-xfixes0, libxkbcommon-x11-0, libfontconfig1, libglib2.0-0t64\n"
-        "Recommends: ffmpeg, libreoffice, python3-gi, gnome-shell, libtesseract5, tesseract-ocr-eng\n"
-        "Homepage: https://github.com/GenissonEmilio/citrica\n"
-        "Description: Conversor local de arquivos com menu radial para Linux\n"
-        " Converta imagens, PDF, mídia, documentos, legendas e arquivos sem upload.\n")
-    run("dpkg-deb", "--build", "--root-owner-group", str(deb), str(OUT / f"citrica_{__version__}_amd64.deb"))
+    build_deb(ROOT, payload, OUT, __version__)
 
 if shutil.which("rpmbuild"):
     top = ROOT / "build/rpm"
@@ -103,7 +80,7 @@ Summary: Conversor local de arquivos com menu radial
 License: AGPL-3.0-or-later
 URL: https://github.com/GenissonEmilio/citrica
 AutoReqProv: no
-Requires: glibc >= 2.39
+Requires: glibc >= {glibc_floor()}
 Requires: libglvnd-glx, libglvnd-egl, libxkbcommon, libxcb, xcb-util-cursor, fontconfig, dbus-libs
 Requires: xcb-util-wm, xcb-util-keysyms, xcb-util-image, xcb-util-renderutil, libxkbcommon-x11
 Recommends: ffmpeg, libreoffice, python3-gobject, gnome-shell, tesseract-libs, tesseract-langpack-eng
@@ -112,16 +89,18 @@ Recommends: ffmpeg, libreoffice, python3-gobject, gnome-shell, tesseract-libs, t
 %description
 Conversor offline de imagens, PDF, áudio, vídeo, documentos e legendas.
 %install
-mkdir -p %{{buildroot}}/opt %{{buildroot}}/usr/bin %{{buildroot}}/usr/share/applications
+mkdir -p %{{buildroot}}/opt %{{buildroot}}/usr/bin %{{buildroot}}/usr/share/applications %{{buildroot}}/usr/share/metainfo
 cp -a "{payload}" %{{buildroot}}/opt/citrica
 ln -s /opt/citrica/citrica %{{buildroot}}/usr/bin/citrica
 cp "{ROOT}/packaging/io.github.GenissonEmilio.citrica.desktop" %{{buildroot}}/usr/share/applications/
+cp "{ROOT}/packaging/io.github.GenissonEmilio.citrica.metainfo.xml" %{{buildroot}}/usr/share/metainfo/
 mkdir -p %{{buildroot}}/usr/share/icons/hicolor/scalable/apps
 cp "{ROOT}/citrica/assets/citrica.svg" %{{buildroot}}/usr/share/icons/hicolor/scalable/apps/io.github.GenissonEmilio.citrica.svg
 %files
 /opt/citrica
 /usr/bin/citrica
 /usr/share/applications/io.github.GenissonEmilio.citrica.desktop
+/usr/share/metainfo/io.github.GenissonEmilio.citrica.metainfo.xml
 /usr/share/icons/hicolor/scalable/apps/io.github.GenissonEmilio.citrica.svg
 """)
     run("rpmbuild", "--define", f"_topdir {top}", "-bb", str(spec))

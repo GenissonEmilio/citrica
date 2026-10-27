@@ -9,6 +9,12 @@ AppVersion={#AppVersion}
 AppPublisher=GenissonEmilio
 AppPublisherURL=https://github.com/GenissonEmilio/citrica
 AppSupportURL=https://github.com/GenissonEmilio/citrica/issues
+AppUpdatesURL=https://github.com/GenissonEmilio/citrica/releases
+VersionInfoCompany=GenissonEmilio
+VersionInfoDescription=Cítrica · conversor local de arquivos
+VersionInfoProductName=Cítrica
+VersionInfoProductVersion={#AppVersion}
+UninstallDisplayName=Cítrica {#AppVersion}
 DefaultDirName={localappdata}\Programs\Citrica
 DefaultGroupName=Cítrica
 PrivilegesRequired=lowest
@@ -22,6 +28,12 @@ LicenseFile=..\LICENSE
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+#ifdef SigningEnabled
+SignTool=citrica
+SignedUninstaller=yes
+SignToolRetryCount=2
+SignToolRetryDelay=5000
+#endif
 
 [Languages]
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"

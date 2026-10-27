@@ -25,7 +25,7 @@ const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Test">
 </interface></node>`;
 export default class Harness extends Extension {
     enable() {
-        const seat = Clutter.get_default_backend().get_default_seat();
+        const seat = global.backend.get_default_seat();
         this.pointer = seat.create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE);
         this.keyboard = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
         this.dbus = Gio.DBusExportedObject.wrapJSObject(XML, this);

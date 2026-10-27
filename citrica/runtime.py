@@ -17,6 +17,23 @@ def program(name):
     if sys.platform != 'win32':
         return shutil.which(name)
     root = Path(getattr(sys, '_MEIPASS', Path(__file__).parent.parent))
+    bundled = {'ffmpeg': ['tools/ffmpeg/bin/ffmpeg.exe'],
+               'ffprobe': ['tools/ffmpeg/bin/ffprobe.exe'],
+               'libreoffice': ['tools/libreoffice/program/soffice.com',
+                              'tools/libreoffice/program/soffice.exe'],
+               'tesseract': ['ocr/tesseract.exe']}
+    for relative in bundled.get(name, []):
+        candidate = root / relative
+        if candidate.is_file():
+            return str(candidate)
+    # The override is useful to test source builds with the exact same engines
+    # as the packaged app; installed bundles always prefer their own versions.
+    engine_root = os.environ.get('CITRICA_WINDOWS_ENGINES')
+    if engine_root:
+        for relative in bundled.get(name, []):
+            candidate = Path(engine_root) / relative
+            if candidate.is_file():
+                return str(candidate)
     for folder in [root / 'bin', Path(os.environ.get('CITRICA_TOOL_DIR', root / 'bin'))]:
         candidate = folder / (name + '.exe')
         if candidate.is_file():
@@ -25,6 +42,7 @@ def program(name):
     if found:
         return found
     relative = {'libreoffice': ['LibreOffice/program/soffice.com', 'LibreOffice/program/soffice.exe'],
+                'tesseract': ['Tesseract-OCR/tesseract.exe'],
                 'localsend': ['LocalSend/localsend_app.exe', 'LocalSend/localsend.exe']}
     for env in ['ProgramFiles', 'ProgramFiles(x86)', 'LOCALAPPDATA']:
         if not os.environ.get(env):
