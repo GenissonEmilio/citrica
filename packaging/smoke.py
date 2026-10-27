@@ -3,7 +3,6 @@
 import subprocess
 import json
 import tempfile
-import shutil
 import os
 from pathlib import Path
 
@@ -68,9 +67,9 @@ def verify(executable: Path):
             proc = subprocess.run([str(executable), '--desktop-request', payload],
                                   check=True, capture_output=True, text=True)
             assert all(Path(p).is_file() for p in json.loads(proc.stdout)['outputs'])
-        if shutil.which('ffmpeg'):
+        if program('ffmpeg'):
             video = root / 'video.mp4'
-            subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
+            subprocess.run([program('ffmpeg'), '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
                             '-c:v', 'libx264', str(video)], check=True)
             payload = json.dumps({'op': 'tool', 'tool': 'speed', 'paths': [str(video)], 'params': {'factor': 2}})
             proc = subprocess.run([str(executable), '--desktop-request', payload],

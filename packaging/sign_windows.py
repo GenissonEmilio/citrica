@@ -6,6 +6,7 @@ certificate must already be available to SignTool on the build machine.
 from __future__ import annotations
 
 import argparse
+import base64
 from dataclasses import dataclass
 import hashlib
 import json
@@ -80,12 +81,18 @@ def _paths(paths: Sequence[Path]) -> list[Path]:
 
 def _run(args, **kwargs):
     # SignTool code 2 is a warning (including absent timestamps), not success.
-    return subprocess.run(args, check=True, capture_output=True, text=True, encoding='utf-8',
-                          errors='replace', timeout=180, **kwargs)
+    try:
+        return subprocess.run(args, check=True, capture_output=True, text=True, encoding='utf-8',
+                              errors='replace', timeout=180, **kwargs)
+    except subprocess.CalledProcessError as error:
+        # CalledProcessError.__str__ omits captured streams. Preserve the actual
+        # PowerShell / signing error in CI, without dumping the environment.
+        print(f'Falha no comando de assinatura/verificação (código {error.returncode}).\n'
+              f'stdout:\n{error.stdout or ""}\nstderr:\n{error.stderr or ""}', file=sys.stderr)
+        raise
 
 
 _INSPECT = r'''
-[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 $ErrorActionPreference = 'Stop'
 $s = Get-AuthenticodeSignature -LiteralPath $env:CITRICA_SIGNING_FILE
 $result = @{ status = $s.Status.ToString(); subject = $null; thumbprint = $null;
@@ -98,14 +105,24 @@ if ($null -ne $s.TimeStamperCertificate) {
     $result.timestamp_subject = $s.TimeStamperCertificate.Subject
     $result.timestamp_thumbprint = $s.TimeStamperCertificate.Thumbprint
 }
-$result | ConvertTo-Json -Compress
+$json = $result | ConvertTo-Json -Compress
+Write-Output ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json)))
 '''
 
 
 def inspect_signature(path: Path) -> dict:
+    # Windows PowerShell's redirected output uses the active code page. An ASCII
+    # envelope keeps Unicode certificate names intact without touching console
+    # handles (which need not exist for GUI/CREATE_NO_WINDOW processes).
     response = _run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', _INSPECT],
-                    env=dict(os.environ, CITRICA_SIGNING_FILE=str(path.resolve())))
-    result = json.loads(response.stdout.lstrip('\ufeff'))
+                    env=dict(os.environ, CITRICA_SIGNING_FILE=str(path.resolve())),
+                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+    try:
+        encoded = response.stdout.strip().lstrip('\ufeff')
+        result = json.loads(base64.b64decode(encoded, validate=True).decode('utf-8'))
+    except (ValueError, UnicodeError) as error:
+        raise RuntimeError('Resposta Authenticode inválida.\n'
+                           f'stdout:\n{response.stdout}\nstderr:\n{response.stderr or ""}') from error
     if not isinstance(result, dict) or not isinstance(result.get('status'), str):
         raise RuntimeError('A verificação Authenticode não retornou um resultado válido.')
     return result

@@ -1,4 +1,4 @@
-"""Real modifier + Wayland drag/drop test inside an isolated GNOME 50 compositor.
+"""Real modifier + Wayland drag/drop test inside an isolated GNOME compositor.
 
 The test harness supplies native virtual input devices to this test compositor
 only. No input is sent to the user's desktop and no Shell security flag is changed.
@@ -108,10 +108,14 @@ def main():
     step('Key', 65307, 'false')
     wait_for(lambda s: not s['visible'])
     # Actual desktop animation values, not a simulated web preview.
+    call('Test', 'ObserveMotion')
     call('Desktop', 'Show', '[]', 'convert')
-    early = status()['animation']
-    assert early['opacity'] < 255 or early['scale'] != 1
     wait_for(lambda s: s['animation']['opacity'] == 255 and abs(s['animation']['scale']-1) < .001)
+    frames = json.loads(call('Test', 'Motion')[0])
+    system_animations = json.loads(call('Test', 'State')[0])['systemAnimations']
+    intermediate = [frame for frame in frames if frame.get('animation') and
+                    (0 < frame['animation']['opacity'] < 255 or abs(frame['animation']['scale']-1) > .001)]
+    assert not system_animations or intermediate, 'Nenhum quadro intermediário da animação nativa.'
     call('Desktop', 'Hide')
     # Alt and Control work during the same real Wayland drag, without Shift.
     start_drag()
@@ -214,8 +218,9 @@ def main():
         'copy_path': True, 'pagination': True, 'tool_dialog': True, 'cancel_drag': True, 'super_drag_setting': True,
         'keyboard_navigation': True, 'custom_shortcut': True, 'disable_animation': True,
         'reopen_after_conversion_empty': True,
+        'system_animations': system_animations, 'animation_intermediate_frames': len(intermediate),
         'state': status()}, ensure_ascii=False, indent=2))
-    print('GNOME 50 / Wayland: Shift, Alt, Ctrl, roda animada, conversão, atalho, Escape, '
+    print('GNOME / Wayland: Shift, Alt, Ctrl, roda, conversão, atalho, Escape, '
           'clipboard, paginação e diálogo de recorte validados.')
 
 

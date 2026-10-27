@@ -1,6 +1,6 @@
-"""Start and clean up an isolated GNOME 50/Wayland integration test session.
+"""Start and clean up an isolated GNOME 46/50/51 Wayland integration test session.
 
-Requires a local GNOME 50 installation. Never installs the harness on the user's
+Requires a local supported GNOME installation. Never installs the harness on the user's
 desktop, sends input to that desktop or changes Shell security settings.
 """
 import json

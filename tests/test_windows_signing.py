@@ -1,5 +1,7 @@
 """Release signing policy and command wiring; no test certificate is trusted."""
+import base64
 import importlib.util
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -100,12 +102,17 @@ def test_inspection_passes_filename_as_environment_data(tmp_path, monkeypatch):
     calls = []
     def run(args, **kwargs):
         calls.append((args, kwargs))
-        return subprocess.CompletedProcess(args, 0, '\ufeff{"status":"NotSigned"}')
+        result = {'status': 'NotSigned', 'subject': 'Certificado com ação e coração'}
+        encoded = base64.b64encode(json.dumps(result, ensure_ascii=False).encode('utf-8')).decode('ascii')
+        return subprocess.CompletedProcess(args, 0, encoded + '\r\n')
     monkeypatch.setattr(signing, '_run', run)
-    assert signing.inspect_signature(source)['status'] == 'NotSigned'
+    result = signing.inspect_signature(source)
+    assert result['status'] == 'NotSigned' and result['subject'] == 'Certificado com ação e coração'
     assert str(source) not in calls[0][0][-1]
     assert calls[0][1]['env']['CITRICA_SIGNING_FILE'] == str(source)
     assert '-ExecutionPolicy' not in calls[0][0]
+    assert '[Console]' not in calls[0][0][-1]
+    assert calls[0][1]['creationflags'] == getattr(subprocess, 'CREATE_NO_WINDOW', 0)
 
 
 def test_inno_signs_setup_and_uninstaller_with_same_checked_callback(tmp_path, monkeypatch):
@@ -124,13 +131,23 @@ def test_inno_signs_setup_and_uninstaller_with_same_checked_callback(tmp_path, m
     assert '#ifdef SigningEnabled\nSignTool=citrica\nSignedUninstaller=yes' in script
 
 
-def test_signtool_warnings_fail_build(monkeypatch):
+def test_signtool_warnings_fail_build_with_complete_diagnostics(monkeypatch, capsys):
     def run(args, **kwargs):
         assert kwargs['check'] and kwargs['timeout'] == 180
-        raise subprocess.CalledProcessError(2, args, stderr='timestamp missing')
+        raise subprocess.CalledProcessError(2, args, output='command output', stderr='timestamp missing\nfull detail')
     monkeypatch.setattr(subprocess, 'run', run)
     with pytest.raises(subprocess.CalledProcessError):
         signing._run(['signtool.exe', 'verify'])
+    diagnostic = capsys.readouterr().err
+    assert 'command output' in diagnostic and 'timestamp missing\nfull detail' in diagnostic
+
+
+def test_invalid_authenticode_transport_keeps_raw_diagnostics(tmp_path, monkeypatch):
+    monkeypatch.setattr(signing, '_run', lambda args, **kwargs:
+                        subprocess.CompletedProcess(args, 0, 'unexpected output', 'PowerShell diagnostic'))
+    with pytest.raises(RuntimeError, match='Resposta Authenticode inválida') as error:
+        signing.inspect_signature(tmp_path / 'ação.exe')
+    assert 'unexpected output' in str(error.value) and 'PowerShell diagnostic' in str(error.value)
 
 
 def test_cli_does_not_claim_authenticode_verification_on_linux(monkeypatch):
@@ -144,6 +161,8 @@ def test_cli_does_not_claim_authenticode_verification_on_linux(monkeypatch):
 def test_real_windows_authenticode_inspection_and_tamper_detection(tmp_path):
     # Do not install a root certificate or trust anything for this test. Official
     # python.org CPython may already be signed; embeddable/custom builds may not.
+    # inspect_signature deliberately launches PowerShell with CREATE_NO_WINDOW,
+    # exercising redirected Unicode paths without a console handle.
     source = tmp_path / 'assinatura com espaços e ação.exe'
     shutil.copy2(sys.executable, source)
     original = signing.inspect_signature(source)

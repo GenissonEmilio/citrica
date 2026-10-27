@@ -8,6 +8,7 @@ from PIL import Image
 from pypdf import PdfReader, PdfWriter
 
 from citrica.core import ConversionError
+from citrica.runtime import program
 from citrica.tools import available_tools, execute, media_info
 
 
@@ -85,13 +86,13 @@ def test_pdf_tools(tmp_path):
 
 @pytest.fixture
 def media(tmp_path):
-    if not shutil.which('ffmpeg'):
+    if not program('ffmpeg'):
         pytest.skip('FFmpeg não instalado')
     audio = tmp_path / 'tone.wav'
-    subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
+    subprocess.run([program('ffmpeg'), '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
                     str(audio)], check=True)
     video = tmp_path / 'video.mp4'
-    subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
+    subprocess.run([program('ffmpeg'), '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
                     '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
                     '-c:v', 'libx264', '-c:a', 'aac', '-shortest', str(video)], check=True)
     return audio, video

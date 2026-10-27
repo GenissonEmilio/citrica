@@ -1,5 +1,4 @@
 import hashlib
-import shutil
 import subprocess
 import tarfile
 import threading
@@ -173,15 +172,15 @@ def test_unknown_format_and_invalid_options(image):
     assert common_formats([]) == []
 
 
-@pytest.mark.skipif(not shutil.which("ffmpeg"), reason="FFmpeg not installed")
+@pytest.mark.skipif(not program("ffmpeg"), reason="FFmpeg not installed")
 def test_real_audio_video_and_shell_metacharacters(tmp_path):
     audio = tmp_path / "$(touch SHOULD_NOT_EXIST); música.wav"
-    subprocess.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=0.3",
+    subprocess.run([program("ffmpeg"), "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=0.3",
                     str(audio)], check=True)
     output = convert(audio, "mp3")[0]
     assert output.stat().st_size > 100
     video = tmp_path / "clip.mp4"
-    subprocess.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "color=c=orange:s=64x48:d=0.3",
+    subprocess.run([program("ffmpeg"), "-v", "error", "-f", "lavfi", "-i", "color=c=orange:s=64x48:d=0.3",
                     "-c:v", "libx264", str(video)], check=True)
     webm = convert(video, "webm")[0]
     assert webm.stat().st_size > 100
@@ -198,7 +197,7 @@ def test_office_real_roundtrip(tmp_path):
     assert len(PdfReader(pdf).pages) == 1
 
 
-@pytest.mark.skipif(not shutil.which("ffmpeg"), reason="FFmpeg not installed")
+@pytest.mark.skipif(not program("ffmpeg"), reason="FFmpeg not installed")
 def test_media_cannot_follow_remote_playlist(tmp_path, monkeypatch):
     import citrica.core as core
     real_run = core.run_process

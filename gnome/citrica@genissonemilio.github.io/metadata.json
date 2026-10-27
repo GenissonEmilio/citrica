@@ -2,7 +2,7 @@
   "uuid": "citrica@genissonemilio.github.io",
   "name": "Cítrica — roda de arquivos",
   "description": "Arraste um arquivo, pressione Shift e solte na roda para converter localmente.",
-  "shell-version": ["50"],
+  "shell-version": ["46", "50", "51"],
   "url": "https://github.com/GenissonEmilio/citrica",
   "version": 3,
   "settings-schema": "org.gnome.shell.extensions.citrica"
