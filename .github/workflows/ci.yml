@@ -140,6 +140,7 @@ jobs:
       # A dispatch is always an unsigned test build. Public tags require a real
       # certificate/private-key provider provisioned on the signing runner.
       CITRICA_SIGNING_REQUIRED: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
+      CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
       CITRICA_SIGN_CERT_SHA1: ${{ startsWith(github.ref, 'refs/tags/') && vars.CITRICA_SIGN_CERT_SHA1 || '' }}
     steps:
       - uses: actions/checkout@v4

@@ -114,6 +114,11 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
         shutil.copy2(ROOT / file, payload / file)
     shutil.copytree(ROOT / 'licenses', payload / 'licenses', dirs_exist_ok=True)
     shutil.copy2(ROOT / 'docs/WINDOWS.md', payload / 'TESTAR-NO-WINDOWS.md')
+    (payload / 'docs').mkdir(exist_ok=True)
+    for name in ['WINDOWS.md', 'WINDOWS-ENGINES.md', 'WINDOWS-SIGNING.md']:
+        shutil.copy2(ROOT / 'docs' / name, payload / 'docs' / name)
+        if name != 'WINDOWS.md':
+            shutil.copy2(ROOT / 'docs' / name, payload / name)
     cli = payload / 'citrica-cli.exe'
     run(cli, '--version')
     # Source imports are not used to perform any conversion in this smoke test.

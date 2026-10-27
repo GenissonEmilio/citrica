@@ -36,6 +36,7 @@ jobs:
           update: true
           install: >-
             base-devel
+            perl
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-nasm
             mingw-w64-x86_64-pkgconf

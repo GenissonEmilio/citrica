@@ -66,7 +66,7 @@ mkdir -p "$work/ffmpeg"
 pushd "$work/ffmpeg"
 "$sources/ffmpeg/configure" --prefix="$prefix" --target-os=mingw32 --arch=x86_64 \
     --enable-gpl --enable-version3 --disable-autodetect --disable-shared --enable-static \
-    --disable-debug --disable-doc --disable-ffplay --disable-network --enable-w32threads \
+    --disable-debug --disable-doc --disable-ffplay --enable-w32threads \
     --enable-libx264 --enable-libmp3lame --enable-libvorbis --enable-libopus --enable-libvpx \
     --enable-libdav1d --enable-zlib --pkg-config-flags=--static \
     --extra-cflags="-I$prefix/include" --extra-ldflags="-L$prefix/lib -static" \

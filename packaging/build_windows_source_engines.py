@@ -63,7 +63,7 @@ def copy_notices(sources, target):
                 shutil.copy2(file, destination / file.name)
 
 
-def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None):
+def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None, office_from=None):
     if sys.platform != 'win32':
         raise RuntimeError('A compilação usa os toolchains Windows MSYS2 e Visual Studio2022.')
     output, cache, work = (Path(p).resolve() for p in [output, cache, work])
@@ -116,8 +116,9 @@ def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None):
         shutil.copy2(file, ocr / file.name)
     data = ocr / 'tessdata'
     data.mkdir()
+    models = {name: download(vendors[name], cache) for name in ['ocr_eng', 'ocr_license']}
     for name, file in [('ocr_eng', 'eng.traineddata'), ('ocr_license', 'LICENSE')]:
-        shutil.copy2(download(vendors[name], cache), data / file)
+        shutil.copy2(models[name], data / file)
     copy_notices({name: sources[name] for name in ['leptonica', 'tesseract']}, ocr / 'licenses')
     copy_notices({name: source for name, source in sources.items() if name not in ['leptonica', 'tesseract']},
                  output / 'tools/ffmpeg/licenses')
@@ -125,8 +126,12 @@ def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None):
     if toolchain_licenses.is_dir():
         shutil.copytree(toolchain_licenses, output / 'tools/ffmpeg/licenses/toolchain')
 
-    archive = download(vendors['libreoffice'], cache)
-    office = extract_office(archive, work / 'office-extract', cache / 'libreoffice-source-engine-extract.log')
+    if office_from:
+        office = Path(office_from).resolve()
+        require_file(office / 'program/soffice.com')
+    else:
+        archive = download(vendors['libreoffice'], cache)
+        office = extract_office(archive, work / 'office-extract', cache / 'libreoffice-source-engine-extract.log')
     shutil.copytree(office, output / 'tools/libreoffice')
 
     # Include the original archives and the actual recipe/configuration used in
@@ -135,10 +140,22 @@ def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None):
     bundle = output / 'engine-sources.zip'
     with zipfile.ZipFile(bundle, 'w', zipfile.ZIP_DEFLATED) as target:
         for name, archive in archives.items():
-            target.write(archive, 'archives/' + name + '-' + archive.name)
+            target.write(archive, 'downloads/sources/' + archive.name)
+        for model in models.values():
+            target.write(model, 'downloads/' + model.name)
         for file in [LOCK, VENDOR_LOCK, ROOT / 'packaging/prepare_windows_engines.py', Path(__file__),
                      ROOT / 'packaging/build_ffmpeg_windows.sh']:
-            target.write(file, 'recipe/' + file.name)
+            target.write(file, 'packaging/' + file.name)
+        target.write(ROOT / 'docs/WINDOWS-ENGINES.md', 'docs/WINDOWS-ENGINES.md')
+        target.writestr('README-SOURCES.txt',
+                        'Corresponding FFmpeg/codecs/Tesseract/Leptonica source for this binary build.\n'
+                        'See docs/WINDOWS-ENGINES.md for toolchain prerequisites.\n'
+                        'Extract this ZIP and run, from its root:\n'
+                        'python packaging/build_windows_source_engines.py --cache downloads '
+                        '--office-from "C:/path/to/Citrica/_internal/tools/libreoffice"\n'
+                        'The provided archive/model cache is verified by SHA-256 before compilation.\n'
+                        'Without --office-from, the script explicitly downloads the pinned Office MSI.\n'
+                        'Sources are unmodified; build configuration and toolchain records are included.\n')
         for file in (work / 'ffmpeg-build').rglob('*'):
             if file.is_file() and file.name in ['config.log', 'config.h', 'config_components.h', 'config.mak',
                                                'msys2-packages.txt', 'gcc-version.txt', 'nasm-version.txt',
@@ -169,5 +186,7 @@ if __name__ == '__main__':
     parser.add_argument('--cache', type=Path, default=CACHE)
     parser.add_argument('--work', type=Path, default=WORK)
     parser.add_argument('--msys-bash', type=Path)
+    parser.add_argument('--office-from', type=Path,
+                        help='reusar a pasta LibreOffice do pacote original, sem baixar o MSI novamente')
     args = parser.parse_args()
-    prepare(args.output, args.cache, args.work, args.msys_bash)
+    prepare(args.output, args.cache, args.work, args.msys_bash, args.office_from)

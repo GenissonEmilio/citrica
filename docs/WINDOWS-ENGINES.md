@@ -27,7 +27,7 @@ O build por fontes desliga dependências opcionais que a aplicação não usa. F
 
 Use Windows x64, Python 3.12+, CMake, Visual Studio 2022 com compilador C++, Inno Setup e MSYS2 MINGW64. O workflow `windows-engines-source.yml` prepara os compiladores; as versões do toolchain são registradas no ZIP de fontes. Os artefatos-fonte do motor têm hashes em `packaging/windows-sources.lock.json`.
 
-No MSYS2, os pacotes de compilação são `base-devel`, `mingw-w64-x86_64-gcc`, `mingw-w64-x86_64-nasm`, `mingw-w64-x86_64-pkgconf`, `mingw-w64-x86_64-meson` e `mingw-w64-x86_64-ninja`. Depois, no PowerShell do repositório:
+No MSYS2, os pacotes de compilação são `base-devel`, `perl`, `mingw-w64-x86_64-gcc`, `mingw-w64-x86_64-nasm`, `mingw-w64-x86_64-pkgconf`, `mingw-w64-x86_64-meson` e `mingw-w64-x86_64-ninja`. Depois, no PowerShell do repositório:
 
 ```powershell
 python packaging/build_windows_source_engines.py --msys-bash C:/msys64/usr/bin/bash.exe
@@ -39,6 +39,8 @@ python packaging/build_windows.py
 ```
 
 Os downloads acontecem nessa preparação explícita do build. Um arquivo de origem alterado é recusado por SHA-256; não há fallback que ignore o hash. Para uma publicação, `CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES=1` recusa o candidato provisório e a ausência do ZIP de fontes. As instruções são reproduzíveis; igualdade bit a bit entre toolchains diferentes ainda não foi estabelecida e não é anunciada.
+
+Para recompilar a partir de `engine-sources.zip`, extraia-o e siga o `README-SOURCES.txt` incluído. A pasta `downloads` contém os arquivos originais e o modelo que o script verifica/reutiliza como cache. `--office-from` permite reutilizar a pasta Office da instalação recebida e dispensa o download do MSI durante essa recompilação.
 
 ## Verificação
 
