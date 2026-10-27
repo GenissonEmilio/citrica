@@ -212,5 +212,5 @@ def test_media_cannot_follow_remote_playlist(tmp_path, monkeypatch):
     source = tmp_path / "disguised.mp4"
     source.write_text("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:1\n"
                       "#EXTINF:1,\nhttp://127.0.0.1:9/segment.ts\n#EXT-X-ENDLIST\n")
-    with pytest.raises(ConversionError, match="not on whitelist"):
+    with pytest.raises(ConversionError, match="not on whitelist|Protocol.*not found"):
         convert(source, "mp3")

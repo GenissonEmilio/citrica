@@ -73,7 +73,7 @@ def main():
         time.sleep(1)
         flow = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT / 'tests/desktop/run_flow.py'
         subprocess.run([sys.executable, str(flow)], env=env, cwd=ROOT, check=True)
-        subprocess.run([*backend, '--settings', '--screenshot',
+        subprocess.run([*backend, '--setup', '--settings', '--screenshot',
                         str(STATE / 'settings.png')], env=dict(env, QT_QPA_PLATFORM='offscreen'),
                        cwd=ROOT, check=True)
     finally:

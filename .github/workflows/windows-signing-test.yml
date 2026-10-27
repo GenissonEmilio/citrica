@@ -1,0 +1,26 @@
+name: Validar Authenticode Windows isoladamente
+on:
+  push:
+    branches: [codex/windows-ubuntu-compatibility]
+    paths:
+      - '.github/workflows/windows-signing-test.yml'
+      - 'packaging/sign_windows.py'
+      - 'tests/test_windows_signing.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  signing-tests:
+    runs-on: windows-2022
+    timeout-minutes: 5
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar somente o runner de testes
+        run: python -m pip install pytest==9.1.1
+      - name: Windows PowerShell 5.1, Unicode, sem console e módulos contaminados
+        run: python -m pytest -q -rA tests/test_windows_signing.py

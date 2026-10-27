@@ -7,6 +7,7 @@ No host desktop or user data is used. GNOME compositor tests are separate.
 import argparse
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import zipfile
@@ -32,19 +33,31 @@ def main():
     state.mkdir()
     shutil.copy2(Path(__file__).resolve().parents[1] / 'fixtures/astronaut.png', state / 'sample.png')
     subprocess.run(['chown', '-R', f'{username}:{username}', str(state)], check=True)
+    desktop = Path('/usr/share/applications/io.github.GenissonEmilio.citrica.desktop').read_text()
+    menu_command = shlex.split(next(line[5:] for line in desktop.splitlines() if line.startswith('Exec=')))
+    executable = menu_command[0]
+    assert executable == '/opt/citrica/citrica' and '--setup' in menu_command
+    assert 'TryExec=/opt/citrica/citrica' in desktop
+    # Reproduce an older portable installation taking precedence in PATH.
+    stale_bin = home / '.local/bin'
+    stale_bin.mkdir(parents=True)
+    stale_launcher = stale_bin / 'citrica'
+    stale_launcher.write_text('#!/bin/sh\nexit 77\n')
+    stale_launcher.chmod(0o755)
+    subprocess.run(['chown', '-R', f'{username}:{username}', str(home / '.local')], check=True)
     def user_run(*arguments, gui=False):
-        command = ['runuser', '-u', username, '--']
+        command = ['runuser', '-u', username, '--', 'env', f'PATH={stale_bin}:/usr/local/bin:/usr/bin:/bin']
         if gui:
             command += ['dbus-run-session', '--', 'env', 'QT_QPA_PLATFORM=offscreen',
                         'XDG_SESSION_TYPE=', 'WAYLAND_DISPLAY=']
-        return subprocess.run([*command, 'citrica', *map(str, arguments)], check=True,
+        return subprocess.run([*command, executable, *map(str, arguments)], check=True,
                               capture_output=True, text=True, timeout=120)
     try:
         version = user_run('--version').stdout.strip()
         doctor = json.loads(user_run('--doctor').stdout)
-        user_run('--setup', '--settings', '--screenshot', state / 'settings.png', gui=True)
+        setup = user_run('--setup', '--settings', '--screenshot', state / 'settings.png', gui=True)
         assert (state / 'settings.png').stat().st_size > 1000
-        assert (home / '.config/citrica/setup.json').is_file()
+        assert (home / '.config/citrica/setup.json').is_file(), setup.stderr
         assert Path('/usr/share/applications/io.github.GenissonEmilio.citrica.desktop').is_file()
         assert not (home / '.local/share/applications/io.github.GenissonEmilio.citrica.desktop').exists()
         assert not Path('/root/.config/citrica/setup.json').exists(), 'Setup não deve modificar o root.'
@@ -63,6 +76,7 @@ def main():
         args.report.write_text(json.dumps({'version': version, 'os_release': Path('/etc/os-release').read_text(),
             'native_install': True, 'normal_user_launch': True, 'first_launch_setup': True,
             'settings_screenshot': True, 'image_pdf_docx': True, 'uninstall': True,
+            'native_menu_ignores_old_portable_path': True,
             'doctor': doctor}, indent=2, ensure_ascii=False))
         print(f'DEB instalado, aberto como usuário comum, conversões e remoção aprovados: {version}')
     finally:

@@ -94,7 +94,15 @@ def _run(args, **kwargs):
 
 _INSPECT = r'''
 $ErrorActionPreference = 'Stop'
-$s = Get-AuthenticodeSignature -LiteralPath $env:CITRICA_SIGNING_FILE
+foreach ($name in @('Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Security')) {
+    $manifest = [IO.Path]::Combine($PSHOME, 'Modules', $name, $name + '.psd1')
+    try {
+        Import-Module -Name $manifest -ErrorAction Stop
+    } catch {
+        throw ('Falha ao importar módulo nativo ' + $manifest + ': ' + $_.Exception.ToString())
+    }
+}
+$s = Microsoft.PowerShell.Security\Get-AuthenticodeSignature -LiteralPath $env:CITRICA_SIGNING_FILE
 $result = @{ status = $s.Status.ToString(); subject = $null; thumbprint = $null;
              timestamp_subject = $null; timestamp_thumbprint = $null }
 if ($null -ne $s.SignerCertificate) {
@@ -114,8 +122,15 @@ def inspect_signature(path: Path) -> dict:
     # Windows PowerShell's redirected output uses the active code page. An ASCII
     # envelope keeps Unicode certificate names intact without touching console
     # handles (which need not exist for GUI/CREATE_NO_WINDOW processes).
-    response = _run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', _INSPECT],
-                    env=dict(os.environ, CITRICA_SIGNING_FILE=str(path.resolve())),
+    # pwsh 7 -> Python -> Windows PowerShell 5.1 otherwise inherits PS7 module
+    # locations and tries to autoload incompatible Security/Utility assemblies.
+    # Sanitize this child only, as documented by Microsoft's about_PSModulePath.
+    env = {key: value for key, value in os.environ.items() if key.upper() != 'PSMODULEPATH'}
+    env['CITRICA_SIGNING_FILE'] = str(path.resolve())
+    windows = Path(env.get('SystemRoot', r'C:\Windows'))
+    powershell = windows / 'System32/WindowsPowerShell/v1.0/powershell.exe'
+    response = _run([str(powershell), '-NoProfile', '-NonInteractive', '-Command', _INSPECT],
+                    env=env,
                     creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
     try:
         encoded = response.stdout.strip().lstrip('\ufeff')

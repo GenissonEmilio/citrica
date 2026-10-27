@@ -12,6 +12,7 @@ import json
 import os
 import shutil
 import subprocess
+import struct
 import sys
 import tempfile
 import urllib.error
@@ -95,6 +96,47 @@ def require_file(path):
         raise RuntimeError(f'Motor incompleto: {path}')
 
 
+def extract_office(archive, destination, log):
+    subprocess.run(['msiexec.exe', '/a', str(archive), '/qn', '/norestart',
+                    f'TARGETDIR={destination}', '/l*v', str(log)], check=True, timeout=600)
+    office = list(Path(destination).glob('**/program/soffice.exe'))
+    if len(office) != 1:
+        raise RuntimeError(f'Extração LibreOffice inesperada; consulte {log}.')
+    require_file(office[0].parent / 'soffice.com')
+    preserve_office_crt(office[0].parent, Path(destination))
+    return office[0].parent.parent
+
+
+def preserve_office_crt(program_folder, extraction):
+    """Keep x64 CRT merge-module files from this same MSI beside soffice.
+
+    An administrative MSI image may place VC runtime files outside the Office
+    folder. A regular installation registers those globally, while our offline
+    engine must work without that system mutation or a preinstalled VC redist.
+    """
+    for name in ['vcruntime140.dll', 'vcruntime140_1.dll', 'msvcp140.dll', 'msvcp140_1.dll',
+                 'msvcp140_2.dll', 'msvcp140_atomic_wait.dll', 'msvcp140_codecvt_ids.dll', 'concrt140.dll']:
+        if (program_folder / name).is_file():
+            continue
+        candidates = []
+        for file in extraction.rglob(name):
+            with file.open('rb') as stream:
+                header = stream.read(64)
+                if len(header) != 64 or header[:2] != b'MZ':
+                    continue
+                offset = struct.unpack_from('<I', header, 60)[0]
+                if offset > 1024**2:
+                    continue
+                stream.seek(offset)
+                pe = stream.read(6)
+                if pe[:4] == b'PE\x00\x00' and len(pe) == 6 and struct.unpack('<H', pe[4:])[0] == 0x8664:
+                    candidates.append(file)
+        if candidates:
+            if len({digest(file) for file in candidates}) != 1:
+                raise RuntimeError(f'Runtime VC x64 ambíguo no MSI: {name}')
+            shutil.copy2(candidates[0], program_folder / name)
+
+
 def prepare(output=DEFAULT_OUTPUT, cache=DEFAULT_CACHE):
     if sys.platform != 'win32':
         raise RuntimeError('A extração administrativa do LibreOffice precisa ser executada no Windows.')
@@ -119,13 +161,8 @@ def prepare(output=DEFAULT_OUTPUT, cache=DEFAULT_CACHE):
         # program/share/presets/resources tree and upstream notices.
         office_extract = staging / 'office-extract'
         log = cache / 'libreoffice-extract.log'
-        subprocess.run(['msiexec.exe', '/a', str(artifacts['libreoffice']), '/qn', '/norestart',
-                        f'TARGETDIR={office_extract}', '/l*v', str(log)], check=True, timeout=600)
-        office = list(office_extract.glob('**/program/soffice.exe'))
-        if len(office) != 1:
-            raise RuntimeError(f'Extração LibreOffice inesperada; consulte {log}.')
-        shutil.copytree(office[0].parent.parent, payload / 'tools/libreoffice')
-        require_file(payload / 'tools/libreoffice/program/soffice.com')
+        office = extract_office(artifacts['libreoffice'], office_extract, log)
+        shutil.copytree(office, payload / 'tools/libreoffice')
 
         ocr_extract = staging / 'ocr-extract'
         subprocess.run([seven_zip(), 'x', str(artifacts['tesseract']), f'-o{ocr_extract}', '-y'],
@@ -143,6 +180,7 @@ def prepare(output=DEFAULT_OUTPUT, cache=DEFAULT_CACHE):
         shutil.copy2(artifacts['ocr_eng'], ocr / 'tessdata/eng.traineddata')
         shutil.copy2(artifacts['ocr_license'], ocr / 'tessdata/LICENSE')
 
+        lock['provenance'] = 'provisional-vendor-binaries; complete corresponding-source bundle not established'
         (payload / 'engines.json').write_text(json.dumps(lock, indent=2, ensure_ascii=False) + '\n',
                                              encoding='utf-8')
         # Deterministic file inventory is copied into the installer's validation

@@ -54,7 +54,21 @@ def text_boxes(image):
     lib.TessBaseAPIDelete.argtypes = [ptr]
     handle = lib.TessBaseAPICreate()
     try:
-        if lib.TessBaseAPIInit3(handle, str(model).encode() if model else None, b'eng') != 0:
+        if sys.platform == 'win32' and model:
+            # The upstream C++ loader uses a narrow fopen path. A UTF-8 model
+            # path can fail for users such as C:\Users\João even though Python
+            # successfully loads the DLL. Read the model with Unicode-aware
+            # Python file APIs and use Tesseract's supported in-memory API.
+            data = (model / 'eng.traineddata').read_bytes()
+            model_data = ctypes.create_string_buffer(data)
+            lib.TessBaseAPIInit5.argtypes = [ptr, ptr, integer, string, integer, ptr, integer,
+                                            ptr, ptr, ctypes.c_size_t, integer]
+            lib.TessBaseAPIInit5.restype = integer
+            initialized = lib.TessBaseAPIInit5(handle, model_data, len(data), b'eng', 3,
+                                               None, 0, None, None, 0, 0)
+        else:
+            initialized = lib.TessBaseAPIInit3(handle, str(model).encode() if model else None, b'eng')
+        if initialized != 0:
             raise ConversionError('Não foi possível carregar o modelo de texto eng do Tesseract.')
         rgb = image.convert('RGB')
         raw = ctypes.create_string_buffer(rgb.tobytes())

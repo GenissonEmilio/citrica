@@ -2,6 +2,8 @@ import hashlib
 import importlib.util
 import io
 import json
+import struct
+import shutil
 from pathlib import Path
 from types import SimpleNamespace
 import zipfile
@@ -68,3 +70,44 @@ def test_ocr_uses_same_offline_tree_in_bundle_and_source(tmp_path, monkeypatch):
     bundle_library.write_bytes(b'locator fixture')
     bundle_model.write_bytes(b'locator fixture')
     assert vision.ocr_paths() == (str(bundle_library), bundle_model.parent)
+
+
+def test_office_keeps_only_original_x64_crt_from_its_msi(tmp_path):
+    office = tmp_path / 'Office/program'
+    office.mkdir(parents=True)
+
+    def binary(path, architecture, content):
+        header = bytearray(128)
+        header[:2] = b'MZ'
+        struct.pack_into('<I', header, 60, 64)
+        header[64:68] = b'PE\x00\x00'
+        struct.pack_into('<H', header, 68, architecture)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(header + content)
+        return path
+
+    x86 = binary(tmp_path / 'System32/msvcp140.dll', 0x14c, b'x86 fixture')
+    x64 = binary(tmp_path / 'System64/msvcp140.dll', 0x8664, b'x64 fixture')
+    engines.preserve_office_crt(office, tmp_path)
+    assert (office / 'msvcp140.dll').read_bytes() == x64.read_bytes()
+    assert (office / 'msvcp140.dll').read_bytes() != x86.read_bytes()
+    # Preserve a runtime already included beside Office instead of replacing it
+    # with a different build from another merge module.
+    x64.write_bytes(x64.read_bytes() + b'updated fixture')
+    engines.preserve_office_crt(office, tmp_path)
+    assert (office / 'msvcp140.dll').read_bytes() != x64.read_bytes()
+
+
+def test_windows_ocr_reads_model_with_unicode_profile_path(tmp_path, monkeypatch):
+    from PIL import Image, ImageDraw, ImageFont
+    library, model = vision.ocr_paths()
+    if not library or not model:
+        pytest.skip('Motor OCR local indisponível')
+    unicode_model = tmp_path / 'João e ação/tessdata'
+    unicode_model.mkdir(parents=True)
+    shutil.copy2(model / 'eng.traineddata', unicode_model / 'eng.traineddata')
+    monkeypatch.setattr(vision, 'sys', SimpleNamespace(platform='win32'))
+    monkeypatch.setattr(vision, 'ocr_paths', lambda: (library, unicode_model))
+    image = Image.new('RGB', (800, 180), 'white')
+    ImageDraw.Draw(image).text((30, 40), 'PRIVATE TEST 1234', font=ImageFont.load_default(size=48), fill='black')
+    assert vision.text_boxes(image)

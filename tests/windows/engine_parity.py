@@ -166,6 +166,46 @@ def fixtures(root, ffmpeg, office, env):
     return result
 
 
+def media_tools(executable, root, env):
+    cases = []
+    common = {'compress': {'quality': 70}, 'strip': {}, 'metadata': {},
+              'edit_metadata': {'author': 'Citrica', 'title': MARKER},
+              'target_size': {'target_kb': 32}, 'trim': {'start': 0.1, 'duration': 0.2},
+              'speed': {'factor': 2}, 'split_media': {'seconds': 0.2}, 'join_media': {}}
+    for kind, source, extras in [
+        ('video', root / 'video.mp4', {'crop': {'rect': '0,0,80,60'}, 'snapshot': {'time': 0.1}}),
+        ('audio', root / 'audio.wav', {'normalize': {}, 'bleep': {'start': 0.1, 'duration': 0.2},
+                                     'channels': {'channels': 2}}),
+    ]:
+        second = source.with_stem('second-' + kind)
+        second.write_bytes(source.read_bytes())
+        paths = [str(source), str(second)]
+        expected = common | extras
+        payload = json.dumps({'op': 'palette', 'paths': paths})
+        palette = json.loads(run([executable, '--desktop-request', payload], env))
+        assert {item['id'] for item in palette['modes']['tools']} == set(expected), (kind, palette)
+        before = hashlib.sha256(source.read_bytes()).hexdigest()
+        for tool, params in expected.items():
+            payload = json.dumps({'op': 'tool', 'tool': tool, 'paths': paths if tool == 'join_media' else paths[:1],
+                                  'params': params})
+            result = json.loads(run([executable, '--desktop-request', payload], env))
+            if tool == 'metadata':
+                info = json.loads(result['text'])
+                assert info[source.name]['streams'], info
+            else:
+                outputs = [Path(path) for path in result.get('outputs', [])]
+                assert outputs and all(p.is_file() and p.stat().st_size > 0 for p in outputs), result
+                if tool == 'snapshot':
+                    with Image.open(outputs[0]) as image:
+                        assert image.size == (160, 120)
+                if tool == 'target_size':
+                    assert outputs[0].stat().st_size <= params['target_kb'] * 1024
+            assert hashlib.sha256(source.read_bytes()).hexdigest() == before
+            cases.append({'family': kind, 'tool': tool, 'success': True})
+        print(f'Ferramentas offline de {kind}: {", ".join(expected)}', flush=True)
+    return cases
+
+
 def verify(executable, report, *, require_bundle=True):
     executable = Path(executable).resolve()
     assert executable.is_file(), executable
@@ -185,7 +225,8 @@ def verify(executable, report, *, require_bundle=True):
     cases = []
     started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix='citrica-parity-') as directory:
-        root = Path(directory)
+        root = Path(directory) / 'arquivos com acentuação'
+        root.mkdir()
         for kind, source in fixtures(root, ffmpeg, office, env):
             before = hashlib.sha256(source.read_bytes()).hexdigest()
             advertised = json.loads(run([executable, source, '--formats'], env))
@@ -208,6 +249,7 @@ def verify(executable, report, *, require_bundle=True):
                               'files': len(outputs), 'success': True})
             assert hashlib.sha256(source.read_bytes()).hexdigest() == before, source
             print(f'Paridade offline: {source.name} → {", ".join(advertised)}', flush=True)
+        tool_cases = media_tools(executable, root, env)
         # OCR uses the bundled DLL, Leptonica/codec dependencies and traineddata;
         # a boolean doctor probe alone cannot establish that its DLL loads.
         image = Image.new('RGB', (1000, 200), 'white')
@@ -223,7 +265,7 @@ def verify(executable, report, *, require_bundle=True):
     data = {'version': doctor['version'], 'offline': True, 'path_isolated': require_bundle,
             'input_extensions': sum(map(len, INPUTS.values())), 'conversions': len(cases),
             'duration_seconds': round(time.monotonic() - started, 2),
-            'ocr_redaction': True, 'originals_preserved': True, 'cases': cases}
+            'ocr_redaction': True, 'originals_preserved': True, 'cases': cases, 'media_tools': tool_cases}
     report = Path(report)
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

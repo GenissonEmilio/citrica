@@ -2,6 +2,7 @@
 import base64
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -100,6 +101,7 @@ def test_timestamp_and_selected_signing_identity_are_required(tmp_path, monkeypa
 def test_inspection_passes_filename_as_environment_data(tmp_path, monkeypatch):
     source = tmp_path / "área $() 'arquivo.exe"
     calls = []
+    monkeypatch.setenv('pSmOdUlEpAtH', 'incompatible PowerShell 7 modules')
     def run(args, **kwargs):
         calls.append((args, kwargs))
         result = {'status': 'NotSigned', 'subject': 'Certificado com ação e coração'}
@@ -113,6 +115,11 @@ def test_inspection_passes_filename_as_environment_data(tmp_path, monkeypatch):
     assert '-ExecutionPolicy' not in calls[0][0]
     assert '[Console]' not in calls[0][0][-1]
     assert calls[0][1]['creationflags'] == getattr(subprocess, 'CREATE_NO_WINDOW', 0)
+    assert not any(key.upper() == 'PSMODULEPATH' for key in calls[0][1]['env'])
+    assert os.environ['pSmOdUlEpAtH'] == 'incompatible PowerShell 7 modules'
+    assert calls[0][0][0] == str(Path(os.environ.get('SystemRoot', r'C:\Windows')) /
+                                'System32/WindowsPowerShell/v1.0/powershell.exe')
+    assert "[IO.Path]::Combine($PSHOME, 'Modules'" in calls[0][0][-1]
 
 
 def test_inno_signs_setup_and_uninstaller_with_same_checked_callback(tmp_path, monkeypatch):
@@ -158,14 +165,23 @@ def test_cli_does_not_claim_authenticode_verification_on_linux(monkeypatch):
 
 
 @pytest.mark.skipif(sys.platform != 'win32', reason='Windows Authenticode and PowerShell')
-def test_real_windows_authenticode_inspection_and_tamper_detection(tmp_path):
+def test_real_windows_authenticode_inspection_and_tamper_detection(tmp_path, monkeypatch):
     # Do not install a root certificate or trust anything for this test. Official
     # python.org CPython may already be signed; embeddable/custom builds may not.
     # inspect_signature deliberately launches PowerShell with CREATE_NO_WINDOW,
     # exercising redirected Unicode paths without a console handle.
+    # Reproduce pwsh -> Python -> powershell.exe module pollution with manifests
+    # that 5.1 cannot load. Sanitization is scoped to the signature child process.
+    incompatible = tmp_path / 'incompatible-modules'
+    for name in ['Microsoft.PowerShell.Security', 'Microsoft.PowerShell.Utility']:
+        module = incompatible / name
+        module.mkdir(parents=True)
+        (module / f'{name}.psd1').write_text("@{ModuleVersion='99.0'; PowerShellVersion='99.0'}", encoding='ascii')
+    monkeypatch.setenv('PSModulePath', str(incompatible))
     source = tmp_path / 'assinatura com espaços e ação.exe'
     shutil.copy2(sys.executable, source)
     original = signing.inspect_signature(source)
+    assert os.environ['PSModulePath'] == str(incompatible)
     assert original['status'] in {'Valid', 'NotSigned'}
     if original['status'] == 'Valid':
         assert original['thumbprint'] and original['subject']

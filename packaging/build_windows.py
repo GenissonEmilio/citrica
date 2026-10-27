@@ -6,6 +6,7 @@ prepared by prepare_windows_engines.py. No engines are downloaded by the app.
 import hashlib
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -32,12 +33,20 @@ def build():
     signing = SigningConfig.from_environment()
     engines = Path(os.environ.get('CITRICA_WINDOWS_ENGINES', ROOT / 'build/windows-engines')).resolve()
     for relative in ['tools/ffmpeg/bin/ffmpeg.exe', 'tools/ffmpeg/bin/ffprobe.exe',
-                     'tools/libreoffice/program/soffice.com', 'ocr/libtesseract-5.dll',
+                     'tools/libreoffice/program/soffice.com',
                      'ocr/tessdata/eng.traineddata', 'engines.json', 'engine-files.sha256.json']:
         if not (engines / relative).is_file():
             raise RuntimeError('Prepare os motores offline antes de compilar: '
                                'python packaging/prepare_windows_engines.py '
                                f'(arquivo ausente: {engines / relative})')
+    if not list((engines / 'ocr').glob('*tesseract*.dll')):
+        raise RuntimeError(f'A DLL OCR não foi preparada em {engines / "ocr"}.')
+    engine_metadata = json.loads((engines / 'engines.json').read_text(encoding='utf-8'))
+    require_sources = os.environ.get('CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES') == '1'
+    if require_sources and (engine_metadata.get('provenance') != 'compiled-from-pinned-sources' or
+                            not (engines / 'engine-sources.zip').is_file()):
+        raise RuntimeError('O build de publicação exige motores compilados com fontes correspondentes: '
+                           'python packaging/build_windows_source_engines.py')
     # Rasterize the project's own vector logo into an Explorer/tray icon.
     os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
     from PySide6.QtCore import Qt
@@ -113,9 +122,9 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
     run(sys.executable, ROOT / 'tests/windows/engine_parity.py', cli)
     doctor = run(cli, '--doctor', capture_output=True, text=True, encoding='utf-8')
     data = json.loads(doctor.stdout)
-    data['validation'] = {'runner': 'Windows Server 2022 x64 / GitHub Actions',
+    data['validation'] = {'runner': platform.platform(), 'github_actions': bool(os.environ.get('GITHUB_ACTIONS')),
                           'packaged_engine_smoke': True,
-                          'offline_engines': json.loads((engines / 'engines.json').read_text(encoding='utf-8')),
+                          'offline_engines': engine_metadata,
                           'conversion_matrix': 'citrica-windows-engine-parity.json',
                           'explorer': 'see separate citrica-windows-explorer-*-validation.json reports'}
     (OUT / 'citrica-windows-validation.json').write_text(json.dumps(data, ensure_ascii=False, indent=2),
@@ -142,6 +151,9 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
         trust['files'] += verify_files([installer], signtool=signing.signtool)
     (OUT / 'citrica-windows-signing.json').write_text(json.dumps(trust, indent=2, ensure_ascii=False) + '\n',
                                                   encoding='utf-8')
+    if (engines / 'engine-sources.zip').is_file():
+        shutil.copy2(engines / 'engine-sources.zip',
+                     OUT / f'citrica-{__version__}-windows-engine-sources.zip')
     checksums = [f"{hashlib.file_digest(p.open('rb'), 'sha256').hexdigest()}  {p.name}"
                  for p in sorted(OUT.iterdir()) if p.name != 'SHA256SUMS-windows.txt']
     (OUT / 'SHA256SUMS-windows.txt').write_text('\n'.join(checksums) + '\n', encoding='utf-8')
