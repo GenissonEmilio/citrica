@@ -16,12 +16,15 @@ import unicodedata
 from ctypes import wintypes
 from pathlib import Path
 
-import pymupdf
 from docx import Document
 from PIL import Image
 from PySide6.QtCore import QPoint
 from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QApplication
+
+# The clean VM has no system MSVC redistributable. Qt loads its own runtime
+# for the source test's PDF oracle; the frozen child uses its separate bundle.
+import pymupdf
 
 from native_flow import Input, InputUnion, Keyboard, Mouse
 from citrica.windows.ipc import send

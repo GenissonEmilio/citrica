@@ -19,6 +19,11 @@ import wave
 import zipfile
 from pathlib import Path
 
+if os.name == 'nt':
+    # Load the test oracle's C++ runtime from the Python Qt wheel, without
+    # installing a system runtime that could conceal a broken frozen bundle.
+    __import__('PySide6.QtCore')
+
 from PIL import Image, ImageDraw
 from pillow_heif import register_heif_opener
 
@@ -56,11 +61,16 @@ def run(args, env, timeout=120):
 
 
 def office_export(office, source, fmt, destination, env):
-    profile = destination / 'profile'
     destination.mkdir(parents=True, exist_ok=True)
-    run([office, f'-env:UserInstallation={profile.as_uri()}', '--headless', '--convert-to', fmt,
-         '--outdir', destination, source], env)
     output = destination / f'{source.stem}.{fmt}'
+    output.unlink(missing_ok=True)
+    # Match the application's short, isolated profile. Nesting Office's
+    # extension registry below the fixture tree can exceed legacy MAX_PATH on
+    # an ordinary Windows installation, unlike the preconfigured CI runner.
+    with tempfile.TemporaryDirectory(prefix='ctra-', ignore_cleanup_errors=os.name == 'nt') as directory:
+        profile = Path(directory) / 'p'
+        run([office, f'-env:UserInstallation={profile.as_uri()}', '--headless', '--convert-to', fmt,
+             '--outdir', destination, source], env)
     assert output.is_file() and output.stat().st_size > 0, output
     return output
 
@@ -112,7 +122,7 @@ def fixtures(root, ffmpeg, office, env):
         stream.writeframes(b''.join(struct.pack('<h', int(10000*math.sin(index*math.tau*440/16000)))
                                    for index in range(8000)))
     video = root / 'seed.mp4'
-    run([ffmpeg, '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:r=25:d=0.5',
+    run([ffmpeg, '-v', 'error', '-y', '-nostdin', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:r=25:d=0.5',
          '-i', audio, '-c:v', 'libx264', '-c:a', 'aac', '-shortest', video], env)
     for kind, source in [('video', video), ('audio', audio)]:
         for ext in INPUTS[kind]:
@@ -127,7 +137,7 @@ def fixtures(root, ffmpeg, office, env):
                               ext, ['-c:v', 'libx264', '-c:a', 'aac'])
             else:
                 codecs = {'wma': ['-c:a', 'wmav2'], 'mka': ['-c:a', 'flac']}.get(ext, [])
-            run([ffmpeg, '-v', 'error', '-i', source, *codecs, path], env)
+            run([ffmpeg, '-v', 'error', '-y', '-nostdin', '-i', source, *codecs, path], env)
             result.append((kind, path))
     document = root / 'document.txt'
     document.write_text(MARKER, encoding='utf-8')
