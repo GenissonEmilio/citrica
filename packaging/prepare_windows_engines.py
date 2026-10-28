@@ -181,6 +181,7 @@ def prepare(output=DEFAULT_OUTPUT, cache=DEFAULT_CACHE):
         shutil.copy2(artifacts['ocr_license'], ocr / 'tessdata/LICENSE')
 
         lock['provenance'] = 'provisional-vendor-binaries; complete corresponding-source bundle not established'
+        lock['ocr_library'] = 'libtesseract-5.dll'
         (payload / 'engines.json').write_text(json.dumps(lock, indent=2, ensure_ascii=False) + '\n',
                                              encoding='utf-8')
         # Deterministic file inventory is copied into the installer's validation

@@ -168,6 +168,7 @@ def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None, office_from=N
                 if file.is_file():
                     target.write(file, 'toolchain-licenses/' + str(file.relative_to(toolchain_licenses)))
     metadata = {'schema': 1, 'provenance': 'compiled-from-pinned-sources', 'sources': lock['sources'],
+                'ocr_library': dlls[0].name,
                 'libreoffice': vendors['libreoffice'], 'ocr_eng': vendors['ocr_eng'],
                 'corresponding_source': {'file': bundle.name, 'sha256': digest(bundle),
                                          'scope': ['ffmpeg', 'linked-codec-libraries', 'tesseract', 'leptonica']},

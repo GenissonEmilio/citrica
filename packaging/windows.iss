@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.5.0"
+  #define AppVersion "0.6.0"
 #endif
 
 [Setup]
@@ -45,6 +45,11 @@ Name: "startup"; Description: "Iniciar na bandeja ao entrar no Windows"; Flags: 
 
 [Files]
 Source: "..\dist\Citrica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[InstallDelete]
+; PrepareToInstall closes the resident first. Preferences live in AppData,
+; outside this bundled runtime, so obsolete DLLs can be removed on upgrade.
+Type: filesandordirs; Name: "{app}\_internal"
 
 [Icons]
 Name: "{userprograms}\Cítrica"; Filename: "{app}\Citrica.exe"

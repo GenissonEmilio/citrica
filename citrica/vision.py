@@ -3,6 +3,7 @@ import csv
 import ctypes
 import ctypes.util
 import io
+import json
 import os
 import sys
 from pathlib import Path
@@ -13,13 +14,31 @@ from citrica.core import ConversionError
 def ocr_paths():
     root = Path(getattr(sys, '_MEIPASS', Path(__file__).parent))
     bundled = next(root.glob('libtesseract.so*'), None)
+    declared_library = False
     if sys.platform == 'win32':
         folders = [root / 'ocr', Path(os.environ.get('CITRICA_OCR_DIR', root / 'ocr')),
                    Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Tesseract-OCR']
         if os.environ.get('CITRICA_WINDOWS_ENGINES'):
             folders.insert(1, Path(os.environ['CITRICA_WINDOWS_ENGINES']) / 'ocr')
-        bundled = next((p for folder in folders for p in folder.glob('*tesseract*.dll')), None)
-    library = str(bundled) if bundled else ctypes.util.find_library('tesseract')
+        bundled = None
+        for folder in folders:
+            try:
+                manifest = json.loads((folder.parent / 'engines.json').read_text(encoding='utf-8'))
+                filename = manifest.get('ocr_library')
+            except (OSError, ValueError, AttributeError):
+                filename = None
+            if (isinstance(filename, str) and filename.lower().endswith('.dll') and
+                    not any(character in filename for character in ['/', '\\', ':'])):
+                declared_library = True
+                candidate = folder / filename
+                bundled = candidate if candidate.is_file() else None
+                # An incomplete update must not silently load an older leftover
+                # DLL or a system installation in place of the declared engine.
+                break
+            bundled = next(folder.glob('*tesseract*.dll'), None)
+            if bundled:
+                break
+    library = str(bundled) if bundled else (None if declared_library else ctypes.util.find_library('tesseract'))
     model_paths = [root / 'ocr-data', root / 'ocr/tessdata',
                               Path(os.environ.get('CITRICA_OCR_DIR', root / 'ocr')) / 'tessdata',
                               Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Tesseract-OCR/tessdata',
@@ -27,6 +46,8 @@ def ocr_paths():
                               Path('/usr/share/tesseract-ocr/5/tessdata')]
     if sys.platform == 'win32' and os.environ.get('CITRICA_WINDOWS_ENGINES'):
         model_paths.insert(2, Path(os.environ['CITRICA_WINDOWS_ENGINES']) / 'ocr/tessdata')
+    if sys.platform == 'win32' and bundled:
+        model_paths.insert(0, bundled.parent / 'tessdata')
     model = next((p for p in model_paths
                   if (p / 'eng.traineddata').is_file()), None)
     return library, model

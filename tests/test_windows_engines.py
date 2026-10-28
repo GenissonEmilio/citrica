@@ -111,3 +111,17 @@ def test_windows_ocr_reads_model_with_unicode_profile_path(tmp_path, monkeypatch
     image = Image.new('RGB', (800, 180), 'white')
     ImageDraw.Draw(image).text((30, 40), 'PRIVATE TEST 1234', font=ImageFont.load_default(size=48), fill='black')
     assert vision.text_boxes(image)
+
+
+def test_ocr_manifest_selects_exact_dll_after_upgrade_and_never_hides_missing_engine(tmp_path, monkeypatch):
+    folder = tmp_path / 'ocr'
+    folder.mkdir()
+    old = folder / 'libtesseract-5.dll'
+    new = folder / 'tesseract55.dll'
+    old.write_bytes(b'old locator fixture')
+    new.write_bytes(b'new locator fixture')
+    (tmp_path / 'engines.json').write_text(json.dumps({'ocr_library': new.name}), encoding='utf-8')
+    monkeypatch.setattr(vision, 'sys', SimpleNamespace(platform='win32', _MEIPASS=str(tmp_path)))
+    assert vision.ocr_paths()[0] == str(new)
+    new.unlink()
+    assert vision.ocr_paths()[0] is None

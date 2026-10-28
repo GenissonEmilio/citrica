@@ -27,6 +27,15 @@ def main():
     assert version == f'Cítrica {VERSION}', version
     sendto = Path(os.environ['APPDATA']) / 'Microsoft/Windows/SendTo/Cítrica.lnk'
     assert sendto.is_file(), 'Enviar para shortcut was not installed'
+    # Upgrades must replace the complete private runtime: a removed OCR/Qt DLL
+    # must not survive and be loaded instead of the newly bundled engine.
+    obsolete = target / '_internal/ocr/obsolete-runtime.dll'
+    obsolete.parent.mkdir(parents=True, exist_ok=True)
+    obsolete.write_bytes(b'previous-version fixture')
+    run(setup, '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', f'/DIR={target}',
+        f'/LOG={target.parent / "upgrade.log"}')
+    assert not obsolete.exists(), 'An obsolete bundled DLL survived the upgrade'
+    assert run(cli, '--version', capture_output=True, text=True, encoding='utf-8').stdout.strip() == version
     (ROOT / 'release').mkdir(exist_ok=True)
     run(gui, '--settings', '--screenshot', ROOT / 'release/citrica-windows-installed-preview.png',
         env=dict(os.environ, QT_QPA_PLATFORM='windows'))
@@ -47,7 +56,8 @@ def main():
         else:
             raise AssertionError('Startup entry remained after uninstall')
     result = {'per_user_install': True, 'installed_cli_version': version, 'sendto_shortcut': True,
-              'installed_gui_launch': True, 'uninstall': True, 'startup_entry_removed': True}
+              'installed_gui_launch': True, 'upgrade_replaces_runtime': True,
+              'uninstall': True, 'startup_entry_removed': True}
     (ROOT / 'release/citrica-windows-installer-validation.json').write_text(json.dumps(result, indent=2),
                                                                           encoding='utf-8')
     print('Instalador Windows: instalação no usuário, aplicativo, Enviar para e desinstalação passaram.')
