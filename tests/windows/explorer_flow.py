@@ -418,6 +418,43 @@ def main():
                     'foreground_hwnd': user.GetForegroundWindow(),
                     'input_down': {name: bool(user.GetAsyncKeyState(vk) & 0x8000)
                                    for name, vk in [('left', 1), ('shift', 0x10), ('ctrl', 0x11), ('alt', 0x12)]}}
+        for stack_kind, probe_flags in [('python', ['--nonblocking']), ('native', ['--native'])]:
+            stack_probe = {'status': 'not-needed', 'reason': 'Resident process has already exited.'}
+            if resident.poll() is None:
+                observer = Path(sys.executable).parent / 'Scripts/py-spy.exe'
+                if not observer.is_file():
+                    stack_probe = {'status': 'unavailable', 'error': f'External observer not installed: {observer}'}
+                else:
+                    try:
+                        # The observer needs its own private MSVC runtime on
+                        # a clean VM. This environment never reaches the app.
+                        python_root = Path(sys.executable).parent
+                        observer_env = os.environ.copy()
+                        observer_env['PATH'] = os.pathsep.join([str(python_root),
+                            str(python_root/'Lib/site-packages/PySide6'), observer_env.get('PATH', '')])
+                        probe = subprocess.run([str(observer), 'dump', '--pid', str(resident.pid), *probe_flags],
+                            capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=8,
+                            check=False, env=observer_env)
+                        stack_probe = {'status': 'captured' if probe.returncode == 0 else 'failed',
+                                       'returncode': probe.returncode, 'stdout': probe.stdout, 'stderr': probe.stderr}
+                    except subprocess.TimeoutExpired as error:
+                        stack_probe = {'status': 'timeout', 'error': f'External {stack_kind} snapshot exceeded 8 seconds.',
+                            'stdout': error.stdout.decode('utf-8', 'replace') if isinstance(error.stdout, bytes) else
+                                      (error.stdout or ''),
+                            'stderr': error.stderr.decode('utf-8', 'replace') if isinstance(error.stderr, bytes) else
+                                      (error.stderr or '')}
+                    except OSError as error:
+                        stack_probe = {'status': 'unavailable', 'error': str(error)}
+            stack_log = STATE/f'{stack_kind}-external-stacks.log'
+            stack_probe.setdefault('returncode', None)
+            stack_probe.setdefault('stdout', '')
+            stack_probe.setdefault('stderr', '')
+            stack_probe['log'] = str(stack_log)
+            try:
+                stack_log.write_text(json.dumps(stack_probe, indent=2), encoding='utf-8')
+            except OSError as error:
+                stack_probe['log_error'] = str(error)
+            snapshot[f'external_{stack_kind}_stacks'] = stack_probe
         failure_file = STATE/'failed-state.json'
         failure_file.write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
         app.primaryScreen().grabWindow(0).save(str(ROOT/f'release/citrica-windows-explorer-failure-{run_id}.png'))

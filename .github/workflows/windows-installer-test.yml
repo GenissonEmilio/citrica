@@ -72,6 +72,9 @@ jobs:
         run: |
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
+      - name: External Python stack observer for diagnostic QA only
+        run: |
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r tests/windows/requirements-debug.lock
       - name: Focused artifact-integrity and responsive IPC-controller tests
         env:
           QT_QPA_PLATFORM: offscreen
