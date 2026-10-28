@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
   "date": "2026-10-28",
-  "status": "candidate; final packaged Unicode/upgrade checks still in progress",
+  "status": "candidate; native Explorer access violation under investigation; final VM upgrade in progress",
   "vm": {
     "os": "Windows 11 Pro x64, pt-BR, build 26300.9457",
     "memory_gb": 4,
@@ -115,7 +115,7 @@
     "initial_packaged_candidate": "failed; OpenCV narrow fopen could not open model under accented installation directory",
     "fix": "Python reads Unicode model path, then OpenCV loads XML from memory",
     "source_regression_in_windows_vm": "6 passed",
-    "fixed_packaged_candidate": "pending"
+    "fixed_packaged_candidate": "Passed in private VM build of ff90885 with byte-verified 2655984 engines; final CI installer check pending."
   },
   "trust": {
     "existing_0_5_0_installation_warning_reproduced": "Open File security warning: unknown publisher, with Internet zone marker",
@@ -128,7 +128,8 @@
   "limitations": [
     "A clean Windows 11 VM and Windows Server CI do not represent every PC, GPU, monitor or document.",
     "The source-only QA Python runtime needs its private Qt CRT loaded; frozen executables use their own runtime and are tested independently.",
-    "The 40725014510 source build passed package/matrix/install/upgrade checks but failed an Alt activation IPC check. This is being investigated, not reported as an overall pass."
+    "The 40725014510 source build passed package/matrix/install/upgrade checks but failed an Alt activation IPC check. This is being investigated, not reported as an overall pass.",
+    "Run 40735116402 failed with a native access violation during the bundled-family Explorer test. Passing earlier checks does not clear this regression."
   ],
   "source_native_repetition": {
     "sessions": 10,
@@ -137,5 +138,60 @@
     "duration_seconds": 184.7,
     "result": "passed",
     "note": "Source app with an explicit private QA Python CRT bootstrap; frozen application is validated independently."
+  },
+  "private_vm_rebuild": {
+    "app_source_commit": "ff90885",
+    "engines": "byte-verified inventory from candidate 2655984",
+    "installer_built": false,
+    "unicode_application_directory": true,
+    "static_tool_operations": 38,
+    "positive_operations": 32,
+    "expected_rejections": 6,
+    "palettes_verified": 5,
+    "originals_preserved": true,
+    "path_isolated": true,
+    "result": "passed",
+    "native": {
+      "sessions": 13,
+      "gestures": 52,
+      "qt_scales": [
+        "1",
+        "1.5"
+      ],
+      "same_folder_sessions": 5,
+      "qa_trace_enabled_sessions": 10,
+      "default_logging_sessions": 3,
+      "result": "passed"
+    }
+  },
+  "latest_local_deb": {
+    "ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40735116402",
+    "artifact_id": 12837118608,
+    "file": "citrica_0.6.0_amd64.deb",
+    "sha256": "1e722fb36376c2a6086e7e4e4dadd463813c9c6a07f23aa4872429058ecb03f6",
+    "ubuntu_install_remove_tests": [
+      "24.04",
+      "26.04",
+      "26.10"
+    ]
+  },
+  "native_ci_regression": {
+    "ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40735116402",
+    "source_commit": "ff90885",
+    "result": "failed",
+    "stage": "Explorer full-family test at WAV to MP3 drop",
+    "resident_exit_code": 3221225477,
+    "native_error": "0xC0000005 access violation",
+    "passed_before_failure": [
+      "304 conversions",
+      "23 media operations",
+      "OCR and face smoke",
+      "cross-process native Qt/OLE",
+      "Unicode installer upgrade and uninstall",
+      "Explorer builtin at 100%",
+      "Explorer builtin at 150%"
+    ],
+    "resolved": false,
+    "next_diagnostic": "Capture fatal native stack plus OLE drop/grab/job boundaries; retest exact installed candidate in Windows 11 VM."
   }
 }

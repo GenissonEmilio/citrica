@@ -21,10 +21,16 @@ def test_watchdog_requires_explicit_opt_in_and_resident(tmp_path, monkeypatch, b
     assert not path.with_suffix('.events.log').exists()
 
 
-def test_watchdog_captures_outside_ipc_and_restores_logging_after_failure(tmp_path, monkeypatch):
+@pytest.mark.parametrize('fatal_already_enabled', [False, True])
+def test_watchdog_captures_outside_ipc_and_restores_logging_after_failure(tmp_path, monkeypatch,
+                                                                       fatal_already_enabled):
     path = tmp_path / 'stacks.log'
     monkeypatch.setenv('CITRICA_QA_TRACEBACK_LOG', str(path))
     calls = []
+    fatal_calls = []
+    monkeypatch.setattr(app.faulthandler, 'is_enabled', lambda: fatal_already_enabled)
+    monkeypatch.setattr(app.faulthandler, 'enable', lambda **kw: fatal_calls.append(('enable', kw)))
+    monkeypatch.setattr(app.faulthandler, 'disable', lambda: fatal_calls.append(('disable', {})))
     monkeypatch.setattr(app.faulthandler, 'dump_traceback_later', lambda *a, **kw: calls.append((a, kw)))
     monkeypatch.setattr(app.faulthandler, 'cancel_dump_traceback_later', lambda: calls.append('cancel'))
     previous = (app.QA.level, app.QA.propagate, list(app.QA.handlers))
@@ -36,6 +42,11 @@ def test_watchdog_captures_outside_ipc_and_restores_logging_after_failure(tmp_pa
     assert arguments == (5,) and options['repeat'] is True
     assert options['file'].closed
     assert calls[-1] == 'cancel'
+    if fatal_already_enabled:
+        assert not fatal_calls, 'An existing fatal handler and its destination must remain untouched'
+    else:
+        assert fatal_calls[0] == ('enable', {'file': options['file'], 'all_threads': True})
+        assert fatal_calls[1] == ('disable', {})
     assert (app.QA.level, app.QA.propagate, list(app.QA.handlers)) == previous
     events = path.with_suffix('.events.log').read_text(encoding='utf-8')
     assert 'ole.test_boundary' in events and 'resident.watchdog stop' in events

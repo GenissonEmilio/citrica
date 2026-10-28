@@ -186,14 +186,18 @@ class Wheel(QWidget):
         self.update()
 
     def dismiss(self):
+        QA.debug('wheel.dismiss begin probing=%s', self.probing)
         self._motion.stop()
         if self.probing:
             self.probing = False
             self.clear()
             self.hide()
             return
+        QA.debug('wheel.dismiss grab begin')
         self._closing_frame = self.grab() if self.isVisible() and self.animations() else None
+        QA.debug('wheel.dismiss grab end; clear begin')
         self.clear()
+        QA.debug('wheel.dismiss clear end')
         if not self.isVisible() or not self.animations():
             self.hide()
             self._closing_frame = None
@@ -380,11 +384,15 @@ class Wheel(QWidget):
             event.ignore()
 
     def dropEvent(self, event):
+        QA.debug('ole.drop begin')
         paths = offered_paths(event.mimeData())
         if paths and not self._closing:
+            QA.debug('ole.drop accept begin')
             event.setDropAction(Qt.DropAction.CopyAction)
             event.accept()
+            QA.debug('ole.drop signal begin')
             self.dropped.emit(paths, event.position().toPoint())
+            QA.debug('ole.drop signal end')
         else:
             event.ignore()
             self.cancelled.emit()

@@ -2,7 +2,7 @@
 
 A **0.6.0 é uma versão candidata em validação**, ainda sem release pública. A última versão estável publicada é a [0.5.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0), cuja roda Linux admite somente GNOME 50. Para testar as correções no Ubuntu, use o DEB candidato descrito abaixo.
 
-1. Baixe o artifact [citrica-native-packages](https://github.com/GenissonEmilio/citrica/actions/runs/40604357125/artifacts/12779848087), do [CI 40604357125](https://github.com/GenissonEmilio/citrica/actions/runs/40604357125). É necessário estar conectado ao GitHub para baixar artifacts.
+1. Baixe o artifact [citrica-native-packages](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402/artifacts/12837118608), do [CI 40735116402](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402). É necessário estar conectado ao GitHub para baixar artifacts.
 2. Extraia o ZIP e localize **`citrica_0.6.0_amd64.deb`**. Ele contém o aplicativo, Python, Qt e os motores de imagem/PDF; essas bibliotecas não precisam ser instaladas manualmente.
 3. Abra o DEB com o instalador de aplicativos do Ubuntu e confirme a instalação.
 
@@ -58,7 +58,9 @@ sudo apt remove citrica
 
 `tests/linux/install_smoke.py` instala o DEB em um container Ubuntu descartável, abre o aplicativo como usuário comum, verifica a configuração inicial, converte PNG→PDF→DOCX e remove o pacote. O script recusa execução fora de container e não acessa a sessão gráfica de trabalho. Esse teste de pacote é distinto dos testes de arraste no compositor GNOME/Wayland real.
 
-No [CI 40604357125](https://github.com/GenissonEmilio/citrica/actions/runs/40604357125), o mesmo DEB da candidata 0.6.0 passou nos três containers limpos: **Ubuntu 24.04, 26.04 e 26.10**. A abertura ocorreu como usuário comum, inclusive com um portátil antigo simulado antes do aplicativo no PATH. Os relatórios `citrica-ubuntu-VERSAO-validation.json` estão nos artifacts de evidências de cada job. O sucesso desses jobs Linux não representa uma publicação da versão ou um resultado da validação Windows.
+No [CI 40735116402](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402), o mesmo DEB da candidata 0.6.0 passou nos três containers limpos: **Ubuntu 24.04, 26.04 e 26.10**. A abertura ocorreu como usuário comum, inclusive com um portátil antigo simulado antes do aplicativo no PATH. Os relatórios `citrica-ubuntu-VERSAO-validation.json` estão nos artifacts de evidências de cada job. O sucesso desses jobs Linux não representa uma publicação da versão ou um resultado da validação Windows.
+
+O mesmo DEB do CI ff90885 passou também por 38 operações avançadas no Ubuntu 26.10 como usuário comum: cinco paletas exatas, ferramentas de imagem/PDF, rostos, OCR, QR e recusas esperadas de entradas inválidas. As nove entradas sintéticas permaneceram intactas. [Relatório do pacote instalado](evidence/0.6.0/citrica-ubuntu-2610-final-static-tools.json).
 
 Nos testes Ubuntu com renderização por software, o próprio GNOME desativou animações do desktop. Nesses ambientes foi verificado o fluxo funcional. No teste separado do GNOME 50/Fedora, o executável congelado da candidata registrou nove quadros intermediários reais na abertura. A validação nativa Ubuntu 24.04 incluiu o gerenciador Arquivos real, com arraste, conversão e copiar/colar. No Ubuntu 26.10, a comparação de pixels confirmou a miniatura acima da roda nos três modos.
 

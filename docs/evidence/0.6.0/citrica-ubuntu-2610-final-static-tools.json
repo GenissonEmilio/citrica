@@ -1,0 +1,414 @@
+{
+  "executable": "/opt/citrica/citrica",
+  "platform": "Linux-7.2.10-200.fc44.x86_64-x86_64-with-glibc2.44",
+  "application_api": "--desktop-request",
+  "source_application_imports": false,
+  "windows_system_only_path": false,
+  "success": true,
+  "originals_sha256": {
+    "fotografia com acentuação.png": "f4faee8fadf755cb3453f9b8a92ca37e8c568eb4e19e626a891d5e33fa671b94",
+    "segunda imagem azul.png": "9333d4cc6e00313ac3190619efa3463bff5a182dec6edb3cb33cd6817507fccf",
+    "ruído para tamanho alvo.png": "4ee487773fad1f35067569a2ec42003b2a082c79814b63a821a6d7c19e7c086c",
+    "rosto da astronauta.png": "88431cd9653ccd539741b555fb0a46b61558b301d4110412b5bc28b5e3ea6cb5",
+    "texto confidencial João.png": "1203660b55ea6abf1c64ab88b805ea2d1173360350956d544f73f263d031be2f",
+    "código QR Unicode.png": "cc99aa97856a089e636268b24665081e188da1cce5e3e454feab2037dfbc1717",
+    "páginas com conteúdo.pdf": "15144dd5d81630c37bba2f9a9bcf32fb749e30cf185f269949e385004db82857",
+    "segundo documento.pdf": "b65c63c2e543f741957d3b846d795c9b84bc9191a5b8e7b550abc9ed0043c5f9",
+    "animação recusada.gif": "49a94e3a2089136fe288c546e380ee0bb860c38ee97c8af4f2d8ec68282785c2"
+  },
+  "originals_preserved": true,
+  "palettes": [
+    {
+      "selection": "image",
+      "tools": [
+        "compress",
+        "crop",
+        "adjust",
+        "annotate",
+        "background",
+        "redact",
+        "metadata",
+        "edit_metadata",
+        "strip",
+        "images_pdf",
+        "collage",
+        "qr",
+        "redact_faces",
+        "redact_text",
+        "target_size"
+      ],
+      "formats": [
+        "png",
+        "jpg",
+        "webp",
+        "avif",
+        "heic",
+        "tiff",
+        "bmp",
+        "gif",
+        "pdf"
+      ],
+      "success": true
+    },
+    {
+      "selection": "image_batch",
+      "tools": [
+        "compress",
+        "crop",
+        "adjust",
+        "annotate",
+        "background",
+        "redact",
+        "metadata",
+        "edit_metadata",
+        "strip",
+        "images_pdf",
+        "collage",
+        "qr",
+        "redact_faces",
+        "redact_text",
+        "target_size"
+      ],
+      "formats": [
+        "png",
+        "jpg",
+        "webp",
+        "avif",
+        "heic",
+        "tiff",
+        "bmp",
+        "gif",
+        "pdf"
+      ],
+      "success": true
+    },
+    {
+      "selection": "pdf",
+      "tools": [
+        "compress",
+        "metadata",
+        "edit_metadata",
+        "strip",
+        "target_size",
+        "split_pdf",
+        "reorder_pdf"
+      ],
+      "formats": [
+        "png",
+        "jpg",
+        "docx",
+        "txt",
+        "pdf"
+      ],
+      "success": true
+    },
+    {
+      "selection": "pdf_batch",
+      "tools": [
+        "compress",
+        "metadata",
+        "edit_metadata",
+        "strip",
+        "target_size",
+        "merge_pdf",
+        "split_pdf",
+        "reorder_pdf"
+      ],
+      "formats": [
+        "png",
+        "jpg",
+        "docx",
+        "txt",
+        "pdf"
+      ],
+      "success": true
+    },
+    {
+      "selection": "mixed_image_pdf",
+      "tools": [
+        "compress",
+        "metadata",
+        "strip",
+        "target_size"
+      ],
+      "formats": [
+        "png",
+        "jpg",
+        "pdf"
+      ],
+      "success": true
+    }
+  ],
+  "cases": [
+    {
+      "family": "image",
+      "tool": "compress",
+      "variant": "compress",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "strip",
+      "variant": "strip",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "crop",
+      "variant": "crop",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "adjust",
+      "variant": "adjust",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "annotate",
+      "variant": "annotate_text",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "annotate",
+      "variant": "annotate_arrow",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "annotate",
+      "variant": "annotate_rectangle",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "annotate",
+      "variant": "annotate_ellipse",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "annotate",
+      "variant": "annotate_number",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "background",
+      "variant": "background_solid",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "background",
+      "variant": "background_gradient_aspect_radius",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "background",
+      "variant": "background_image",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact",
+      "variant": "redact_solid",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact",
+      "variant": "redact_blur",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "metadata",
+      "variant": "metadata",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "edit_metadata",
+      "variant": "edit_metadata",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "images_pdf",
+      "variant": "images_pdf",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "collage",
+      "variant": "collage",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "qr",
+      "variant": "qr",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact_faces",
+      "variant": "redact_faces_solid",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact_faces",
+      "variant": "redact_faces_blur",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact_text",
+      "variant": "redact_text_solid",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact_text",
+      "variant": "redact_text_blur",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "target_size",
+      "variant": "target_size",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "metadata",
+      "variant": "metadata",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "compress",
+      "variant": "compress",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "strip",
+      "variant": "strip",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "edit_metadata",
+      "variant": "edit_metadata",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "target_size",
+      "variant": "target_size",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "split_pdf",
+      "variant": "split_pdf",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "reorder_pdf",
+      "variant": "reorder_pdf",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "merge_pdf",
+      "variant": "merge_pdf",
+      "expected_rejection": false,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "crop",
+      "variant": "negative_crop",
+      "expected_rejection": true,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "adjust",
+      "variant": "nonfinite_brightness",
+      "expected_rejection": true,
+      "success": true
+    },
+    {
+      "family": "pdf",
+      "tool": "reorder_pdf",
+      "variant": "duplicate_page_order",
+      "expected_rejection": true,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "images_pdf",
+      "variant": "animation_refused",
+      "expected_rejection": true,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "redact_faces",
+      "variant": "no_face_explained",
+      "expected_rejection": true,
+      "success": true
+    },
+    {
+      "family": "image",
+      "tool": "qr",
+      "variant": "no_qr_explained",
+      "expected_rejection": true,
+      "success": true
+    }
+  ],
+  "operations": 38,
+  "positive_operations": 32,
+  "negative_operations": 6,
+  "duration_seconds": 7.92
+}

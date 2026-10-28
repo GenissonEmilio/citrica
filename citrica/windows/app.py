@@ -50,12 +50,20 @@ def qa_tracebacks(args):
     QA.addHandler(handler)
     try:
         with path.open('ab', buffering=0) as traces:
+            fatal_was_enabled = faulthandler.is_enabled()
             try:
+                # Preserve an existing fatal handler and its destination. A
+                # frozen GUI normally has none; capture native crashes there
+                # in the same QA file as periodic watchdog snapshots.
+                if not fatal_was_enabled:
+                    faulthandler.enable(file=traces, all_threads=True)
                 faulthandler.dump_traceback_later(5, repeat=True, file=traces)
                 QA.debug('resident.watchdog start pid=%s', os.getpid())
                 yield
             finally:
                 faulthandler.cancel_dump_traceback_later()
+                if not fatal_was_enabled:
+                    faulthandler.disable()
                 QA.debug('resident.watchdog stop')
     finally:
         QA.removeHandler(handler)
@@ -294,9 +302,11 @@ class Desktop(QObject):
 
     @Slot()
     def _job_finished(self):
+        QA.debug('job.finished begin')
         job = self.sender()
         self.jobs.discard(job)
         job.deleteLater()
+        QA.debug('job.finished deleteLater queued')
 
     def notify(self, title, message):
         self.last_message = message
@@ -405,11 +415,13 @@ class Desktop(QObject):
         self.drag_verified = True
 
     def drop(self, paths, point):
+        QA.debug('drop.begin generation=%s files=%s', self.generation, len(paths))
         self.offer(paths)  # An actual OLE drop always supersedes a selection preview.
         self.dragging = False
         self.pending_drop = (self.generation, point)
         if self.palette:
             self.render()
+        QA.debug('drop.end generation=%s', self.generation)
 
     def drag_mode(self, mode):
         QA.debug('drag_mode.begin mode=%s active=%s armed=%s', mode, self.active, self.armed)
@@ -446,6 +458,7 @@ class Desktop(QObject):
                           self.dragging and not self.native.left_down() else None)
 
     def hide_wheel(self):
+        QA.debug('hide.begin generation=%s', self.generation)
         self.generation += 1
         self.paths, self.palette, self.dragging, self.active = [], None, False, False
         self.armed = False
@@ -455,6 +468,7 @@ class Desktop(QObject):
         self.native.visible = False
         self.native.reset_drag()
         self.wheel.dismiss()
+        QA.debug('hide.end generation=%s', self.generation)
 
     def apply(self, item):
         if self.dragging and not self.drag_verified:

@@ -293,5 +293,116 @@
     "intermediate_states_observed": true,
     "opening_ms": 240,
     "note": "This is GNOME 50 validation on Fedora, not a native Ubuntu 26.04 VM run."
+  },
+  "latest_ci_deb_installation": {
+    "run_id": 40735116402,
+    "head_commit": "ff90885",
+    "run_url": "https://github.com/GenissonEmilio/citrica/actions/runs/40735116402",
+    "artifact_url": "https://github.com/GenissonEmilio/citrica/actions/runs/40735116402/artifacts/12837118608",
+    "package_file": "citrica_0.6.0_amd64.deb",
+    "package_sha256": "1e722fb36376c2a6086e7e4e4dadd463813c9c6a07f23aa4872429058ecb03f6",
+    "results": {
+      "26.04": {
+        "version": "Cítrica 0.6.0",
+        "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "native_install": true,
+        "normal_user_launch": true,
+        "first_launch_setup": true,
+        "settings_screenshot": true,
+        "image_pdf_docx": true,
+        "uninstall": true,
+        "native_menu_ignores_old_portable_path": true,
+        "doctor": {
+          "version": "0.6.0",
+          "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.43",
+          "dependencies": {
+            "ffmpeg": null,
+            "libreoffice": null
+          },
+          "tools": {
+            "faces": true,
+            "text": true,
+            "qr": true,
+            "share": false
+          },
+          "desktop": {
+            "installed": false,
+            "active": false
+          }
+        }
+      },
+      "26.10": {
+        "version": "Cítrica 0.6.0",
+        "os_release": "PRETTY_NAME=\"Ubuntu 26.10\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.10\"\nVERSION=\"26.10 (Stonking Stingray)\"\nVERSION_CODENAME=stonking\nRELEASE_TYPE=stable\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nDOCUMENTATION_URL=\"https://docs.ubuntu.com\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nLOGO=ubuntu-logo\nVENDOR_NAME=\"Canonical\"\nVENDOR_URL=\"https://canonical.com/\"\nUBUNTU_CODENAME=stonking\n",
+        "native_install": true,
+        "normal_user_launch": true,
+        "first_launch_setup": true,
+        "settings_screenshot": true,
+        "image_pdf_docx": true,
+        "uninstall": true,
+        "native_menu_ignores_old_portable_path": true,
+        "doctor": {
+          "version": "0.6.0",
+          "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.44",
+          "dependencies": {
+            "ffmpeg": null,
+            "libreoffice": null
+          },
+          "tools": {
+            "faces": true,
+            "text": true,
+            "qr": true,
+            "share": false
+          },
+          "desktop": {
+            "installed": false,
+            "active": false
+          }
+        }
+      },
+      "24.04": {
+        "version": "Cítrica 0.6.0",
+        "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+        "native_install": true,
+        "normal_user_launch": true,
+        "first_launch_setup": true,
+        "settings_screenshot": true,
+        "image_pdf_docx": true,
+        "uninstall": true,
+        "native_menu_ignores_old_portable_path": true,
+        "doctor": {
+          "version": "0.6.0",
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+          "dependencies": {
+            "ffmpeg": null,
+            "libreoffice": null
+          },
+          "tools": {
+            "faces": true,
+            "text": true,
+            "qr": true,
+            "share": false
+          },
+          "desktop": {
+            "installed": false,
+            "active": false
+          }
+        }
+      }
+    },
+    "scope": "Linux and all three DEB jobs passed. Windows result is recorded separately."
+  },
+  "latest_ubuntu_26_10_static_tools": {
+    "package_sha256": "1e722fb36376c2a6086e7e4e4dadd463813c9c6a07f23aa4872429058ecb03f6",
+    "backend": "installed /opt/citrica/citrica",
+    "normal_user": true,
+    "operations": 38,
+    "positive_operations": 32,
+    "expected_rejections": 6,
+    "palettes": 5,
+    "originals_preserved": true,
+    "duration_seconds": 7.92,
+    "result": "passed",
+    "evidence": "evidence/0.6.0/citrica-ubuntu-2610-final-static-tools.json"
   }
 }

@@ -1,0 +1,23 @@
+[
+  {
+    "iteration": 1,
+    "same_folder": false,
+    "qt_scale": "1",
+    "qa_watchdog_enabled": false,
+    "returncode": 0
+  },
+  {
+    "iteration": 2,
+    "same_folder": false,
+    "qt_scale": "1.5",
+    "qa_watchdog_enabled": false,
+    "returncode": 0
+  },
+  {
+    "iteration": 3,
+    "same_folder": true,
+    "qt_scale": "1.5",
+    "qa_watchdog_enabled": false,
+    "returncode": 0
+  }
+]
