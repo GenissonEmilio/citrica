@@ -1,12 +1,12 @@
 # Cítrica no Windows
 
-Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. O aplicativo permanece na bandeja. A candidata Linux 0.6.0 usa a extensão do GNOME 46/50/51 com Wayland.
+Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. O aplicativo permanece na bandeja. A versão Linux 0.6.0 usa a extensão do GNOME 46/50/51 com Wayland.
 
 ## Instalar e abrir
 
-A [candidata 0.6.0 do CI](https://github.com/GenissonEmilio/citrica/actions/runs/40760249570/artifacts/12848364933) inclui todos os motores descritos abaixo. Extraia o artifact e execute o arquivo terminado em `setup-unsigned-test.exe`. O pacote passou pelo CI completo e continua sem assinatura pública; [resultados e escopo dos testes](VALIDACAO-0.6.0.md).
+A [release 0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0) inclui todos os motores descritos abaixo. Baixe o [instalador Windows](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe) e execute o arquivo terminado em `setup-unsigned-test.exe`. O pacote passou pelo CI completo e pela VM Windows 11 e continua sem assinatura pública; [resultados e escopo dos testes](VALIDACAO-0.6.0.md).
 
-Baixe o arquivo `citrica-VERSÃO-windows-x86_64-setup.exe` da release. O instalador usa a conta atual, cria a entrada no menu Iniciar e adiciona **Enviar para → Cítrica** no Explorer. Atalho na área de trabalho e inicialização automática são opcionais.
+Os arquivos da 0.6.0 mantêm `unsigned-test` no nome para identificar o estado da assinatura. O instalador usa a conta atual, cria a entrada no menu Iniciar e adiciona **Enviar para → Cítrica** no Explorer. Atalho na área de trabalho e inicialização automática são opcionais.
 
 A assinatura Authenticode e a reputação do SmartScreen são verificações diferentes. O relatório `citrica-windows-signing.json` informa se aquele pacote está assinado; um candidato marcado `unsigned` ainda pode exibir **Editor desconhecido**. Não desative o Defender, SmartScreen ou Smart App Control. Consulte [assinatura e distribuição](WINDOWS-SIGNING.md) para os caminhos de certificação/loja e os limites dessa validação.
 
@@ -28,7 +28,7 @@ A ativação observa tecla e movimento do botão. A seleção da janela de orige
 
 ## Motores e ferramentas
 
-O candidato 0.6.0 inclui Python, Qt, Pillow/codecs de imagem, PDF, QR, detecção local de rostos e os motores FFmpeg/FFprobe, LibreOffice e Tesseract com modelo OCR. Não é preciso instalar Word, configurar PATH nem baixar motores ao usar a roda. As versões 0.4.0/0.5.0 exigiam motores externos para parte desses recursos.
+O Cítrica 0.6.0 inclui Python, Qt, Pillow/codecs de imagem, PDF, QR, detecção local de rostos e os motores FFmpeg/FFprobe, LibreOffice e Tesseract com modelo OCR. Não é preciso instalar Word, configurar PATH nem baixar motores ao usar a roda. As versões 0.4.0/0.5.0 exigiam motores externos para parte desses recursos.
 
 - **Áudio/vídeo:** conversões e ferramentas usam o FFmpeg/FFprobe da própria pasta instalada, inclusive **Tamanho alvo**.
 - **DOCX e PDF:** PDF→DOCX, DOCX→PDF/TXT e TXT→PDF/DOCX funcionam com os motores incluídos, sem Word/LibreOffice. O modo básico pode alterar layouts avançados; PDFs escaneados continuam como imagens no DOCX, sem OCR automático.
@@ -71,6 +71,6 @@ CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
 
 ## O que foi validado e o que ainda falta
 
-Os testes do motor e da interface Qt são executados no CI Linux e Windows. A matriz do candidato usa o executável congelado com PATH reduzido ao Windows: 50 extensões de entrada, todas as saídas anunciadas e as ferramentas de mídia/OCR. Isso detecta dependências instaladas por acaso na máquina de build. O teste na VM limpa também precisa verificar a instalação, as bibliotecas de runtime e o arraste real no Explorer. A execução efetiva e as evidências estão registradas em VALIDACAO.md; isso não equivale a validar todos os PCs, monitores ou documentos do usuário.
+Os testes do motor e da interface Qt são executados no CI Linux e Windows. A matriz do pacote publicado usa o executável congelado com PATH reduzido ao Windows: 50 extensões de entrada, todas as saídas anunciadas e as ferramentas de mídia/OCR. Isso detecta dependências instaladas por acaso na máquina de build. O mesmo instalador publicado passou na VM limpa por instalação, atualização da versão pública 0.5.0, remoção, 38 operações avançadas e 24 arrastes reais no Explorer. A execução efetiva e as evidências estão registradas em [VALIDACAO-0.6.0.md](VALIDACAO-0.6.0.md); isso não equivale a validar todos os PCs, monitores ou documentos do usuário.
 
 Para forçar o motor incluído mesmo com LibreOffice instalado, defina `CITRICA_OFFICE_ENGINE=builtin` antes de iniciar o aplicativo ou a CLI. O padrão automático prefere LibreOffice quando encontrado.

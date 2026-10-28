@@ -1,6 +1,6 @@
-# Validação da candidata 0.6.0
+# Validação da versão 0.6.0
 
-A parte funcional passou no Windows e no Ubuntu. O pacote Windows continua **sem assinatura pública**; os testes não eliminam o aviso de fornecedor desconhecido. A versão pública estável permanece em 0.5.0 até a conclusão da distribuição assinada.
+A parte funcional passou no Windows e no Ubuntu. O pacote Windows continua **sem assinatura pública**; os testes não eliminam o aviso de fornecedor desconhecido. A 0.6.0 é distribuída como release normal para teste público, por solicitação do mantenedor, preservando `unsigned-test` nos nomes Windows. Isso não representa distribuição assinada ou certificação da Store.
 
 ## Pacote Windows final
 
@@ -49,6 +49,6 @@ Compositores GNOME/Wayland reais e isolados validaram a roda nos GNOME 46 e 51 d
 
 O instalador 0.5.0 com marcador de origem da Internet exibiu o aviso de fornecedor desconhecido na VM. A tela azul específica relatada externamente não foi reproduzida. O instalador final e o aplicativo apresentam `NotSigned`; não há alegação de aviso eliminado.
 
-Em 28 de outubro de 2026, o mantenedor informou que concluiu a verificação Microsoft e apresentou confirmação do envio da candidatura à SignPath. A aprovação da SignPath continua pendente; o painel Microsoft apresentado ainda não contém um produto Cítrica. A identidade do pacote, a adaptação MSIX e a certificação da Store são etapas posteriores. Os instaladores testados acima continuam sem assinatura. [Requisitos e próximos passos](WINDOWS-SIGNING.md). Nenhuma proteção foi desativada e nenhum certificado autoassinado foi instalado para simular confiança pública.
+Em 28 de outubro de 2026, o mantenedor informou que concluiu a verificação Microsoft e apresentou confirmação do envio da candidatura à SignPath. A aprovação da SignPath continua pendente; o produto Cítrica foi reservado no Partner Center com Store ID `9NV389WMRJNC` e sua identidade oficial foi obtida. A adaptação MSIX e a certificação da Store são etapas posteriores. Os instaladores testados acima continuam sem assinatura. [Requisitos e próximos passos](WINDOWS-SIGNING.md). Nenhuma proteção foi desativada e nenhum certificado autoassinado foi instalado para simular confiança pública.
 
 A VM e o CI não representam todos os PCs, GPUs ou documentos. A escala **Qt** de 150% não equivale a testar toda configuração de DPI do monitor Windows. [Resultados estruturados e histórico Windows](validation-0.6.0-windows.json).

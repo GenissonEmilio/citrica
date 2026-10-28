@@ -1,13 +1,13 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux e Windows.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0">Baixar versão estável 0.5.0</a> · <a href="docs/UBUNTU.md">Testar candidata 0.6.0 no Ubuntu</a> · <a href="docs/VALIDACAO.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0">Baixar versão 0.6.0</a> · <a href="docs/UBUNTU.md">Instalar no Ubuntu</a> · <a href="docs/VALIDACAO-0.6.0.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
-O Cítrica 0.5 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
+O Cítrica 0.6 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
 
-**Candidata 0.6.0 para Ubuntu:** o DEB passou em instalação, primeira abertura como usuário comum, conversão e remoção no Ubuntu **24.04, 26.04 e 26.10**. A roda foi testada separadamente nos GNOME 46/50/51. O pacote de teste está nos artifacts do CI; a versão pública estável continua sendo a 0.5.0. [Instalar a candidata no Ubuntu](docs/UBUNTU.md).
+**Versão 0.6.0:** motores offline incluídos no Windows, correções de travamento da roda e atualização do instalador com o aplicativo aberto. O DEB passou em instalação, primeira abertura como usuário comum, conversão e remoção no Ubuntu **24.04, 26.04 e 26.10**. A roda foi testada separadamente nos GNOME 46/50/51. [Instalar no Ubuntu](docs/UBUNTU.md). **O Windows continua sem assinatura pública**, enquanto a SignPath analisa a candidatura; a distribuição pela Microsoft Store está em preparação.
 
 **Na 0.5.0:** correções da roda no Explorer, DOCX→PDF/TXT sem Office, PDF→DOCX em ambas as plataformas e miniatura do arraste acima da roda no GNOME. A roda reabre vazia após converter ou cancelar e mantém as animações de abertura, seleção e fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
@@ -15,13 +15,13 @@ Implementação independente inspirada no fluxo do [Tangerine](https://www.tange
 
 ## Windows x64
 
-**Candidata 0.6.0:** o [artifact de teste do Windows](https://github.com/GenissonEmilio/citrica/actions/runs/40760249570/artifacts/12848364933) contém o instalador e o portátil `unsigned-test`, com FFmpeg/ffprobe, LibreOffice e OCR incluídos. O CI completo passou por 304 conversões de 50 extensões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. O download exige conta GitHub; a assinatura pública ainda está pendente. [Validação da candidata](docs/VALIDACAO-0.6.0.md).
+A 0.6.0 inclui FFmpeg/ffprobe, LibreOffice e OCR. O CI completo passou por 304 conversões de 50 extensões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. Os pacotes `unsigned-test` são os mesmos arquivos validados na VM Windows 11; estão disponíveis para teste público, com assinatura pública ainda pendente. [Validação e limites](docs/VALIDACAO-0.6.0.md).
 
-Baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.5.0/citrica-0.5.0-windows-x86_64-setup.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.5.0/citrica-0.5.0-windows-x86_64-portable.zip). O instalador usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
+Baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-portable-unsigned-test.zip). O instalador usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
 
 Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferramentas; **Ctrl**, ações. **Ctrl+Alt+C** abre/fecha a roda. O aplicativo permanece na bandeja ao fechar as configurações. O atalho e a inicialização automática são configuráveis.
 
-Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **PDF→DOCX e DOCX→PDF/TXT funcionam sem instalar Office. FFmpeg/ffprobe, LibreOffice e Tesseract são opcionais externos no Windows.** O instalador ainda não tem assinatura digital. Os resultados e limites dos testes do Explorer estão na documentação de validação.
+Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **PDF→DOCX, DOCX→PDF/TXT, áudio/vídeo e OCR funcionam com os motores incluídos, sem instalar Office, FFmpeg ou Tesseract à parte.** O instalador ainda não tem assinatura digital. Os resultados e limites dos testes do Explorer estão na documentação de validação.
 
 ![Roda em execução nativa no Windows do CI](docs/windows-wheel.png)
 
@@ -33,10 +33,10 @@ Demonstração no Fedora: arraste o arquivo, escolha o formato na roda e receba 
 
 https://github.com/user-attachments/assets/812f2703-e781-4b44-a544-3829eae95688
 
-Baixe o RPM da [release v0.5.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.5.0):
+Baixe o RPM da [release v0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0):
 
 ~~~bash
-sudo dnf install ./citrica-0.5.0-1.x86_64.rpm
+sudo dnf install ./citrica-0.6.0-1.x86_64.rpm
 citrica --install-gnome
 ~~~
 
@@ -53,11 +53,11 @@ Abra **Cítrica** no menu de aplicativos ou execute `citrica --settings` para tr
 
 ![Configurações do Cítrica](docs/settings.png)
 
-Na versão estável **0.5.0**, a roda global Linux requer **GNOME Shell 50 / Wayland**. A candidata **0.6.0** acrescenta **GNOME 46 e 51**, usados no Ubuntu 24.04 e 26.10. A CLI funciona em outros ambientes; KDE, Cinnamon e X11 continuam sem roda global. Os pacotes oficiais são x86_64, com glibc >= 2.39.
+A versão **0.6.0** oferece roda global em **GNOME Shell 46, 50 e 51 / Wayland**, incluindo Ubuntu 24.04, 26.04 e 26.10. A CLI funciona em outros ambientes; KDE, Cinnamon e X11 continuam sem roda global. Os pacotes oficiais são x86_64, com glibc >= 2.39.
 
-## Ubuntu / candidata 0.6.0
+## Ubuntu 24.04 / 26.04 / 26.10
 
-Baixe o artifact [citrica-native-packages do CI](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402/artifacts/12837118608) e extraia o ZIP. Esse download de teste exige uma conta GitHub; ele contém **`citrica_0.6.0_amd64.deb`**.
+Baixe diretamente o [instalador DEB 0.6.0](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica_0.6.0_amd64.deb). Não é preciso entrar no GitHub nem extrair um ZIP.
 
 Abra o DEB com o instalador de aplicativos do Ubuntu. Se a loja não abrir pacotes locais, abra um terminal na pasta do arquivo e execute:
 
@@ -68,17 +68,17 @@ sudo apt install ./citrica_0.6.0_amd64.deb
 
 O `apt` resolve as dependências automaticamente. Abra **Cítrica** no menu para preparar a integração e o atalho. Quando as configurações pedirem, salve seu trabalho, **saia e entre novamente no GNOME** para carregar a extensão. Depois arraste um arquivo no **Arquivos**, toque **Shift** e solte no formato desejado. [Compatibilidade, dependências e resultados dos testes](docs/UBUNTU.md).
 
-## Pacotes estáveis 0.5.0 e dependências
+## Pacotes 0.6.0 e dependências
 
 ~~~bash
-# DEB estável: roda somente em GNOME 50; para Ubuntu, use a candidata acima
-sudo apt install ./citrica_0.5.0_amd64.deb
+# Ubuntu 24.04 ou mais recente
+sudo apt install ./citrica_0.6.0_amd64.deb
 # Portátil, sem precisar instalar Python
- tar -xzf citrica-0.5.0-linux-x86_64.tar.gz
+ tar -xzf citrica-0.6.0-linux-x86_64.tar.gz
  ./citrica/install.sh
 ~~~
 
-O instalador portátil registra o aplicativo em `~/.local/bin/citrica`, configura a extensão e instala menus de contexto no usuário atual. O RPM/DEB registra o aplicativo no sistema. Na estável 0.5.0, execute `citrica --install-gnome` para preparar a roda; na candidata 0.6.0, a primeira abertura pelo menu prepara essa integração. Para menus de contexto opcionais, execute `citrica --install-integrations`. O script do Nautilus funciona sem plugin adicional; a entrada direta exige `nautilus-python`. A roda exige uma das versões de GNOME/Wayland indicadas acima.
+O instalador portátil registra o aplicativo em `~/.local/bin/citrica`, configura a extensão e instala menus de contexto no usuário atual. O RPM/DEB registra o aplicativo no sistema. Na 0.6.0, a primeira abertura pelo menu prepara a integração; `citrica --install-gnome` também permite configurá-la manualmente. Para menus de contexto opcionais, execute `citrica --install-integrations`. O script do Nautilus funciona sem plugin adicional; a entrada direta exige `nautilus-python`. A roda exige uma das versões de GNOME/Wayland indicadas acima.
 
 Os pacotes Linux incluem Python, Qt, Pillow, motores PDF, leitor QR, modelo de rostos OpenCV e Tesseract com modelo de texto inglês. **FFmpeg e LibreOffice são programas opcionais do sistema**:
 

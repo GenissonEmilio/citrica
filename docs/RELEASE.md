@@ -7,8 +7,10 @@ O **Cítrica 0.6.0** inclui os motores de conversão no Windows e amplia a insta
 
 **Instalação:** Linux recebe DEB, RPM e TAR.GZ. No Ubuntu, abra o DEB pelo instalador do sistema ou use `sudo apt install ./citrica_0.6.0_amd64.deb`. No Windows, use o instalador completo ou extraia todo o ZIP portátil, preservando `_internal` junto dos launchers.
 
-**Validação:** os recibos distinguem a matriz de conversões, testes do Explorer real, VM Windows 11, instalação/atualização/remoção e testes Ubuntu/GNOME. Consulte [Validação 0.6.0](VALIDACAO-0.6.0.md) e os relatórios que acompanham cada pacote; sucesso no CI não representa todos os PCs ou documentos.
+**Validação:** os recibos distinguem a matriz de conversões, testes do Explorer real, VM Windows 11, instalação/atualização/remoção e testes Ubuntu/GNOME. Consulte [Validação 0.6.0](https://github.com/GenissonEmilio/citrica/blob/v0.6.0/docs/VALIDACAO-0.6.0.md) e os relatórios que acompanham cada pacote; sucesso no CI não representa todos os PCs ou documentos.
 
-**Assinatura:** consulte `citrica-windows-signing.json` para o estado do arquivo baixado. Candidatos identificados como `unsigned-test` são testes sem editor verificado. A publicação assinada depende de uma identidade aprovada; uma assinatura não garante reputação SmartScreen imediata. [Opções de distribuição](WINDOWS-SIGNING.md).
+**Distribuição desta release:** a 0.6.0 é uma release normal para teste público. Os arquivos Windows preservam `unsigned-test` no nome e ainda não têm assinatura pública; a candidatura à SignPath foi enviada e aguarda aprovação. A conta Microsoft foi verificada, e o pacote da Store é preparado separadamente. A verificação da conta não assina o EXE do GitHub.
+
+**Assinatura:** consulte `citrica-windows-signing.json` para o estado do arquivo baixado. Candidatos identificados como `unsigned-test` são testes sem editor verificado. A publicação assinada depende de uma identidade aprovada; uma assinatura não garante reputação SmartScreen imediata. [Opções de distribuição](https://github.com/GenissonEmilio/citrica/blob/v0.6.0/docs/WINDOWS-SIGNING.md).
 
 PDF→DOCX mantém texto editável quando disponível; PDFs escaneados viram páginas com imagens, sem OCR automático nessa conversão. Layouts complexos podem mudar. A roda Linux requer GNOME/Wayland; outros desktops não recebem uma roda global por instalar o DEB. Compartilhamento continua dependendo de LocalSend. As conversões preservam os originais; Mover é uma ação explícita.

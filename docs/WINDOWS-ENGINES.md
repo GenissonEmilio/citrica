@@ -1,6 +1,6 @@
 # Motores offline do Windows
 
-O candidato 0.6.0 leva os motores junto do aplicativo. Não baixa programas ao abrir arquivos e não exige um PATH preparado pelo usuário. A árvore `_internal` precisa permanecer ao lado dos dois launchers.
+O Cítrica 0.6.0 leva os motores junto do aplicativo. Não baixa programas ao abrir arquivos e não exige um PATH preparado pelo usuário. A árvore `_internal` precisa permanecer ao lado dos dois launchers.
 
 | Local no pacote | Finalidade |
 | --- | --- |
