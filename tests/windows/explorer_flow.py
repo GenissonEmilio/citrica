@@ -94,7 +94,8 @@ def main():
     # Every run owns these synthetic fixtures. Previous outputs must not be
     # accepted as this run's conversion result or confuse hidden extensions.
     if folder.exists():
-        shutil.rmtree(folder)
+        cleanup = ('\\\\?\\' + str(folder)) if os.name == 'nt' else folder
+        shutil.rmtree(cleanup)
     folder.mkdir(exist_ok=True)
     def fixture(case, name):
         parent = folder if arguments.same_folder else folder/case

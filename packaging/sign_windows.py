@@ -70,12 +70,34 @@ def pe_files(payload: Path) -> list[Path]:
     return sorted(p for p in payload.rglob('*') if p.is_file() and p.suffix.lower() in {'.exe', '.dll', '.pyd'})
 
 
+def _inno_uninstaller(path: Path) -> bool:
+    """Inno invokes SignTool on these PE temporaries before embedding them."""
+    if path.name.lower() not in {'uninst.e32.tmp', 'uninst.e64.tmp'}:
+        return False
+    try:
+        size = path.stat().st_size
+        with path.open('rb') as content:
+            dos = content.read(64)
+            if len(dos) != 64 or dos[:2] != b'MZ':
+                return False
+            offset = int.from_bytes(dos[60:64], 'little')
+            # Bound both the DOS stub and the complete PE signature/COFF header.
+            if offset < 64 or offset > 1024 * 1024 or offset + 24 > size:
+                return False
+            content.seek(offset)
+            return content.read(4) == b'PE\x00\x00'
+    except OSError:
+        return False
+
+
 def _paths(paths: Sequence[Path]) -> list[Path]:
     result = list(dict.fromkeys(Path(path).resolve() for path in paths))
     if not result:
         raise ValueError('Nenhum executável ou biblioteca foi indicado para assinatura.')
-    if any(not path.is_file() or path.suffix.lower() not in {'.exe', '.dll', '.pyd'} for path in result):
-        raise ValueError('Assinatura aceita apenas arquivos existentes .exe, .dll e .pyd.')
+    if any(not path.is_file() or (path.suffix.lower() not in {'.exe', '.dll', '.pyd'} and
+                                 not _inno_uninstaller(path)) for path in result):
+        raise ValueError('Assinatura aceita apenas arquivos existentes .exe/.dll/.pyd '
+                         'ou os temporários PE oficiais do desinstalador Inno Setup.')
     return result
 
 

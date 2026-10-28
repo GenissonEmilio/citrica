@@ -47,6 +47,41 @@ def test_payload_selection_includes_native_dependencies_and_rejects_bad_inputs(t
         signing._paths([tmp_path / 'readme.md'])
 
 
+def _pe_header():
+    header = bytearray(256)
+    header[:2] = b'MZ'
+    header[60:64] = (128).to_bytes(4, 'little')
+    header[128:132] = b'PE\x00\x00'
+    return header
+
+
+@pytest.mark.parametrize('filename', ['uninst.e32.tmp', 'uninst.e64.tmp'])
+def test_inno_callback_accepts_only_its_named_pe_temporaries(tmp_path, filename):
+    path = tmp_path / filename
+    path.write_bytes(_pe_header())
+    assert signing._paths([path]) == [path.resolve()]
+
+
+def test_inno_callback_rejects_arbitrary_temp_names_and_malformed_pe(tmp_path):
+    arbitrary = tmp_path / 'arbitrary.tmp'
+    arbitrary.write_bytes(_pe_header())
+    with pytest.raises(ValueError, match='temporários PE oficiais'):
+        signing._paths([arbitrary])
+    malformed = tmp_path / 'uninst.e32.tmp'
+    cases = [b'', b'MZ', bytes(256)]
+    for offset in [0, 63, 250, 1024 * 1024 + 1]:
+        data = _pe_header()
+        data[60:64] = offset.to_bytes(4, 'little')
+        cases.append(data)
+    data = _pe_header()
+    data[128:132] = b'BAD!'
+    cases.append(data)
+    for data in cases:
+        malformed.write_bytes(data)
+        with pytest.raises(ValueError, match='temporários PE oficiais'):
+            signing._paths([malformed])
+
+
 def test_unsigned_payload_gets_pinned_certificate_sha256_timestamp_and_trust_check(tmp_path, monkeypatch):
     source = tmp_path / 'Cítrica com espaço.exe'
     source.write_bytes(b'controlled fixture')

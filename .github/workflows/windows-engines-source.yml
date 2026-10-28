@@ -12,6 +12,8 @@ jobs:
     env:
       PYTHONUTF8: '1'
       CITRICA_BUILD_JOBS: '2'
+      CITRICA_SIGNING_REQUIRED: '0'
+      CITRICA_SIGN_CERT_SHA1: ''
       CITRICA_WINDOWS_ENGINES: ${{ github.workspace }}/build/windows-source-engines
       CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES: '1'
     steps:
@@ -48,9 +50,22 @@ jobs:
         run: python -m pytest -q
       - name: Offline package and complete conversion/tool matrix
         run: python packaging/build_windows.py
+      - name: Mark source-engine candidate as unsigned test
+        if: always() && hashFiles('release/citrica-windows-signing.json') != ''
+        shell: pwsh
+        run: |
+          $trust = Get-Content release/citrica-windows-signing.json -Raw | ConvertFrom-Json
+          if ($trust.status -ne 'unsigned' -or $trust.authenticode_verified) {
+            throw 'Source-engine QA candidate must remain unsigned.'
+          }
+          foreach ($file in Get-ChildItem release -File | Where-Object { $_.Extension -in @('.exe', '.zip') -and $_.BaseName -notlike '*-unsigned-test' }) {
+            Rename-Item $file.FullName ($file.BaseName + '-unsigned-test' + $file.Extension)
+          }
+          'UNSIGNED SOURCE-ENGINE TEST BUILD. Publisher is not verified. Not a public release.' | Out-File release/UNSIGNED-TEST-BUILD.txt -Encoding utf8
+          python -c "import hashlib; from pathlib import Path; p=Path('release'); (p/'SHA256SUMS-windows.txt').write_text(''.join(f'{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.name}\n' for f in sorted(p.iterdir()) if f.is_file() and not f.name.startswith('SHA256SUMS')), encoding='utf-8')"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: citrica-windows-source-engine-candidate
+          name: citrica-windows-source-engine-candidate-unsigned-test
           path: release/*
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
