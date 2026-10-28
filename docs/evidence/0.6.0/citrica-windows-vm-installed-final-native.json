@@ -1,0 +1,11 @@
+{
+  "native_input_test": "passed",
+  "cross_process_qt_ole_drag": true,
+  "global_shift": true,
+  "real_conversion": true,
+  "original_preserved": true,
+  "global_hotkey": true,
+  "reopened_empty": true,
+  "global_escape": true,
+  "manual_explorer": "pending external tester"
+}

@@ -1,0 +1,37 @@
+{
+  "version": "0.6.0",
+  "installer_sha256": "efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc",
+  "unicode_install_directory": true,
+  "obsolete_dll_removed": true,
+  "obsolete_module_removed": true,
+  "preferences_preserved": true,
+  "startup_preference_preserved": true,
+  "sendto_shortcut": true,
+  "engine_manifest_library_exact": "tesseract55.dll",
+  "engine_files_sha256_verified": 19578,
+  "engine_provenance": "compiled-from-pinned-sources",
+  "doctor": {
+    "version": "0.6.0",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "dependencies": {
+      "ffmpeg": "C:\\CitricaVM\\Aplica\u00e7\u00e3o Jo\u00e3o\\Citrica\\_internal\\tools\\ffmpeg\\bin\\ffmpeg.exe",
+      "libreoffice": "C:\\CitricaVM\\Aplica\u00e7\u00e3o Jo\u00e3o\\Citrica\\_internal\\tools\\libreoffice\\program\\soffice.com"
+    },
+    "tools": {
+      "faces": true,
+      "text": true,
+      "qr": true,
+      "share": false
+    },
+    "desktop": {
+      "platform": "windows",
+      "active": false
+    }
+  },
+  "ordinary_user_token": true,
+  "old_live_resident_stopped": true,
+  "new_gui_sha256": "e9a9aa1f42a8c2d355332381629ede4cb6cf532f9176bd9c6ee2fb39a1ab91e3",
+  "new_stop_helper_sha256": "d97a623aa36f1a8a295ce74b53f8e1d4d02509c80b85eede4b5c854218415a75",
+  "app_source_commit": "8e86d5b",
+  "result": "passed"
+}

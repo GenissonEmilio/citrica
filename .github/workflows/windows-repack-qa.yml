@@ -1,0 +1,168 @@
+name: Windows unsigned QA repackage with verified engines
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Same-repository run containing the source-built engine portable
+        required: true
+        type: string
+        default: '40735116402'
+      source_artifact_id:
+        description: Explicit unsigned-test artifact ID from that run
+        required: true
+        type: string
+        default: '12840413543'
+
+
+  workflow_call:
+    inputs:
+      source_run_id:
+        description: Same-repository source engine run
+        required: false
+        type: string
+        default: '40735116402'
+      source_artifact_id:
+        description: Explicit unsigned-test artifact ID
+        required: false
+        type: string
+        default: '12840413543'
+
+# This manual diagnostic workflow cannot publish releases or sign applications.
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  repack-qa:
+    runs-on: windows-2022
+    timeout-minutes: 75
+    env:
+      PYTHONUTF8: '1'
+      CITRICA_WINDOWS_ENGINES: ${{ github.workspace }}/build/windows-reused-engines
+      CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES: '1'
+      CITRICA_SIGNING_REQUIRED: '0'
+      CITRICA_SIGN_CERT_SHA1: ''
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Validate same-repository run and explicit unsigned artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ inputs.source_run_id }}
+          SOURCE_ARTIFACT: ${{ inputs.source_artifact_id }}
+        shell: python
+        run: |
+          import json, os, re, subprocess
+          from pathlib import Path
+          repository = os.environ['GITHUB_REPOSITORY']
+          run, artifact_id = os.environ['SOURCE_RUN'], os.environ['SOURCE_ARTIFACT']
+          if not all(re.fullmatch(r'[1-9][0-9]*', value) for value in [run, artifact_id]):
+              raise SystemExit('Run and artifact IDs must be positive decimal IDs.')
+          def api(endpoint):
+              return json.loads(subprocess.run(['gh', 'api', endpoint], check=True,
+                  capture_output=True, text=True, encoding='utf-8').stdout)
+          source = api(f'repos/{repository}/actions/runs/{run}')
+          artifact = api(f'repos/{repository}/actions/artifacts/{artifact_id}')
+          if (source.get('repository', {}).get('full_name') != repository or
+                  source.get('head_repository', {}).get('full_name') != repository):
+              raise SystemExit('Engine source run must belong to this repository, not a fork.')
+          if (artifact.get('workflow_run', {}).get('id') != int(run) or artifact.get('expired') is not False or
+                  artifact.get('name') != 'citrica-windows-x86_64-unsigned-test'):
+              raise SystemExit('Artifact does not match the explicit run and unsigned-test artifact name.')
+          Path('release').mkdir(exist_ok=True)
+          Path('release/UNSIGNED-TEST-BUILD.txt').write_text(
+              'UNSIGNED DIAGNOSTIC TEST BUILD. Publisher is not verified. Not a public release.\n', encoding='utf-8')
+          Path('release/citrica-windows-engine-origin.json').write_text(json.dumps({
+              'repository': repository, 'source_run_id': int(run), 'source_artifact_id': int(artifact_id),
+              'source_commit': source['head_sha'], 'source_run_conclusion': source.get('conclusion'),
+              'artifact_digest': artifact.get('digest'), 'current_commit': os.environ['GITHUB_SHA'],
+              'purpose': 'unsigned-test-only', 'release_eligible': False}, indent=2) + '\n', encoding='utf-8')
+      - name: Download only the selected same-repository artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ inputs.source_artifact_id }}
+          run-id: ${{ inputs.source_run_id }}
+          repository: ${{ github.repository }}
+          github-token: ${{ github.token }}
+          path: build/prior-unsigned-artifact
+      - name: Restore only inventory-verified engines and corresponding source
+        shell: pwsh
+        run: |
+          $portable = @(Get-ChildItem build/prior-unsigned-artifact -Recurse -File -Filter '*-portable-unsigned-test.zip')
+          if ($portable.Count -ne 1) { throw 'Expected exactly one unsigned-test portable archive.' }
+          python packaging/reuse_windows_test_engines.py $portable[0].FullName --output "$env:CITRICA_WINDOWS_ENGINES"
+          if ($LASTEXITCODE -ne 0) { throw 'Engine integrity/provenance verification failed.' }
+      - name: Python dependencies and focused integrity tests
+        run: |
+          python -m pip install -r requirements.lock
+          python -m pip install -e . --no-deps
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r tests/windows/requirements-debug.lock
+          python -m pytest tests/test_windows_engine_reuse.py -q
+      - name: Expose verified FFmpeg to source test fixtures
+        shell: pwsh
+        run: '"$env:CITRICA_WINDOWS_ENGINES/tools/ffmpeg/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append'
+      - name: Source application tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+      - name: Rebuild application, installer and 304 conversions plus 23 media and 38 static operations
+        id: package
+        run: python packaging/build_windows.py
+      - name: Native OLE drag and global keyboard flow
+        if: always() && steps.package.outcome == 'success'
+        run: python tests/windows/native_flow.py dist/Citrica/Citrica.exe
+      - name: Install, Unicode runtime, upgrade and uninstall
+        if: always() && steps.package.outcome == 'success'
+        shell: pwsh
+        run: |
+          $version = python -c "from citrica import __version__; print(__version__)"
+          python tests/windows/install_smoke.py "release/citrica-$version-windows-x86_64-setup.exe"
+      - name: Real Explorer with builtin document engine
+        if: always() && steps.package.outcome == 'success'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Real Explorer with Qt scale 150 percent
+        if: always() && steps.package.outcome == 'success'
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Real Explorer with source-built offline engines
+        if: always() && steps.package.outcome == 'success'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --bundled-engines
+      - name: Repeated conversions in the same Explorer folder
+        if: always() && steps.package.outcome == 'success'
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --same-folder
+      - name: Mark every diagnostic package unsigned-test
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory release -Force | Out-Null
+          'UNSIGNED DIAGNOSTIC TEST BUILD. Publisher is not verified. Not a public release.' | Out-File release/UNSIGNED-TEST-BUILD.txt -Encoding utf8
+          if (Test-Path release/citrica-windows-signing.json) {
+            $trust = Get-Content release/citrica-windows-signing.json -Raw | ConvertFrom-Json
+            if ($trust.status -ne 'unsigned' -or $trust.authenticode_verified) { throw 'QA repack must remain unsigned.' }
+          }
+          foreach ($file in Get-ChildItem release -File | Where-Object { $_.Extension -in @('.exe', '.zip') -and $_.BaseName -notlike '*-unsigned-test' }) {
+            Rename-Item $file.FullName ($file.BaseName + '-unsigned-test' + $file.Extension)
+          }
+          python -c "import hashlib; from pathlib import Path; p=Path('release'); (p/'SHA256SUMS-windows.txt').write_text(''.join(f'{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.name}\n' for f in sorted(p.iterdir()) if f.is_file() and not f.name.startswith('SHA256SUMS')), encoding='utf-8')"
+      - name: Keep diagnostic packages and evidence even after native failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: citrica-windows-repack-unsigned-test
+          path: |
+            release/*
+            build/windows-native/**/*.json
+            build/windows-native/**/*.log
+            build/windows-installer/**/*.log
+            build/windows-explorer-*/**/*.json
+            build/windows-explorer-*/**/*.log
+            build/windows-reused-engines/engines.json
+            build/windows-reused-engines/engine-files.sha256.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -8,6 +8,7 @@ from PIL import Image
 from pypdf import PdfReader, PdfWriter
 
 from citrica.core import ConversionError
+from citrica.runtime import program
 from citrica.tools import available_tools, execute, media_info
 
 
@@ -85,13 +86,13 @@ def test_pdf_tools(tmp_path):
 
 @pytest.fixture
 def media(tmp_path):
-    if not shutil.which('ffmpeg'):
+    if not program('ffmpeg'):
         pytest.skip('FFmpeg não instalado')
     audio = tmp_path / 'tone.wav'
-    subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
+    subprocess.run([program('ffmpeg'), '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
                     str(audio)], check=True)
     video = tmp_path / 'video.mp4'
-    subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
+    subprocess.run([program('ffmpeg'), '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',
                     '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
                     '-c:v', 'libx264', '-c:a', 'aac', '-shortest', str(video)], check=True)
     return audio, video
@@ -207,6 +208,23 @@ def test_media_metadata_edit(media, index):
     assert tags['title'] == 'Test title'
 
 
+@pytest.mark.skipif(not program('ffprobe'), reason='FFprobe não instalado')
+def test_media_metadata_probe_never_follows_remote_playlist(tmp_path, monkeypatch):
+    import citrica.tools as tools
+    real_run = tools.run_external
+
+    def force_hls_reader(args, **kwargs):
+        return real_run(args[:-1] + ['-f', 'hls', args[-1]], **kwargs)
+
+    monkeypatch.setattr(tools, 'run_external', force_hls_reader)
+    source = tmp_path / 'disguised.mp4'
+    source.write_text('#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:1\n'
+                      '#EXTINF:1,\nhttp://127.0.0.1:9/segment.ts\n#EXT-X-ENDLIST\n')
+    with pytest.raises(subprocess.CalledProcessError) as error:
+        tools.media_info(source)
+    assert 'not on whitelist' in error.value.stderr or 'Protocol not found' in error.value.stderr
+
+
 def test_redact_faces_positive_fixture(tmp_path):
     source = tmp_path / 'face.png'
     shutil.copyfile(Path(__file__).parent / 'fixtures/astronaut.png', source)
@@ -217,6 +235,32 @@ def test_redact_faces_positive_fixture(tmp_path):
     with Image.open(output) as im:
         for left, top, right, bottom in boxes:
             assert im.getpixel(((left+right)//2, (top+bottom)//2))[:3] == (0, 0, 0)
+
+
+def test_face_model_in_unicode_install_path(tmp_path, monkeypatch):
+    import cv2
+    from citrica.vision import face_boxes
+    model_name = 'haarcascade_frontalface_default.xml'
+    model = Path(cv2.data.haarcascades) / model_name
+    install = tmp_path / 'Aplicação João' / '人脸模型'
+    install.mkdir(parents=True)
+    shutil.copyfile(model, install / model_name)
+    monkeypatch.setattr(cv2.data, 'haarcascades', str(install))
+    with Image.open(Path(__file__).parent / 'fixtures/astronaut.png') as image:
+        assert face_boxes(image)
+    assert face_boxes(Image.new('RGB', (320, 200), 'white')) == []
+
+
+@pytest.mark.parametrize('model_data', [None, '', 'invalid XML',
+    '<?xml version="1.0"?><opencv_storage><other>1</other></opencv_storage>'])
+def test_face_model_load_error_is_explained(tmp_path, monkeypatch, model_data):
+    import cv2
+    from citrica.vision import face_boxes
+    if model_data is not None:
+        (tmp_path / 'haarcascade_frontalface_default.xml').write_text(model_data, encoding='utf-8')
+    monkeypatch.setattr(cv2.data, 'haarcascades', str(tmp_path))
+    with pytest.raises(ConversionError, match='modelo local de rostos'):
+        face_boxes(Image.new('RGB', (320, 200), 'white'))
 
 
 def test_redact_text_positive_fixture(tmp_path):

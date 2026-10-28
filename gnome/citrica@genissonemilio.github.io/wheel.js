@@ -180,10 +180,13 @@ export class WheelView {
             group.add_child(overlay);
             const angle = -Math.PI / 2 + i * TAU / count;
             if (item) {
-                const labelGroup = new St.BoxLayout({vertical: true, width: 80,
+                const labelGroup = new St.BoxLayout({width: 80,
                     x: C + LABEL_RADIUS * Math.cos(angle) - 40,
                     y: C + LABEL_RADIUS * Math.sin(angle) - (item.kind === 'format' ? 10 : 23),
                     style: 'spacing:3px;'});
+                // GNOME 51 removed `vertical`; GNOME 46 predates `orientation`.
+                if ('orientation' in labelGroup) labelGroup.orientation = Clutter.Orientation.VERTICAL;
+                else labelGroup.vertical = true;
                 if (item.kind !== 'format') labelGroup.add_child(new St.Icon({icon_size: 20,
                     x_align: Clutter.ActorAlign.CENTER,
                     icon_name: item.kind === 'page' ? 'view-more-symbolic' : ICONS[item.id] || 'document-properties-symbolic',

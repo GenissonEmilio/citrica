@@ -1,5 +1,7 @@
 # Validação da versão 0.5.0
 
+A candidata seguinte é acompanhada separadamente em [Validação 0.6.0](VALIDACAO-0.6.0.md), incluindo VM Windows 11, motores offline e Ubuntu.
+
 A 0.5.0 trata os relatos de roda ausente/vazia no Windows e inclui PDF→DOCX em ambas as plataformas. O vídeo recebido mostra uma roda sem seleção; arquivos e dados pessoais desse vídeo não fazem parte das evidências públicas.
 
 ## Motor compartilhado

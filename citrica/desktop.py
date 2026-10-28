@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -14,9 +16,57 @@ from citrica.runtime import external_environment
 
 UUID = "citrica@genissonemilio.github.io"
 SHELL_VERSION = 3
-SHELL_REVISION = 2
+SHELL_REVISION = 3
 DESKTOP_PATH = "/io/github/GenissonEmilio/Citrica/Desktop"
 DESKTOP_NAME = "io.github.GenissonEmilio.Citrica.Desktop"
+SUPPORTED_SHELLS = {46, 50, 51}
+
+
+def gnome_environment():
+    try:
+        result = subprocess.run(['gnome-shell', '--version'], capture_output=True, text=True,
+                                timeout=5, env=external_environment())
+        match = re.search(r'GNOME Shell (\d+)', result.stdout)
+        major = int(match[1]) if match else None
+    except (OSError, subprocess.TimeoutExpired):
+        major = None
+    session = os.environ.get('XDG_SESSION_TYPE', '').lower()
+    wayland = session == 'wayland' or (not session and bool(os.environ.get('WAYLAND_DISPLAY')))
+    return {'shell': major, 'wayland': wayland, 'supported': major in SUPPORTED_SHELLS and wayland}
+
+
+def extension_source():
+    root = Path(sys._MEIPASS) if getattr(sys, 'frozen', False) else Path(__file__).parent.parent
+    return root / 'gnome' / UUID
+
+
+def setup_desktop():
+    """First menu launch configures only the current user, once per payload."""
+    from citrica import __version__
+    from citrica.integration import install
+    environment = gnome_environment()
+    source = extension_source()
+    fingerprint = hashlib.sha256()
+    for path in sorted(source.rglob('*')):
+        if path.is_file() and path.name != 'gschemas.compiled':
+            fingerprint.update(str(path.relative_to(source)).encode())
+            fingerprint.update(path.read_bytes())
+    expected = {'version': __version__, 'command': backend_command(), 'extension': fingerprint.hexdigest(),
+                'environment': environment}
+    marker = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config')) / 'citrica/setup.json'
+    try:
+        previous = json.loads(marker.read_text())
+    except (OSError, ValueError):
+        previous = None
+    if previous == expected and (not environment['supported'] or extension_dir().is_dir()):
+        return
+    # The native package owns its menu launcher/icon. Avoid a user copy that
+    # would shadow package updates and remain visible after uninstalling it.
+    install(include_application=False)
+    if environment['supported']:
+        install_gnome()
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text(json.dumps(expected, ensure_ascii=False, indent=2))
 
 
 def backend_command():
@@ -51,10 +101,15 @@ def extension_dir():
 
 
 def install_gnome():
-    root = Path(__file__).parent.parent
-    source = root / "gnome" / UUID
-    if getattr(sys, "frozen", False):
-        source = Path(sys._MEIPASS) / "gnome" / UUID
+    environment = gnome_environment()
+    if environment['shell'] not in SUPPORTED_SHELLS:
+        found = str(environment['shell']) if environment['shell'] else 'não encontrado'
+        raise RuntimeError(f'A roda global requer GNOME 46, 50 ou 51. GNOME atual: {found}. '
+                           'O conversor pela linha de comando continua disponível.')
+    if not environment['wayland']:
+        raise RuntimeError('Entre na sessão GNOME com Wayland para configurar a roda global. '
+                           'A sessão X11 não é compatível com a integração de arraste.')
+    source = extension_source()
     if not source.is_dir():
         raise RuntimeError("Os arquivos da extensão GNOME não foram encontrados neste pacote.")
     destination = extension_dir()

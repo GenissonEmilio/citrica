@@ -1,24 +1,52 @@
 name: Validar Explorer Windows por código-fonte
 on:
   workflow_dispatch:
+    inputs:
+      reuse_source_engines:
+        description: Repackage current app with verified source-built engines and full packaged QA
+        required: false
+        type: boolean
+        default: false
+      source_run_id:
+        description: Same-repository source engine run for packaged QA
+        required: false
+        type: string
+        default: '40735116402'
+      source_artifact_id:
+        description: Explicit unsigned-test artifact ID for packaged QA
+        required: false
+        type: string
+        default: '12840413543'
 permissions:
   contents: read
+  actions: read
 jobs:
   explorer:
+    if: ${{ !inputs.reuse_source_engines }}
     runs-on: windows-2022
-    timeout-minutes: 10
+    timeout-minutes: 30
     env:
       PYTHONUTF8: '1'
+      CITRICA_WINDOWS_ENGINES: ${{ github.workspace }}/build/windows-engines
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
-      - name: Dependências incluídas no aplicativo, sem instalar Office
+      - name: Dependências Python
         run: |
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
+      - name: Preparar os mesmos motores offline do pacote
+        shell: pwsh
+        run: |
+          $sevenZip = Get-Command 7z.exe -ErrorAction SilentlyContinue
+          if (!$sevenZip -and !(Test-Path "$env:ProgramFiles\7-Zip\7z.exe")) {
+            throw '7-Zip ausente no runner.'
+          }
+          python packaging/prepare_windows_engines.py
+          if ($LASTEXITCODE -ne 0) { throw 'Falha na preparação dos motores offline.' }
       - name: Explorer real, Ctrl, Alt e DOCX/PDF
         run: python tests/windows/explorer_flow.py --source
       - name: Explorer real com escala Qt de 150%
@@ -38,4 +66,12 @@ jobs:
             release/*.png
             build/windows-explorer-*/**/*.json
             build/windows-explorer-*/**/*.log
+            build/windows-engine-cache/*.log
           retention-days: 7
+
+  repack:
+    if: ${{ inputs.reuse_source_engines }}
+    uses: ./.github/workflows/windows-repack-qa.yml
+    with:
+      source_run_id: ${{ inputs.source_run_id }}
+      source_artifact_id: ${{ inputs.source_artifact_id }}

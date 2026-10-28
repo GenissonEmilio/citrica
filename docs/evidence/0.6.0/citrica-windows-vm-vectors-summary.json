@@ -1,0 +1,132 @@
+{
+  "app_source_commit": "8e86d5b",
+  "qa_controller_commit": "4a3c479",
+  "ordinary_user_token": true,
+  "private_freeze_only": true,
+  "installer_built": false,
+  "physical_input_source_verified": true,
+  "gui_sha256": "873a3bca6d316f868dd0449d1af9e868df3070d16675f45a38ff97813e00eae9",
+  "flows": [
+    {
+      "label": "basic-100",
+      "report": {
+        "real_explorer": true,
+        "qt_scale_factor": "1",
+        "office_engine": "builtin",
+        "ipc_controller": "pumped-worker",
+        "same_folder": false,
+        "cases": {
+          "ctrl_actions_stationary_activation": true,
+          "docx_pdf_without_office": true,
+          "pdf_docx_editable": true,
+          "alt_tools": true
+        },
+        "originals_preserved": true,
+        "result": "passed"
+      }
+    },
+    {
+      "label": "basic-150",
+      "report": {
+        "real_explorer": true,
+        "qt_scale_factor": "1.5",
+        "office_engine": "builtin",
+        "ipc_controller": "pumped-worker",
+        "same_folder": false,
+        "cases": {
+          "ctrl_actions_stationary_activation": true,
+          "docx_pdf_without_office": true,
+          "pdf_docx_editable": true,
+          "alt_tools": true
+        },
+        "originals_preserved": true,
+        "result": "passed"
+      }
+    },
+    {
+      "label": "bundled",
+      "report": {
+        "real_explorer": true,
+        "qt_scale_factor": "1",
+        "office_engine": "bundled",
+        "ipc_controller": "pumped-worker",
+        "same_folder": false,
+        "cases": {
+          "ctrl_actions_stationary_activation": true,
+          "docx_pdf_without_office": true,
+          "pdf_docx_editable": true,
+          "alt_tools": true,
+          "bundled_image": {
+            "input": ".png",
+            "output": "jpg",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_video": {
+            "input": ".mp4",
+            "output": "webm",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_audio": {
+            "input": ".wav",
+            "output": "mp3",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_document": {
+            "input": ".odt",
+            "output": "pdf",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_sheet": {
+            "input": ".xlsx",
+            "output": "pdf",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_slides": {
+            "input": ".pptx",
+            "output": "pdf",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_subtitle": {
+            "input": ".srt",
+            "output": "vtt",
+            "palette_verified": true,
+            "converted": true
+          },
+          "bundled_archive": {
+            "input": ".zip",
+            "output": "tar",
+            "palette_verified": true,
+            "converted": true
+          }
+        },
+        "originals_preserved": true,
+        "result": "passed"
+      }
+    },
+    {
+      "label": "same-folder",
+      "report": {
+        "real_explorer": true,
+        "qt_scale_factor": "1.5",
+        "office_engine": "builtin",
+        "ipc_controller": "pumped-worker",
+        "same_folder": true,
+        "cases": {
+          "ctrl_actions_stationary_activation": true,
+          "docx_pdf_without_office": true,
+          "pdf_docx_editable": true,
+          "alt_tools": true
+        },
+        "originals_preserved": true,
+        "result": "passed"
+      }
+    }
+  ],
+  "result": "passed"
+}

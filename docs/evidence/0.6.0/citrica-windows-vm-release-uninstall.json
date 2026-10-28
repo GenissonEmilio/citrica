@@ -1,0 +1,13 @@
+{
+  "uninstall": true,
+  "launchers_removed": true,
+  "sendto_removed": true,
+  "startup_entry_removed": true,
+  "preferences_preserved": true,
+  "reinstalled_for_manual_testing": true,
+  "version": "C\u00edtrica 0.6.0",
+  "ordinary_user_token": true,
+  "app_source_commit": "8e86d5b",
+  "installer_sha256": "efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc",
+  "result": "passed"
+}

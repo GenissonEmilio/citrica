@@ -25,7 +25,8 @@ const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Test">
 </interface></node>`;
 export default class Harness extends Extension {
     enable() {
-        const seat = Clutter.get_default_backend().get_default_seat();
+        const backend = Clutter.get_default_backend?.() ?? global.stage.context.get_backend();
+        const seat = backend.get_default_seat();
         this.pointer = seat.create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE);
         this.keyboard = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
         this.dbus = Gio.DBusExportedObject.wrapJSObject(XML, this);
@@ -45,7 +46,8 @@ export default class Harness extends Extension {
     })); }
     Prepare() { Main.welcomeDialog?.close(); Main.overview.hide(); }
     State() { return JSON.stringify({pointer:global.get_pointer(),
-        focus:global.display.focus_window?.get_stable_sequence(),overview:Main.overview.visible}); }
+        focus:global.display.focus_window?.get_stable_sequence(),overview:Main.overview.visible,
+        systemAnimations: St.Settings.get().enable_animations}); }
     DragLayers() {
         const feedback = global.compositor.get_feedback_group();
         const extension = Main.extensionManager.lookup('citrica@genissonemilio.github.io')?.stateObj;

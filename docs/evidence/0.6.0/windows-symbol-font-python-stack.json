@@ -1,0 +1,7 @@
+{
+  "status": "captured",
+  "returncode": 0,
+  "stdout": "Process 3652: D:\\a\\citrica\\citrica\\dist\\Citrica\\Citrica.exe --background\nPython v3.12.10 (D:\\a\\citrica\\citrica\\dist\\Citrica\\Citrica.exe)\n\nThread 7380 (idle): \"MainThread\"\n    paintEvent (citrica\\windows\\wheel.py:316)\n    _launch (citrica\\windows\\app.py:639)\n    launch (citrica\\windows\\app.py:590)\n    main (citrica\\__main__.py:146)\n    <module> (entry.py:3)\nThread 3312 (idle): \"Dummy-11\"\n    _wait_for_tstate_lock (threading.py:1169)\n    join (threading.py:1153)\n    _communicate (subprocess.py:1632)\n    communicate (subprocess.py:1209)\n    preview_files (citrica\\windows\\explorer.py:38)\n    <lambda> (citrica\\windows\\app.py:407)\n    run (citrica\\windows\\app.py:84)\nThread 4504 (idle): \"Thread-12 (_readerthread)\"\n    _readerthread (subprocess.py:1599)\n    run (threading.py:1012)\n    _bootstrap_inner (threading.py:1075)\n    _bootstrap (threading.py:1032)\n",
+  "stderr": "",
+  "log": "D:\\a\\citrica\\citrica\\build\\windows-explorer-1\\python-external-stacks.log"
+}

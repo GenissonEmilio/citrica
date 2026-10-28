@@ -1,0 +1,228 @@
+"""Release signing policy and command wiring; no test certificate is trusted."""
+import base64
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+import pytest
+
+
+_SCRIPT = Path(__file__).resolve().parents[1] / 'packaging/sign_windows.py'
+_SPEC = importlib.util.spec_from_file_location('citrica_sign_windows', _SCRIPT)
+signing = importlib.util.module_from_spec(_SPEC)
+sys.modules[_SPEC.name] = signing
+_SPEC.loader.exec_module(signing)
+
+THUMBPRINT = 'A1' * 20
+
+
+def test_signing_configuration_is_explicit_and_never_fakes_trust():
+    assert signing.SigningConfig.from_environment({}) is None
+    with pytest.raises(ValueError, match='obrigatória'):
+        signing.SigningConfig.from_environment({'CITRICA_SIGNING_REQUIRED': '1'})
+    with pytest.raises(ValueError, match='hexadecimais'):
+        signing.SigningConfig.from_environment({'CITRICA_SIGN_CERT_SHA1': 'fake'})
+    with pytest.raises(ValueError, match='0 ou 1'):
+        signing.SigningConfig.from_environment({'CITRICA_SIGNING_REQUIRED': 'yes'})
+    with pytest.raises(ValueError, match='sem credenciais'):
+        signing.SigningConfig.from_environment({'CITRICA_SIGN_CERT_SHA1': THUMBPRINT,
+                                               'CITRICA_SIGN_TIMESTAMP_URL': 'https://user:secret@example.org'})
+    config = signing.SigningConfig.from_environment({'CITRICA_SIGN_CERT_SHA1': 'a1 ' * 20,
+                                                     'CITRICA_SIGN_MACHINE_STORE': '1'})
+    assert config.thumbprint == THUMBPRINT and config.machine_store
+
+
+def test_payload_selection_includes_native_dependencies_and_rejects_bad_inputs(tmp_path):
+    (tmp_path / 'nested').mkdir()
+    for filename in ['Citrica.exe', 'citrica-cli.exe', 'nested/library.DLL', 'nested/module.pyd', 'readme.md']:
+        (tmp_path / filename).write_bytes(b'controlled fixture')
+    assert len(signing.pe_files(tmp_path)) == 4
+    with pytest.raises(ValueError, match='Nenhum'):
+        signing._paths([])
+    with pytest.raises(ValueError, match='existentes'):
+        signing._paths([tmp_path / 'readme.md'])
+
+
+def _pe_header():
+    header = bytearray(256)
+    header[:2] = b'MZ'
+    header[60:64] = (128).to_bytes(4, 'little')
+    header[128:132] = b'PE\x00\x00'
+    return header
+
+
+@pytest.mark.parametrize('filename', ['uninst.e32.tmp', 'uninst.e64.tmp'])
+def test_inno_callback_accepts_only_its_named_pe_temporaries(tmp_path, filename):
+    path = tmp_path / filename
+    path.write_bytes(_pe_header())
+    assert signing._paths([path]) == [path.resolve()]
+
+
+def test_inno_callback_rejects_arbitrary_temp_names_and_malformed_pe(tmp_path):
+    arbitrary = tmp_path / 'arbitrary.tmp'
+    arbitrary.write_bytes(_pe_header())
+    with pytest.raises(ValueError, match='temporários PE oficiais'):
+        signing._paths([arbitrary])
+    malformed = tmp_path / 'uninst.e32.tmp'
+    cases = [b'', b'MZ', bytes(256)]
+    for offset in [0, 63, 250, 1024 * 1024 + 1]:
+        data = _pe_header()
+        data[60:64] = offset.to_bytes(4, 'little')
+        cases.append(data)
+    data = _pe_header()
+    data[128:132] = b'BAD!'
+    cases.append(data)
+    for data in cases:
+        malformed.write_bytes(data)
+        with pytest.raises(ValueError, match='temporários PE oficiais'):
+            signing._paths([malformed])
+
+
+def test_unsigned_payload_gets_pinned_certificate_sha256_timestamp_and_trust_check(tmp_path, monkeypatch):
+    source = tmp_path / 'Cítrica com espaço.exe'
+    source.write_bytes(b'controlled fixture')
+    calls, states = [], iter([{'status': 'NotSigned'},
+                             {'status': 'Valid', 'thumbprint': THUMBPRINT, 'timestamp_thumbprint': 'TSA'}])
+    monkeypatch.setattr(signing, 'find_signtool', lambda configured=None: 'signtool.exe')
+    monkeypatch.setattr(signing, 'inspect_signature', lambda path: next(states))
+    monkeypatch.setattr(signing, '_run', lambda args, **kwargs: calls.append(args))
+    receipts = signing.sign_files(signing.SigningConfig(THUMBPRINT, machine_store=True), [source])
+    assert calls[0][0:4] == ['signtool.exe', 'sign', '/sha1', THUMBPRINT]
+    assert calls[0][calls[0].index('/fd') + 1] == 'SHA256'
+    assert calls[0][calls[0].index('/td') + 1] == 'SHA256'
+    assert '/tr' in calls[0] and '/sm' in calls[0]
+    assert '/p' not in calls[0] and '/f' not in calls[0]  # no passwords or exported keys
+    assert calls[0][-1] == str(source)
+    assert calls[1] == ['signtool.exe', 'verify', '/pa', '/all', '/tw', str(source)]
+    assert receipts[0]['status'] == 'Valid' and not receipts[0]['preserved_vendor_signature']
+
+
+def test_valid_vendor_signature_is_preserved_and_invalid_one_rejected(tmp_path, monkeypatch):
+    source = tmp_path / 'vendor.dll'
+    source.write_bytes(b'controlled fixture')
+    calls = []
+    monkeypatch.setattr(signing, 'find_signtool', lambda configured=None: 'signtool.exe')
+    monkeypatch.setattr(signing, '_run', lambda args, **kwargs: calls.append(args))
+    monkeypatch.setattr(signing, 'inspect_signature', lambda path: {'status': 'Valid', 'thumbprint': 'VENDOR',
+                                                                   'timestamp_thumbprint': 'TSA'})
+    assert signing.sign_files(signing.SigningConfig(THUMBPRINT), [source])[0]['preserved_vendor_signature']
+    assert all(command[1] == 'verify' for command in calls)
+    calls.clear()
+    monkeypatch.setattr(signing, 'inspect_signature', lambda path: {'status': 'HashMismatch'})
+    with pytest.raises(RuntimeError, match='rejeitado'):
+        signing.sign_files(signing.SigningConfig(THUMBPRINT), [source])
+    assert calls == []
+
+
+def test_timestamp_and_selected_signing_identity_are_required(tmp_path, monkeypatch):
+    source = tmp_path / 'Citrica.exe'
+    source.write_bytes(b'controlled fixture')
+    monkeypatch.setattr(signing, 'find_signtool', lambda configured=None: 'signtool.exe')
+    monkeypatch.setattr(signing, '_run', lambda args, **kwargs: None)
+    monkeypatch.setattr(signing, 'inspect_signature', lambda path: {'status': 'Valid', 'thumbprint': THUMBPRINT})
+    with pytest.raises(RuntimeError, match='timestamp'):
+        signing.verify_files([source])
+    states = iter([{'status': 'NotSigned'},
+                   {'status': 'Valid', 'thumbprint': 'WRONG', 'timestamp_thumbprint': 'TSA'}])
+    monkeypatch.setattr(signing, 'inspect_signature', lambda path: next(states))
+    with pytest.raises(RuntimeError, match='não corresponde'):
+        signing.sign_files(signing.SigningConfig(THUMBPRINT), [source])
+
+
+def test_inspection_passes_filename_as_environment_data(tmp_path, monkeypatch):
+    source = tmp_path / "área $() 'arquivo.exe"
+    calls = []
+    monkeypatch.setenv('pSmOdUlEpAtH', 'incompatible PowerShell 7 modules')
+    def run(args, **kwargs):
+        calls.append((args, kwargs))
+        result = {'status': 'NotSigned', 'subject': 'Certificado com ação e coração'}
+        encoded = base64.b64encode(json.dumps(result, ensure_ascii=False).encode('utf-8')).decode('ascii')
+        return subprocess.CompletedProcess(args, 0, encoded + '\r\n')
+    monkeypatch.setattr(signing, '_run', run)
+    result = signing.inspect_signature(source)
+    assert result['status'] == 'NotSigned' and result['subject'] == 'Certificado com ação e coração'
+    assert str(source) not in calls[0][0][-1]
+    assert calls[0][1]['env']['CITRICA_SIGNING_FILE'] == str(source)
+    assert '-ExecutionPolicy' not in calls[0][0]
+    assert '[Console]' not in calls[0][0][-1]
+    assert calls[0][1]['creationflags'] == getattr(subprocess, 'CREATE_NO_WINDOW', 0)
+    assert not any(key.upper() == 'PSMODULEPATH' for key in calls[0][1]['env'])
+    assert os.environ['pSmOdUlEpAtH'] == 'incompatible PowerShell 7 modules'
+    assert calls[0][0][0] == str(Path(os.environ.get('SystemRoot', r'C:\Windows')) /
+                                'System32/WindowsPowerShell/v1.0/powershell.exe')
+    assert "[IO.Path]::Combine($PSHOME, 'Modules'" in calls[0][0][-1]
+
+
+def test_inno_signs_setup_and_uninstaller_with_same_checked_callback(tmp_path, monkeypatch):
+    tool = tmp_path / 'Windows SDK' / 'signtool.exe'
+    tool.parent.mkdir()
+    tool.write_bytes(b'controlled fixture')
+    for name in ['CITRICA_SIGN_CERT_SHA1', 'CITRICA_SIGN_TIMESTAMP_URL', 'CITRICA_SIGNTOOL',
+                 'CITRICA_SIGN_MACHINE_STORE', 'CITRICA_SIGNING_REQUIRED']:
+        monkeypatch.setenv(name, '')
+    config = signing.SigningConfig(THUMBPRINT, signtool=str(tool))
+    arguments = signing.inno_signing_arguments(config)
+    assert arguments[0] == '/DSigningEnabled=1'
+    assert arguments[1].startswith('/Scitrica=$q') and arguments[1].endswith('--sign $f')
+    assert signing.SigningConfig.from_environment() == config
+    script = (_SCRIPT.parent / 'windows.iss').read_text()
+    assert '#ifdef SigningEnabled\nSignTool=citrica\nSignedUninstaller=yes' in script
+
+
+def test_signtool_warnings_fail_build_with_complete_diagnostics(monkeypatch, capsys):
+    def run(args, **kwargs):
+        assert kwargs['check'] and kwargs['timeout'] == 180
+        raise subprocess.CalledProcessError(2, args, output='command output', stderr='timestamp missing\nfull detail')
+    monkeypatch.setattr(subprocess, 'run', run)
+    with pytest.raises(subprocess.CalledProcessError):
+        signing._run(['signtool.exe', 'verify'])
+    diagnostic = capsys.readouterr().err
+    assert 'command output' in diagnostic and 'timestamp missing\nfull detail' in diagnostic
+
+
+def test_invalid_authenticode_transport_keeps_raw_diagnostics(tmp_path, monkeypatch):
+    monkeypatch.setattr(signing, '_run', lambda args, **kwargs:
+                        subprocess.CompletedProcess(args, 0, 'unexpected output', 'PowerShell diagnostic'))
+    with pytest.raises(RuntimeError, match='Resposta Authenticode inválida') as error:
+        signing.inspect_signature(tmp_path / 'ação.exe')
+    assert 'unexpected output' in str(error.value) and 'PowerShell diagnostic' in str(error.value)
+
+
+def test_cli_does_not_claim_authenticode_verification_on_linux(monkeypatch):
+    monkeypatch.setattr(signing.sys, 'platform', 'linux')
+    with pytest.raises(SystemExit) as error:
+        signing.main(['--verify', 'Citrica.exe'])
+    assert error.value.code == 2
+
+
+@pytest.mark.skipif(sys.platform != 'win32', reason='Windows Authenticode and PowerShell')
+def test_real_windows_authenticode_inspection_and_tamper_detection(tmp_path, monkeypatch):
+    # Do not install a root certificate or trust anything for this test. Official
+    # python.org CPython may already be signed; embeddable/custom builds may not.
+    # inspect_signature deliberately launches PowerShell with CREATE_NO_WINDOW,
+    # exercising redirected Unicode paths without a console handle.
+    # Reproduce pwsh -> Python -> powershell.exe module pollution with manifests
+    # that 5.1 cannot load. Sanitization is scoped to the signature child process.
+    incompatible = tmp_path / 'incompatible-modules'
+    for name in ['Microsoft.PowerShell.Security', 'Microsoft.PowerShell.Utility']:
+        module = incompatible / name
+        module.mkdir(parents=True)
+        (module / f'{name}.psd1').write_text("@{ModuleVersion='99.0'; PowerShellVersion='99.0'}", encoding='ascii')
+    monkeypatch.setenv('PSModulePath', str(incompatible))
+    source = tmp_path / 'assinatura com espaços e ação.exe'
+    shutil.copy2(sys.executable, source)
+    original = signing.inspect_signature(source)
+    assert os.environ['PSModulePath'] == str(incompatible)
+    assert original['status'] in {'Valid', 'NotSigned'}
+    if original['status'] == 'Valid':
+        assert original['thumbprint'] and original['subject']
+        content = bytearray(source.read_bytes())
+        content[64] ^= 1  # change a byte in the hashed DOS stub, without executing
+        source.write_bytes(content)
+        assert signing.inspect_signature(source)['status'] == 'HashMismatch'
+    else:
+        assert original['thumbprint'] is None

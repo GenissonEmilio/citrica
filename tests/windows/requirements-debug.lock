@@ -1,0 +1,3 @@
+# External observer for Windows diagnostic CI only; never a product dependency.
+py-spy==0.4.2 \
+    --hash=sha256:8b06a353c177677e4e1701b288d8c58e2f8d4208ee81a8048d9f72ba800918f8

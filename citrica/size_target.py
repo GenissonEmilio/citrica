@@ -50,6 +50,10 @@ def fit(source, target, limit, cancel):
                     return
         raise ConversionError('Não foi possível atingir o alvo preservando ao menos 25% da resolução.')
     from citrica.tools import media_info
+    from citrica.runtime import program
+    ffmpeg = program('ffmpeg')
+    if not ffmpeg:
+        raise ConversionError('FFmpeg não instalado.')
     info = media_info(source)
     duration = float(info.get('format', {}).get('duration', 0))
     if duration <= 0:
@@ -60,7 +64,7 @@ def fit(source, target, limit, cancel):
     audio_rate = 64000 if video and has_audio else 0
     for _ in range(4):
         check_cancel(cancel)
-        args = ['ffmpeg', '-v', 'error', '-nostdin', '-y', '-protocol_whitelist', 'file,pipe', '-i', str(source)]
+        args = [ffmpeg, '-v', 'error', '-nostdin', '-y', '-protocol_whitelist', 'file,pipe', '-i', str(source)]
         if video:
             if bitrate-audio_rate < 10000:
                 raise ConversionError('O alvo é pequeno demais para a duração do vídeo.')

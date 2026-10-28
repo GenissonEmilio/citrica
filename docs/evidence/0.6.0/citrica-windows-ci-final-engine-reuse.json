@@ -1,0 +1,32 @@
+{
+  "purpose": "unsigned-test-only",
+  "release_eligible": false,
+  "success": true,
+  "portable_archive": "citrica-0.6.0-windows-x86_64-portable-unsigned-test.zip",
+  "engine_files_verified": 19578,
+  "inventory_sha256": "7adcd79a8b07c49df38532940d09c1c0f39880e90e528cea7b84c4bd1c2531ee",
+  "corresponding_source_sha256": "89e4b1b10d303b59d9ee9527ddc1074ba6dd80a08257aecaafe96779ce4e9c43",
+  "provenance": "compiled-from-pinned-sources",
+  "current_locks_match": true,
+  "build_affecting_recipes_match": true,
+  "recipes": {
+    "packaging/build_ffmpeg_windows.sh": {
+      "artifact_sha256": "bdb72fb51976e74b9b20ddf5338a6441ac1c220005f019af708b521810c1d1f5",
+      "current_sha256": "bdb72fb51976e74b9b20ddf5338a6441ac1c220005f019af708b521810c1d1f5",
+      "whole_file_equal_after_newlines": true
+    },
+    "packaging/build_windows_source_engines.py": {
+      "artifact_sha256": "fd86bd03ba448f44a48350c049ea47148ecf820d02f36c15e6182372c3aff8d3",
+      "current_sha256": "fd86bd03ba448f44a48350c049ea47148ecf820d02f36c15e6182372c3aff8d3",
+      "whole_file_equal_after_newlines": true
+    },
+    "packaging/prepare_windows_engines.py": {
+      "artifact_sha256": "6e331211f63430317f4b710c690fd2b7256c760d8ec7dd9c4b714c26db8ecd2d",
+      "current_sha256": "6e331211f63430317f4b710c690fd2b7256c760d8ec7dd9c4b714c26db8ecd2d",
+      "whole_file_equal_after_newlines": true
+    }
+  },
+  "application_runtime_reused": false,
+  "unlisted_engine_files_ignored": 42,
+  "reproducible_bit_for_bit_verified": false
+}

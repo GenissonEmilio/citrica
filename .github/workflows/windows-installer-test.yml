@@ -3,37 +3,122 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: Run de build com o artefato citrica-windows-x86_64
+        description: Same-repository full-build run containing the exact unsigned-test package
         required: true
         type: string
+        default: '40748086416'
+      artifact_id:
+        description: Explicit unsigned-test artifact ID from that run
+        required: true
+        type: string
+        default: '12845060748'
 permissions:
   contents: read
   actions: read
 jobs:
   installer:
     runs-on: windows-2022
+    timeout-minutes: 45
     env:
       PYTHONUTF8: '1'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
-      - uses: actions/download-artifact@v4
-        with:
-          name: citrica-windows-x86_64
-          run-id: ${{ inputs.run_id }}
-          github-token: ${{ github.token }}
-          path: candidate
-      - name: Instalar, abrir e desinstalar
-        shell: pwsh
+          cache: pip
+      - name: Authenticate exact same-repository artifact and application commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ inputs.run_id }}
+          SOURCE_ARTIFACT: ${{ inputs.artifact_id }}
+        shell: python
         run: |
-          $setup = (Get-ChildItem candidate/citrica-*-windows-x86_64-setup.exe | Select-Object -First 1).FullName
-          python tests/windows/install_smoke.py $setup
-      - uses: actions/upload-artifact@v4
-        if: always()
+          import json, os, re, subprocess
+          from pathlib import Path
+          repository = os.environ['GITHUB_REPOSITORY']
+          run, artifact_id = os.environ['SOURCE_RUN'], os.environ['SOURCE_ARTIFACT']
+          if not all(re.fullmatch(r'[1-9][0-9]*', value) for value in [run, artifact_id]):
+              raise SystemExit('Run/artifact IDs must be positive decimal IDs.')
+          def api(endpoint):
+              return json.loads(subprocess.run(['gh', 'api', endpoint], check=True,
+                  capture_output=True, text=True, encoding='utf-8').stdout)
+          source = api(f'repos/{repository}/actions/runs/{run}')
+          artifact = api(f'repos/{repository}/actions/artifacts/{artifact_id}')
+          if (source.get('repository', {}).get('full_name') != repository or
+                  source.get('head_repository', {}).get('full_name') != repository):
+              raise SystemExit('The existing application build must belong to this repository, not a fork.')
+          if (artifact.get('workflow_run', {}).get('id') != int(run) or artifact.get('expired') is not False or
+                  artifact.get('name') != 'citrica-windows-repack-unsigned-test' or
+                  artifact.get('workflow_run', {}).get('head_sha') != source['head_sha']):
+              raise SystemExit('Explicit artifact does not match the selected unsigned-test run/commit.')
+          Path('release').mkdir(exist_ok=True)
+          Path('release/citrica-windows-existing-build-origin.json').write_text(json.dumps({
+              'repository': repository, 'source_run_id': int(run), 'source_artifact_id': int(artifact_id),
+              'artifact_name': artifact['name'], 'artifact_digest': artifact.get('digest'),
+              'app_commit': source['head_sha'], 'qa_controller_commit': os.environ['GITHUB_SHA'],
+              'source_run_conclusion': source.get('conclusion'), 'restored': False,
+              'purpose': 'exact-existing-build-desktop-retest', 'release_eligible': False}, indent=2) + '\n',
+              encoding='utf-8')
+      - name: Download only the authenticated existing artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: windows-installer-validation
+          artifact-ids: ${{ inputs.artifact_id }}
+          run-id: ${{ inputs.run_id }}
+          repository: ${{ github.repository }}
+          github-token: ${{ github.token }}
+          path: build/existing-artifact
+      - name: Python QA dependencies from the project lock
+        run: |
+          python -m pip install -r requirements.lock
+          python -m pip install -e . --no-deps
+      - name: External Python stack observer for diagnostic QA only
+        run: |
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r tests/windows/requirements-debug.lock
+      - name: Focused artifact-integrity and responsive IPC-controller tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest tests/test_windows_artifact_restore.py tests/test_windows_engine_reuse.py tests/test_windows_explorer_ipc.py -q
+      - name: Verify full-build evidence and restore exact setup and portable PEs
+        id: restore
+        run: python packaging/restore_windows_qa_artifact.py build/existing-artifact
+      - name: Retest 38 static operations through the exact packaged CLI
+        if: always() && steps.restore.outcome == 'success'
+        run: python tests/windows/static_tools_parity.py dist/Citrica/citrica-cli.exe --report release/citrica-windows-existing-static-tools-parity.json
+      - name: Native OLE drag and global keyboard flow against the existing GUI
+        if: always() && steps.restore.outcome == 'success'
+        run: python tests/windows/native_flow.py dist/Citrica/Citrica.exe
+      - name: Install exact setup, Unicode runtime, upgrade and uninstall
+        if: always() && steps.restore.outcome == 'success'
+        run: python tests/windows/install_smoke.py build/existing-setup.exe
+      - name: Real Explorer with builtin document engine
+        if: always() && steps.restore.outcome == 'success'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Real Explorer with Qt scale 150 percent
+        if: always() && steps.restore.outcome == 'success'
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Real Explorer with the existing source-built offline engines
+        if: always() && steps.restore.outcome == 'success'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --bundled-engines
+      - name: Repeated conversions in the same Explorer folder
+        if: always() && steps.restore.outcome == 'success'
+        env:
+          QT_SCALE_FACTOR: '1.5'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --same-folder
+      - name: Keep retest evidence only, including controlled native failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-existing-build-desktop-retest-evidence
           path: |
-            release/*
-            build/windows-installer/*.log
+            release/**/*.json
+            release/*.png
+            build/windows-native/**/*.json
+            build/windows-native/**/*.log
+            build/windows-installer/**/*.log
+            build/windows-explorer-*/**/*.json
+            build/windows-explorer-*/**/*.log
+          if-no-files-found: warn
+          retention-days: 14

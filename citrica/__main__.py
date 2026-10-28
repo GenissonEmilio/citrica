@@ -32,13 +32,24 @@ def main():
     parser.add_argument("--install-integrations", action="store_true")
     parser.add_argument("--screenshot", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--settings", action="store_true", help="configurações e atalhos do desktop")
-    parser.add_argument("--install-gnome", action="store_true", help="instala a roda global para GNOME 50")
+    parser.add_argument("--setup", action="store_true", help="Linux: configura a integração na primeira abertura")
+    parser.add_argument("--install-gnome", action="store_true", help="instala a roda global para GNOME 46/50/51 Wayland")
     parser.add_argument("--desktop-request", help=argparse.SUPPRESS)
     parser.add_argument("--tool", help="abre uma ferramenta para os arquivos selecionados")
     parser.add_argument("--pick", action="store_true", help="escolhe arquivos para a roda")
     parser.add_argument("--background", action="store_true", help="Windows: inicia somente na bandeja")
     parser.add_argument("--quit", action="store_true", help="Windows: encerra a instância na bandeja")
     args = parser.parse_args()
+    if args.quit and sys.platform == 'win32':
+        from citrica.windows.ipc import quit_resident
+        return quit_resident()
+    if args.setup and sys.platform != 'win32':
+        from citrica.desktop import setup_desktop
+        try:
+            setup_desktop()
+        except Exception as error:
+            # Still open settings so the user can inspect/retry a failed setup.
+            print(f'Configuração do desktop: {error}', file=sys.stderr)
     if args.internal_explorer_selection is not None:
         from citrica.windows.explorer import selected_files
         try:

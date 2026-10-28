@@ -1,6 +1,6 @@
-"""Start and clean up an isolated GNOME 50/Wayland integration test session.
+"""Start and clean up an isolated GNOME 46/50/51 Wayland integration test session.
 
-Requires a local GNOME 50 installation. Never installs the harness on the user's
+Requires a local supported GNOME installation. Never installs the harness on the user's
 desktop, sends input to that desktop or changes Shell security settings.
 """
 import json
@@ -73,7 +73,7 @@ def main():
         time.sleep(1)
         flow = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT / 'tests/desktop/run_flow.py'
         subprocess.run([sys.executable, str(flow)], env=env, cwd=ROOT, check=True)
-        subprocess.run([*backend, '--settings', '--screenshot',
+        subprocess.run([*backend, '--setup', '--settings', '--screenshot',
                         str(STATE / 'settings.png')], env=dict(env, QT_QPA_PLATFORM='offscreen'),
                        cwd=ROOT, check=True)
     finally:

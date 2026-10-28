@@ -22,7 +22,7 @@ def desktop_exec(parts):
                     .replace("$", "\\$").replace("%", "%%") + '"' for arg in parts)
 
 
-def install(data_home: Path | None = None) -> list[Path]:
+def install(data_home: Path | None = None, *, include_application=True) -> list[Path]:
     root = data_home or Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
     cmd = command()
     executable = desktop_exec(cmd)
@@ -56,12 +56,16 @@ def install(data_home: Path | None = None) -> list[Path]:
     }
     result = []
     for relative, content in files.items():
+        if not include_application and relative.startswith('applications/'):
+            continue
         path = root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
         if relative.startswith("nautilus/scripts/"):
             path.chmod(0o755)
         result.append(path)
+    if not include_application:
+        return result
     icon = root / "icons/hicolor/scalable/apps/io.github.GenissonEmilio.citrica.svg"
     icon.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(Path(__file__).parent / "assets/citrica.svg", icon)

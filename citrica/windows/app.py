@@ -1,9 +1,12 @@
 """Resident Windows app, tray, preferences, IPC and asynchronous wheel actions."""
 import json
+import faulthandler
 import logging
+import os
 import platform
 import sys
 import threading
+from contextlib import contextmanager
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QPoint, QThread, QTimer, Signal, Slot
@@ -22,6 +25,50 @@ from citrica.gui import ICON, STYLE
 from citrica.windows import config
 from citrica.windows.ipc import MAX_REQUEST, send, server_name
 from citrica.windows.wheel import CENTER, SIZE, Wheel, hit_test
+
+QA = logging.getLogger('citrica.qa')
+
+
+@contextmanager
+def qa_tracebacks(args):
+    """Opt-in fatal crash capture and operation boundaries for desktop QA.
+
+    Only a resident launched explicitly by the desktop harness enables this.
+    No input paths or file contents are recorded by the boundary events.
+    Never walk live frames from an asynchronous periodic watchdog: CPython3.12
+    can crash in that diagnostic itself while Qt/Python threads change frames.
+    """
+    destination = os.environ.get('CITRICA_QA_TRACEBACK_LOG')
+    if not destination or not args.background:
+        yield
+        return
+    path = Path(destination)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handler = logging.FileHandler(path.with_suffix('.events.log'), encoding='utf-8')
+    handler.setFormatter(logging.Formatter('%(asctime)s %(threadName)s %(message)s'))
+    previous_level, previous_propagate = QA.level, QA.propagate
+    QA.setLevel(logging.DEBUG)
+    QA.propagate = False
+    QA.addHandler(handler)
+    try:
+        with path.open('ab', buffering=0) as traces:
+            fatal_was_enabled = faulthandler.is_enabled()
+            try:
+                # Preserve an existing fatal handler and its destination. A
+                # frozen GUI normally has none; capture native crashes there.
+                if not fatal_was_enabled:
+                    faulthandler.enable(file=traces, all_threads=True)
+                QA.debug('resident.qa_fatal_capture start pid=%s', os.getpid())
+                yield
+            finally:
+                if not fatal_was_enabled:
+                    faulthandler.disable()
+                QA.debug('resident.qa_fatal_capture stop')
+    finally:
+        QA.removeHandler(handler)
+        QA.setLevel(previous_level)
+        QA.propagate = previous_propagate
+        handler.close()
 
 
 class Job(QThread):
@@ -178,6 +225,7 @@ class Desktop(QObject):
         self.pointer_timer.start(20)
 
     def _accept(self):
+        QA.debug('ipc.accept')
         socket = self.server.nextPendingConnection()
         buffer = bytearray()
         def read():
@@ -188,7 +236,10 @@ class Desktop(QObject):
             if b'\n' not in buffer:
                 return
             try:
-                result = self.dispatch(json.loads(buffer.split(b'\n', 1)[0]))
+                payload = json.loads(buffer.split(b'\n', 1)[0])
+                QA.debug('ipc.dispatch begin op=%s', payload.get('op'))
+                result = self.dispatch(payload)
+                QA.debug('ipc.dispatch end')
             except Exception as error:
                 result = {'error': str(error)}
             socket.write(json.dumps(result, ensure_ascii=False).encode('utf-8') + b'\n')
@@ -250,9 +301,11 @@ class Desktop(QObject):
 
     @Slot()
     def _job_finished(self):
+        QA.debug('job.finished begin')
         job = self.sender()
         self.jobs.discard(job)
         job.deleteLater()
+        QA.debug('job.finished deleteLater queued')
 
     def notify(self, title, message):
         self.last_message = message
@@ -295,12 +348,15 @@ class Desktop(QObject):
 
     def load_palette(self):
         token, paths = self.generation, list(self.paths)
+        QA.debug('palette.begin generation=%s files=%s', token, len(paths))
         def done(palette):
+            QA.debug('palette.done generation=%s current=%s active=%s', token, self.generation, self.active)
             if token != self.generation or not self.active:
                 return
             self.palette = palette
             self.render()
         def failed(error):
+            QA.debug('palette.failed generation=%s', token)
             if token == self.generation and self.active:
                 self.hide_wheel()
                 self.notify('Cítrica · seleção inválida', error)
@@ -332,16 +388,19 @@ class Desktop(QObject):
     def prepare_drag(self, hwnd):
         self.drag_epoch += 1
         epoch = self.drag_epoch
+        QA.debug('preview.begin epoch=%s hwnd=%s', epoch, hwnd)
         self.drag_candidates = []
         self.preview_error = ''
         from citrica.windows.explorer import preview_files
         def done(paths):
+            QA.debug('preview.done epoch=%s current=%s files=%s', epoch, self.drag_epoch, len(paths))
             if epoch != self.drag_epoch or not self.native.left_down():
                 return
             self.drag_candidates = paths
             if paths and self.armed:
                 self.show_wheel(paths, self.mode, dragging=True, verified=False)
         def failed(error):
+            QA.debug('preview.failed epoch=%s', epoch)
             if epoch == self.drag_epoch:
                 self.preview_error = error
             logging.getLogger('citrica').info('Prévia Explorer indisponível: %s', error)
@@ -355,13 +414,16 @@ class Desktop(QObject):
         self.drag_verified = True
 
     def drop(self, paths, point):
+        QA.debug('drop.begin generation=%s files=%s', self.generation, len(paths))
         self.offer(paths)  # An actual OLE drop always supersedes a selection preview.
         self.dragging = False
         self.pending_drop = (self.generation, point)
         if self.palette:
             self.render()
+        QA.debug('drop.end generation=%s', self.generation)
 
     def drag_mode(self, mode):
+        QA.debug('drag_mode.begin mode=%s active=%s armed=%s', mode, self.active, self.armed)
         if not self.active:
             if self.busy or self._quitting:
                 return
@@ -385,6 +447,7 @@ class Desktop(QObject):
         elif mode != self.mode:
             self.mode, self.page = mode, 0
             self.render()
+        QA.debug('drag_mode.end mode=%s active=%s armed=%s', self.mode, self.active, self.armed)
 
     def release(self):
         token = self.generation
@@ -394,6 +457,7 @@ class Desktop(QObject):
                           self.dragging and not self.native.left_down() else None)
 
     def hide_wheel(self):
+        QA.debug('hide.begin generation=%s', self.generation)
         self.generation += 1
         self.paths, self.palette, self.dragging, self.active = [], None, False, False
         self.armed = False
@@ -403,6 +467,7 @@ class Desktop(QObject):
         self.native.visible = False
         self.native.reset_drag()
         self.wheel.dismiss()
+        QA.debug('hide.end generation=%s', self.generation)
 
     def apply(self, item):
         if self.dragging and not self.drag_verified:
@@ -521,6 +586,14 @@ def math_ceil(value, divisor):
 
 
 def launch(args):
+    with qa_tracebacks(args):
+        return _launch(args)
+
+
+def _launch(args):
+    if args.quit:
+        from citrica.windows.ipc import quit_resident
+        return quit_resident()
     app = QApplication.instance() or QApplication([])
     app.setApplicationName('Cítrica')
     app.setOrganizationName('GenissonEmilio')
@@ -528,7 +601,6 @@ def launch(args):
     app.setStyle('Fusion')
     app.setStyleSheet(STYLE)
     app.setQuitOnLastWindowClosed(False)
-    import os
     from logging.handlers import RotatingFileHandler
     log_dir = Path(os.environ.get('LOCALAPPDATA', config.config_dir().parent)) / 'Citrica/Logs'
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -540,17 +612,6 @@ def launch(args):
         logging.getLogger('citrica').error('Falha na interface', exc_info=(kind, error, traceback))
         QMessageBox.warning(None, 'Cítrica · falha', str(error) + '\nUse as configurações para salvar um diagnóstico.')
     sys.excepthook = report_exception
-    if args.quit:
-        result = send({'op': 'quit'})
-        if not result:
-            return 0
-        import time
-        deadline = time.monotonic() + 15
-        while time.monotonic() < deadline:
-            if send({'op': 'status'}, timeout=100) is None:
-                return 0
-            QThread.msleep(100)
-        return 1
     payload = ({'op': 'show', 'paths': [str(p.resolve()) for p in args.files]} if args.files or args.wheel or args.dock
                else {'op': 'pick'} if args.pick else {'op': 'status'} if args.background else {'op': 'settings'})
     existing = send(payload)

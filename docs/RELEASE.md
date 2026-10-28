@@ -1,15 +1,16 @@
-O **Cítrica 0.5.0** corrige o fluxo da roda no Windows e adiciona **PDF→DOCX em Linux e Windows**, com motores incluídos no aplicativo.
+O **Cítrica 0.6.0** inclui os motores de conversão no Windows e amplia a instalação nativa no Ubuntu. Arquivos que dependem de áudio/vídeo ou Office deixam de exigir programas instalados à parte no Windows.
 
-- **Windows / Ctrl, Alt e Shift:** a seleção da janela de origem do Explorer antecipa a prévia enquanto o arraste OLE é negociado. A leitura do Explorer roda em processo separado com limite de tempo, mantendo a interface livre. A operação exige a oferta real do arquivo.
-- Ofertas nativas FileNameW/CF_HDROP são reconhecidas quando o Qt não fornece URLs. A roda aparece sem recriar/elevar novamente a janela durante DragEnter.
-- Drops feitos antes de as opções carregarem são mantidos até o motor ficar pronto. Soltar e tocar novamente o mesmo modificador permite nova tentativa.
-- **DOCX→PDF/TXT sem instalar Office**, além de TXT→PDF/DOCX. LibreOffice continua opcional para maior fidelidade e necessário para outros formatos Office.
-- **PDF→DOCX editável**, com texto, tabelas e imagens conforme o layout. O motor usa um processo separado para permitir cancelamento sem publicar arquivo parcial.
-- **Linux / GNOME 50:** a miniatura nativa do arquivo fica acima da roda com Ctrl, Alt e Shift; extensão versão 3, revisão 2.
-- Diagnóstico Windows inclui formatos de oferta recebidos, confirmação do arraste e execução elevada. O aplicativo deve usar o mesmo nível normal de permissões do Explorer.
+- **Windows offline:** FFmpeg/FFprobe, LibreOffice e Tesseract com modelo OCR acompanham instalador e portátil. Codecs e OCR têm build por fontes fixadas e pacote de fontes correspondentes.
+- **Pastas com acentos:** os modelos de texto e rostos são lidos por APIs que preservam caminhos Unicode. Atualizações substituem o runtime privado completo, removendo DLLs antigas.
+- **Ubuntu:** DEB construído no Ubuntu 24.04, dependências do sistema corretas, configuração inicial por usuário e roda GNOME 46/50/51 em Wayland. O menu abre a instalação nativa mesmo com um portátil antigo no PATH.
+- **Roda:** Shift converte, Alt abre ferramentas e Ctrl abre ações durante o arraste. A miniatura permanece acima da roda e a reabertura limpa a seleção. Atalhos padrão: Super+Shift+C no GNOME e Ctrl+Alt+C no Windows.
 
-**Windows:** instale `citrica-0.5.0-windows-x86_64-setup.exe` ou extraia o ZIP portátil completo. O atalho padrão é **Ctrl+Alt+C**. **Linux:** RPM, DEB e TAR.GZ; no GNOME, **Super+Shift+C**. Shift converte, Alt abre ferramentas e Ctrl abre ações durante o arraste.
+**Instalação:** Linux recebe DEB, RPM e TAR.GZ. No Ubuntu, abra o DEB pelo instalador do sistema ou use `sudo apt install ./citrica_0.6.0_amd64.deb`. No Windows, use o instalador completo ou extraia todo o ZIP portátil, preservando `_internal` junto dos launchers.
 
-**Validação:** suíte compartilhada, conversões pelo executável empacotado, testes nativos GNOME e Windows, Explorer real em escalas Qt de 100%/150% e instalação/desinstalação. As execuções e os resultados efetivamente concluídos ficam em [VALIDACAO.md](https://github.com/GenissonEmilio/citrica/blob/main/docs/VALIDACAO.md).
+**Validação:** os recibos distinguem a matriz de conversões, testes do Explorer real, VM Windows 11, instalação/atualização/remoção e testes Ubuntu/GNOME. Consulte [Validação 0.6.0](https://github.com/GenissonEmilio/citrica/blob/v0.6.0/docs/VALIDACAO-0.6.0.md) e os relatórios que acompanham cada pacote; sucesso no CI não representa todos os PCs ou documentos.
 
-**Limites:** layouts Word/PDF avançados podem mudar; PDF escaneado vira DOCX com imagens, sem OCR automático. FFmpeg, Tesseract e LocalSend continuam opcionais externos no Windows. O instalador ainda não tem assinatura digital. A roda Linux requer GNOME 50/Wayland. Originais preservados nas conversões; Mover é uma ação explícita.
+**Distribuição desta release:** a 0.6.0 é uma release normal para teste público. Os arquivos Windows preservam `unsigned-test` no nome e ainda não têm assinatura pública; a candidatura à SignPath foi enviada e aguarda aprovação. A conta Microsoft foi verificada, e o pacote da Store é preparado separadamente. A verificação da conta não assina o EXE do GitHub.
+
+**Assinatura:** consulte `citrica-windows-signing.json` para o estado do arquivo baixado. Candidatos identificados como `unsigned-test` são testes sem editor verificado. A publicação assinada depende de uma identidade aprovada; uma assinatura não garante reputação SmartScreen imediata. [Opções de distribuição](https://github.com/GenissonEmilio/citrica/blob/v0.6.0/docs/WINDOWS-SIGNING.md).
+
+PDF→DOCX mantém texto editável quando disponível; PDFs escaneados viram páginas com imagens, sem OCR automático nessa conversão. Layouts complexos podem mudar. A roda Linux requer GNOME/Wayland; outros desktops não recebem uma roda global por instalar o DEB. Compartilhamento continua dependendo de LocalSend. As conversões preservam os originais; Mover é uma ação explícita.

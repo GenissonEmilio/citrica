@@ -5,6 +5,11 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      windows_engine_sources:
+        description: Compilar motores Windows do fonte, com fontes correspondentes (mais demorado)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -47,6 +52,12 @@ jobs:
       - name: Pacotes Linux x86_64
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         run: python packaging/build.py
+      - name: Matriz completa de conversões Linux
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python tests/windows/engine_parity.py dist/citrica/citrica --system-engines --report release/citrica-linux-engine-parity.json
+      - name: Ferramentas de imagem e PDF pelo pacote Linux
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python tests/windows/static_tools_parity.py dist/citrica/citrica --report release/citrica-linux-static-tools-parity.json
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
@@ -61,11 +72,43 @@ jobs:
             release/*.rpm
             release/*.deb
             release/*.png
+            release/citrica-linux-engine-parity.json
+            release/citrica-linux-static-tools-parity.json
             release/SHA256SUMS
+          retention-days: 14
+  ubuntu-deb:
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    needs: linux
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ['24.04', '26.04', '26.10']
+    container: ubuntu:${{ matrix.ubuntu }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: citrica-native-packages
+          path: release
+      - name: Preparar Ubuntu limpo
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 util-linux passwd dbus-x11
+      - name: Instalar, abrir como usuário comum, converter e remover DEB
+        run: python3 tests/linux/install_smoke.py release/citrica_*_amd64.deb --report release/citrica-ubuntu-${{ matrix.ubuntu }}-validation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: citrica-ubuntu-${{ matrix.ubuntu }}-evidence
+          path: release/citrica-ubuntu-${{ matrix.ubuntu }}-validation.json
+          if-no-files-found: warn
           retention-days: 14
   publish:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [linux, windows]
+    needs: [linux, windows, ubuntu-deb]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -82,33 +125,113 @@ jobs:
         run: |
           python - <<'PY'
           import hashlib
+          import json
           from pathlib import Path
           root = Path('release')
+          trust = json.loads((root / 'citrica-windows-signing.json').read_text(encoding='utf-8'))
+          if trust.get('status') != 'signed' or trust.get('authenticode_verified') is not True:
+              raise SystemExit('Release bloqueada: os arquivos Windows precisam de assinatura Authenticode verificada. Consulte docs/WINDOWS-SIGNING.md.')
+          if not trust.get('files') or any(item.get('status') != 'Valid' or not item.get('timestamp_thumbprint')
+                                           for item in trust['files']):
+              raise SystemExit('Release bloqueada: relatório de assinatura/timestamp incompleto.')
+          if any('unsigned-test' in p.name.lower() for p in root.iterdir()):
+              raise SystemExit('Release bloqueada: artefatos de teste não assinados encontrados.')
+          validation = json.loads((root / 'citrica-windows-validation.json').read_text(encoding='utf-8'))
+          engines = validation.get('validation', {}).get('offline_engines', {})
+          sources = list(root.glob('citrica-*-windows-engine-sources.zip'))
+          if engines.get('provenance') != 'compiled-from-pinned-sources' or len(sources) != 1:
+              raise SystemExit('Release bloqueada: motores Windows precisam de build por fonte e pacote de fontes correspondentes.')
+          if hashlib.sha256(sources[0].read_bytes()).hexdigest() != engines.get('corresponding_source', {}).get('sha256'):
+              raise SystemExit('Release bloqueada: hash do pacote de fontes Windows não corresponde ao build.')
           files = [p for p in sorted(root.iterdir()) if not p.name.startswith('SHA256SUMS')]
           (root / 'SHA256SUMS').write_text(''.join(f"{hashlib.file_digest(p.open('rb'), 'sha256').hexdigest()}  {p.name}\n" for p in files))
           PY
           gh release create "$GITHUB_REF_NAME" release/* --title "Cítrica $GITHUB_REF_NAME · Linux e Windows" --notes-file docs/RELEASE.md --draft
   windows:
     runs-on: windows-2022
+    timeout-minutes: 120
     env:
       PYTHONUTF8: '1'
+      CITRICA_BUILD_JOBS: '2'
+      CITRICA_WINDOWS_ENGINES: ${{ github.workspace }}/build/windows-engines
+      # A dispatch is always an unsigned test build. Public tags require a real
+      # certificate/private-key provider provisioned on the signing runner.
+      CITRICA_SIGNING_REQUIRED: ${{ startsWith(github.ref, 'refs/tags/') && '1' || '0' }}
+      CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES: ${{ (startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.windows_engine_sources)) && '1' || '0' }}
+      CITRICA_SIGN_CERT_SHA1: ${{ startsWith(github.ref, 'refs/tags/') && vars.CITRICA_SIGN_CERT_SHA1 || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
-      - name: Motores externos para os testes Windows
+      - name: Exigir editor verificável nas releases públicas
+        if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         run: |
-          # Keep this runner free of Office: missing LibreOffice was one of the
-          # reported failures. Optional LibreOffice paths remain covered on Linux.
-          choco install ffmpeg tesseract --yes --no-progress --execution-timeout=600
-          if ($LASTEXITCODE -notin @(0, 1641, 3010)) { throw "Falha nas dependências Windows: $LASTEXITCODE" }
+          $thumbprint = ($env:CITRICA_SIGN_CERT_SHA1 -replace '\s', '').ToUpperInvariant()
+          if ($thumbprint -notmatch '^[0-9A-F]{40}$') {
+            throw 'Release bloqueada: não há certificado Authenticode configurado. Conclua o provisionamento descrito em docs/WINDOWS-SIGNING.md; workflow_dispatch gera apenas builds de teste não assinados.'
+          }
+          $certificate = Get-Item "Cert:\CurrentUser\My\$thumbprint" -ErrorAction SilentlyContinue
+          if (!$certificate -or !$certificate.HasPrivateKey) {
+            throw 'Release bloqueada: a identidade selecionada não possui certificado/chave privada acessível neste runner. Não serão publicados instaladores sem assinatura.'
+          }
+          if ($certificate.NotBefore -gt (Get-Date) -or $certificate.NotAfter -lt (Get-Date)) {
+            throw 'Release bloqueada: o certificado selecionado está fora do período de validade.'
+          }
       - name: Dependências Python
         run: |
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
+      - name: Preparar motores offline com versões e SHA-256 fixos
+        if: ${{ !startsWith(github.ref, 'refs/tags/') && !(github.event_name == 'workflow_dispatch' && inputs.windows_engine_sources) }}
+        shell: pwsh
+        run: |
+          $sevenZip = Get-Command 7z.exe -ErrorAction SilentlyContinue
+          if (!$sevenZip -and !(Test-Path "$env:ProgramFiles\7-Zip\7z.exe")) {
+            throw '7-Zip ausente no runner; necessário para extrair motores sem instalar programas externos.'
+          }
+          python packaging/prepare_windows_engines.py
+          if ($LASTEXITCODE -ne 0) { throw 'Falha na preparação dos motores offline.' }
+      - name: Conferir toolchain Visual Studio 2022 e CMake
+        if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.windows_engine_sources)
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (!(Test-Path $vswhere)) { throw 'Visual Studio Installer/vswhere não encontrado no runner.' }
+          $visualStudio = & $vswhere -latest -products '*' -version '[17.0,18.0)' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$visualStudio) { throw 'Visual Studio 2022 com toolchain C++ x64 não encontrado.' }
+          if (!(Get-Command cmake -ErrorAction SilentlyContinue)) { throw 'CMake ausente no runner.' }
+          Write-Host "Toolchain MSVC: $visualStudio"
+          cmake --version
+      - name: Preparar MSYS2 para os motores por fonte
+        if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.windows_engine_sources)
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e
+        id: msys
+        with:
+          msystem: MINGW64
+          location: C:\msys64
+          update: true
+          install: >-
+            base-devel
+            perl
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-nasm
+            mingw-w64-x86_64-pkgconf
+            mingw-w64-x86_64-meson
+            mingw-w64-x86_64-ninja
+      - name: Compilar motores Windows e preservar fontes correspondentes
+        if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.windows_engine_sources)
+        env:
+          CITRICA_MSYS_BASH: ${{ steps.msys.outputs.msys2-location }}/usr/bin/bash.exe
+        run: python packaging/build_windows_source_engines.py --output "${{ env.CITRICA_WINDOWS_ENGINES }}"
+      - name: Expor FFmpeg preparado aos testes de código-fonte
+        shell: pwsh
+        run: |
+          # Unit tests also synthesize media using the ordinary ffmpeg command.
+          # The frozen matrix independently removes this PATH and all overrides.
+          "$env:CITRICA_WINDOWS_ENGINES/tools/ffmpeg/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Testes reais do motor e interface Qt no Windows
         env:
           QT_QPA_PLATFORM: offscreen
@@ -125,7 +248,7 @@ jobs:
         run: |
           $version = python -c "from citrica import __version__; print(__version__)"
           python tests/windows/install_smoke.py "release/citrica-$version-windows-x86_64-setup.exe"
-      - name: Explorer real, Ctrl, Alt e documentos sem LibreOffice
+      - name: Explorer real, Ctrl, Alt e documentos com motor básico
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
       - name: Explorer real com escala Qt de 150%
@@ -133,15 +256,31 @@ jobs:
         env:
           QT_SCALE_FACTOR: '1.5'
         run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe
+      - name: Explorer real e motores offline de todas as famílias
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --bundled-engines
       - name: Conversões seguidas na mesma pasta do Explorer
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         env:
           QT_SCALE_FACTOR: '1.5'
         run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --same-folder
+      - name: Identificar artefatos de teste não assinados
+        if: always() && github.event_name == 'workflow_dispatch' && hashFiles('release/citrica-windows-signing.json') != ''
+        shell: pwsh
+        run: |
+          $trust = Get-Content release/citrica-windows-signing.json -Raw | ConvertFrom-Json
+          if ($trust.status -ne 'unsigned' -or $trust.authenticode_verified) {
+            throw 'O dispatch deve gerar um build de teste explicitamente não assinado.'
+          }
+          foreach ($file in Get-ChildItem release -File | Where-Object { $_.Extension -in @('.exe', '.zip') }) {
+            Rename-Item $file.FullName ($file.BaseName + '-unsigned-test' + $file.Extension)
+          }
+          'BUILD DE TESTE NÃO ASSINADO. O editor não está verificado. Não é uma release pública. Consulte citrica-windows-signing.json e docs/WINDOWS-SIGNING.md.' | Out-File release/UNSIGNED-TEST-BUILD.txt -Encoding utf8
+          python -c "import hashlib; from pathlib import Path; p=Path('release'); (p/'SHA256SUMS-windows.txt').write_text(''.join(f'{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.name}\n' for f in sorted(p.iterdir()) if f.is_file() and not f.name.startswith('SHA256SUMS')), encoding='utf-8')"
       - uses: actions/upload-artifact@v4
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: always() && (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') && hashFiles('release/*-setup*.exe') != ''
         with:
-          name: citrica-windows-x86_64
+          name: citrica-windows-x86_64-${{ startsWith(github.ref, 'refs/tags/') && 'signed' || 'unsigned-test' }}
           path: release/*
           retention-days: 14
       - uses: actions/upload-artifact@v4
@@ -151,10 +290,19 @@ jobs:
           path: |
             build/windows-native/**/*.json
             build/windows-native/**/*.log
-            build/windows-installer/*.log
+            build/windows-installer/**/*.log
+            build/windows-engine-cache/*.log
+            build/windows-source-build/**/config.log
+            build/windows-source-build/**/CMakeCache.txt
+            build/windows-source-build/**/*version.txt
+            build/windows-source-build/**/msys2-packages.txt
+            build/windows-engines/engines.json
+            build/windows-engines/engine-files.sha256.json
             build/windows-explorer-*/**/*.json
             build/windows-explorer-*/**/*.log
             release/*.png
+            release/*parity.json
+            release/*signing.json
             release/*validation.json
           retention-days: 7
       - uses: actions/upload-artifact@v4

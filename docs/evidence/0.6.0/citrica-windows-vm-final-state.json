@@ -1,0 +1,27 @@
+{
+  "id": "52b-final-installed-state",
+  "sendto_shortcut": true,
+  "gui_sha256": "e9a9aa1f42a8c2d355332381629ede4cb6cf532f9176bd9c6ee2fb39a1ab91e3",
+  "desktop_shortcut": true,
+  "gui_signature": "NotSigned",
+  "defender": {
+    "AMServiceEnabled": true,
+    "AntivirusEnabled": true,
+    "RealTimeProtectionEnabled": true
+  },
+  "ok": true,
+  "installer_sha256": "efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc",
+  "version": "0.6.0",
+  "resident_parent": "already-exited",
+  "resident": {
+    "ProcessId": 9556,
+    "ParentProcessId": 9668,
+    "ExecutablePath": "C:\\CitricaVM\\Aplicação João\\Citrica\\Citrica.exe"
+  },
+  "installer_signature": "NotSigned",
+  "settings": {
+    "shortcut": "Ctrl+Alt+C",
+    "drag_key": "Shift",
+    "animations": true
+  }
+}

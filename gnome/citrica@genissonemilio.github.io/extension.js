@@ -414,7 +414,7 @@ export default class Citrica extends Extension {
     }
 
     Status() {
-        return JSON.stringify({version: 3, revision: 2, appearance: 'annular-sectors',
+        return JSON.stringify({version: 3, revision: 3, appearance: 'annular-sectors',
             visible: !!this._wheel, dragging: this._drag, closing: this._closingViews.size,
             animation: this._wheel ? {opacity: this._wheel.opacity, scale: this._wheel.scale_x} : null,
             motion: this._view?.motionState() ?? null, cachedSelection: !!this._palette,
