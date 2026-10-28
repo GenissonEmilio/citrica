@@ -208,6 +208,23 @@ def test_media_metadata_edit(media, index):
     assert tags['title'] == 'Test title'
 
 
+@pytest.mark.skipif(not program('ffprobe'), reason='FFprobe não instalado')
+def test_media_metadata_probe_never_follows_remote_playlist(tmp_path, monkeypatch):
+    import citrica.tools as tools
+    real_run = tools.run_external
+
+    def force_hls_reader(args, **kwargs):
+        return real_run(args[:-1] + ['-f', 'hls', args[-1]], **kwargs)
+
+    monkeypatch.setattr(tools, 'run_external', force_hls_reader)
+    source = tmp_path / 'disguised.mp4'
+    source.write_text('#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:1\n'
+                      '#EXTINF:1,\nhttp://127.0.0.1:9/segment.ts\n#EXT-X-ENDLIST\n')
+    with pytest.raises(subprocess.CalledProcessError) as error:
+        tools.media_info(source)
+    assert 'not on whitelist' in error.value.stderr or 'Protocol not found' in error.value.stderr
+
+
 def test_redact_faces_positive_fixture(tmp_path):
     source = tmp_path / 'face.png'
     shutil.copyfile(Path(__file__).parent / 'fixtures/astronaut.png', source)

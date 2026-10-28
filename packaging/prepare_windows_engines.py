@@ -45,7 +45,7 @@ def download(entry, cache):
     if entry.get('fallback_url'):
         urls.append(entry['fallback_url'])
     last_error = None
-    for url in urls:
+    for url in [origin for origin in urls for _ in range(3)]:
         if urllib.parse.urlsplit(url).scheme != 'https':
             raise ValueError('A origem dos motores precisa usar HTTPS.')
         try:

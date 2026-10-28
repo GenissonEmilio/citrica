@@ -151,8 +151,13 @@
       }
     }
   },
-  "animation_scope": "GNOME disabled St animations in both software-rendered containers. Functional flow was tested; intermediate animation frames must be measured separately in the GNOME 50 test.",
-  "ubuntu_26_04": "Covered by the separate DEB installation CI matrix; no local native Ubuntu 26.04 compositor run claimed here.",
+  "animation_scope": "GNOME disabled St animations in both software-rendered Ubuntu containers. The separate Fedora GNOME 50 run with the frozen Ubuntu 24.04 backend observed 9 intermediate opening frames.",
+  "ubuntu_26_04": {
+    "gnome_shell_default_major": 50,
+    "local_native_ubuntu_26_04_compositor_run": false,
+    "native_package_ci": "Passed in the clean Ubuntu 26.04 container in run 40604357125; full receipt is in ci_deb_installation.results.26.04.",
+    "gnome_50_scope": "Native GNOME 50 validation ran separately on Fedora, not Ubuntu 26.04."
+  },
   "frozen_engine": {
     "builder": "Ubuntu 24.04 / Python 3.12.3 / glibc 2.39",
     "packaging_smoke_passed": true,
@@ -166,5 +171,117 @@
     ],
     "local_deb_sha256": "9434d773171e8818fc635009b3136bd8fca5de2c5b6c55059a8c71fb12aa0afc",
     "note": "Local validation build; public CI artifacts have their own checksums."
+  },
+  "release_status": "candidate; not a public 0.6.0 release",
+  "ci_deb_installation": {
+    "run_id": 40604357125,
+    "run_url": "https://github.com/GenissonEmilio/citrica/actions/runs/40604357125",
+    "head_commit": "ec00e005ec0d1fefbfeda6636fe9d931aa25a4dc",
+    "scope": "The Linux build and all three Ubuntu DEB jobs succeeded. This receipt makes no claim about the Windows job or overall workflow conclusion.",
+    "package_artifact": "https://github.com/GenissonEmilio/citrica/actions/runs/40604357125/artifacts/12779848087",
+    "package_file": "citrica_0.6.0_amd64.deb",
+    "results": {
+      "24.04": {
+        "version": "Cítrica 0.6.0",
+        "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+        "native_install": true,
+        "normal_user_launch": true,
+        "first_launch_setup": true,
+        "settings_screenshot": true,
+        "image_pdf_docx": true,
+        "uninstall": true,
+        "native_menu_ignores_old_portable_path": true,
+        "doctor": {
+          "version": "0.6.0",
+          "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+          "dependencies": {
+            "ffmpeg": null,
+            "libreoffice": null
+          },
+          "tools": {
+            "faces": true,
+            "text": true,
+            "qr": true,
+            "share": false
+          },
+          "desktop": {
+            "installed": false,
+            "active": false
+          }
+        }
+      },
+      "26.04": {
+        "version": "Cítrica 0.6.0",
+        "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+        "native_install": true,
+        "normal_user_launch": true,
+        "first_launch_setup": true,
+        "settings_screenshot": true,
+        "image_pdf_docx": true,
+        "uninstall": true,
+        "native_menu_ignores_old_portable_path": true,
+        "doctor": {
+          "version": "0.6.0",
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.43",
+          "dependencies": {
+            "ffmpeg": null,
+            "libreoffice": null
+          },
+          "tools": {
+            "faces": true,
+            "text": true,
+            "qr": true,
+            "share": false
+          },
+          "desktop": {
+            "installed": false,
+            "active": false
+          }
+        }
+      },
+      "26.10": {
+        "version": "Cítrica 0.6.0",
+        "os_release": "PRETTY_NAME=\"Ubuntu 26.10\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.10\"\nVERSION=\"26.10 (Stonking Stingray)\"\nVERSION_CODENAME=stonking\nRELEASE_TYPE=stable\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nDOCUMENTATION_URL=\"https://docs.ubuntu.com\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nLOGO=ubuntu-logo\nVENDOR_NAME=\"Canonical\"\nVENDOR_URL=\"https://canonical.com/\"\nUBUNTU_CODENAME=stonking\n",
+        "native_install": true,
+        "normal_user_launch": true,
+        "first_launch_setup": true,
+        "settings_screenshot": true,
+        "image_pdf_docx": true,
+        "uninstall": true,
+        "native_menu_ignores_old_portable_path": true,
+        "doctor": {
+          "version": "0.6.0",
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.44",
+          "dependencies": {
+            "ffmpeg": null,
+            "libreoffice": null
+          },
+          "tools": {
+            "faces": true,
+            "text": true,
+            "qr": true,
+            "share": false
+          },
+          "desktop": {
+            "installed": false,
+            "active": false
+          }
+        }
+      }
+    }
+  },
+  "native_onboarding_additional_step": {
+    "status": "pending rerun",
+    "step": "Final --setup --settings --screenshot inside tests/desktop/run_session.py, after the native flow.",
+    "reason": "Added after the native 46/50/51 runs. No compositor was launched again while the Windows VM needed the available memory.",
+    "already_verified": "Unit tests for setup idempotence passed; the frozen package first launch passed offscreen on all three Ubuntu versions."
+  },
+  "gnome_50_animation_separate_validation": {
+    "environment": "Fedora / GNOME 50 / Wayland, isolated compositor",
+    "backend": "Frozen Ubuntu 24.04 candidate 0.6.0 build",
+    "intermediate_opening_frames": 9,
+    "intermediate_states_observed": true,
+    "opening_ms": 240,
+    "note": "This is GNOME 50 validation on Fedora, not a native Ubuntu 26.04 VM run."
   }
 }

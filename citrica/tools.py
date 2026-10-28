@@ -135,7 +135,8 @@ def media_info(path):
     executable = program('ffprobe')
     if not executable:
         raise ConversionError('FFprobe não encontrado. Instale FFmpeg com FFprobe.')
-    result = run_external([executable, '-v', 'error', '-show_format', '-show_streams', '-of', 'json', str(path)],
+    result = run_external([executable, '-v', 'error', '-protocol_whitelist', 'file,pipe',
+                           '-show_format', '-show_streams', '-of', 'json', str(path)],
                           check=True, capture_output=True, text=True, encoding='utf-8', timeout=30)
     return json.loads(result.stdout)
 

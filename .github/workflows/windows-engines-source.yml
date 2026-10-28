@@ -1,14 +1,6 @@
 name: Windows engines from corresponding source
 on:
   workflow_dispatch:
-  push:
-    branches: [codex/windows-ubuntu-compatibility]
-    paths:
-      - .github/workflows/windows-engines-source.yml
-      - packaging/build_windows_source_engines.py
-      - packaging/build_ffmpeg_windows.sh
-      - packaging/windows-sources.lock.json
-      - packaging/prepare_windows_engines.py
 
 permissions:
   contents: read

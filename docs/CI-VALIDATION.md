@@ -4,9 +4,11 @@ Esta configuração prepara candidatos para validação. Um workflow verde não 
 
 ## Build de teste por workflow_dispatch
 
-No workflow **Testes e release Linux e Windows**, escolha a branch candidata e execute manualmente. O dispatch não cria tag nem release. O Windows usa motores offline preparados por `packaging/prepare_windows_engines.py`, com versões/origens/SHA-256 registrados em `packaging/windows-engines.lock.json`.
+No workflow **Testes e release Linux e Windows**, escolha a branch candidata e execute manualmente. O dispatch não cria tag nem release. Por padrão, o Windows usa motores offline provisórios preparados por `packaging/prepare_windows_engines.py`, com versões/origens/SHA-256 registrados em `packaging/windows-engines.lock.json`. Esse caminho de binários vendor serve somente para QA na VM; não satisfaz a exigência de fontes correspondentes de uma release.
 
-O runner precisa de 7-Zip, já listado na imagem Windows Server 2022 do GitHub. O CI verifica sua presença; não instala FFmpeg, Tesseract ou LibreOffice no sistema. A árvore resultante fica em `build/windows-engines`, exposta aos testes por `CITRICA_WINDOWS_ENGINES` e copiada para `_internal` no pacote. [Inventário oficial do runner](https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md).
+Para testar o caminho de publicação, marque **windows_engine_sources** no dispatch. O CI prepara MSYS2/MinGW e confere Visual Studio 2022/CMake, então executa `packaging/build_windows_source_engines.py` para compilar FFmpeg/codecs e OCR dos fontes fixados em `packaging/windows-sources.lock.json`. O resultado inclui `engine-sources.zip`, receitas, configuração e registros de toolchain. O LibreOffice continua vindo do MSI upstream documentado. Esta opção compila no próprio run, sem reaproveitar artefatos de procedência diferente. A compilação demora mais; a assinatura continua desabilitada nesse candidato de teste.
+
+O caminho vendor precisa de 7-Zip, já listado na imagem Windows Server 2022 do GitHub. O CI verifica sua presença; não instala FFmpeg, Tesseract ou LibreOffice no sistema. Ambos os caminhos produzem a árvore `build/windows-engines`, exposta aos testes por `CITRICA_WINDOWS_ENGINES` e copiada para `_internal` no pacote. [Inventário oficial do runner](https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md).
 
 Os testes unitários sintetizam mídia usando o FFmpeg dessa árvore. O build congelado executa a matriz de todas as extensões suportadas, removendo esse PATH e os overrides para comprovar o uso dos motores distribuídos. As regressões da roda também preservam o teste do motor básico DOCX/PDF, forçado com `CITRICA_OFFICE_ENGINE=builtin` dentro do roteiro Explorer.
 
@@ -27,6 +29,8 @@ Três jobs independentes baixam esse mesmo pacote em containers limpos **Ubuntu 
 ## Tags e publicação
 
 Os pacotes Windows de tags públicas exigem assinatura Authenticode. Sem `CITRICA_SIGN_CERT_SHA1` válido e o certificado/chave privada acessível no Certificate Store do runner, o job Windows falha antes de preparar os motores e compilar seu pacote. A variável contém somente o identificador público do certificado; ela não provisiona a chave. O build Linux é independente dessa exigência de assinatura Windows.
+
+Tags sempre escolhem a compilação dos motores por fonte; a preparação vendor é ignorada, independentemente dos inputs. `CITRICA_RELEASE_REQUIRE_ENGINE_SOURCES=1` exige a procedência `compiled-from-pinned-sources` e o pacote de fontes no build. Os mesmos testes de paridade, instalação e Explorer são executados sobre o resultado. O CI inclui as fontes correspondentes entre os arquivos finais e confere seu SHA-256 no relatório antes de criar a release.
 
 O caminho atual é uma preparação para certificado próprio acessível pelo Windows/HSM. Nenhuma chave privada é importada pelo workflow. Se for adotado SignPath ou Store, o mantenedor precisará configurar o fluxo do serviço aprovado; preencher um thumbprint não substitui essa etapa. Consulte [WINDOWS-SIGNING.md](WINDOWS-SIGNING.md).
 

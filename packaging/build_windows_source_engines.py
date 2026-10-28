@@ -63,18 +63,55 @@ def copy_notices(sources, target):
                 shutil.copy2(file, destination / file.name)
 
 
+def verified_office_reuse(office, pinned):
+    """Reuse only the intact Office tree from a package with the same MSI pin.
+
+    Checking only soffice.com would let a different Office version be bundled
+    while engines.json still described the pinned upstream MSI. The original
+    package's metadata and complete file inventory establish which tree is
+    being reused, including its merge-module CRT files and upstream notices.
+    """
+    office = Path(office).resolve()
+    require_file(office / 'program/soffice.com')
+    package = office.parent.parent
+    try:
+        metadata = json.loads((package / 'engines.json').read_text(encoding='utf-8'))
+        inventory = json.loads((package / 'engine-files.sha256.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError) as error:
+        raise RuntimeError('--office-from exige a pasta Office de um pacote Cítrica com manifesto e inventário.') from error
+    original = metadata.get('libreoffice') if isinstance(metadata, dict) else None
+    if (not isinstance(original, dict) or original.get('sha256') != pinned['sha256'] or
+            original.get('version') != pinned['version']):
+        raise RuntimeError('--office-from contém uma versão LibreOffice diferente do MSI fixado para este build.')
+    if not isinstance(inventory, dict):
+        raise RuntimeError('Inventário Office inválido no pacote reutilizado.')
+    prefix = 'tools/libreoffice/'
+    expected = {name[len(prefix):]: value for name, value in inventory.items()
+                if isinstance(name, str) and name.startswith(prefix)}
+    actual = {file.relative_to(office).as_posix(): file for file in office.rglob('*') if file.is_file()}
+    if not expected or expected.keys() != actual.keys():
+        raise RuntimeError('A pasta Office foi alterada: arquivos ausentes ou extras em relação ao inventário.')
+    for name, file in actual.items():
+        if digest(file) != expected[name]:
+            raise RuntimeError(f'A pasta Office foi alterada: SHA-256 diferente para {name}.')
+    return office
+
+
 def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None, office_from=None):
     if sys.platform != 'win32':
         raise RuntimeError('A compilação usa os toolchains Windows MSYS2 e Visual Studio2022.')
     output, cache, work = (Path(p).resolve() for p in [output, cache, work])
+    lock = json.loads(LOCK.read_text(encoding='utf-8'))
+    vendors = json.loads(VENDOR_LOCK.read_text(encoding='utf-8'))
+    office = verified_office_reuse(office_from, vendors['libreoffice']) if office_from else None
+    if office and (office.is_relative_to(output) or office.is_relative_to(work)):
+        raise RuntimeError('--office-from precisa estar fora das pastas de saída e trabalho que serão recriadas.')
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True)
     if output.exists():
         shutil.rmtree(output)
     output.mkdir(parents=True)
-    lock = json.loads(LOCK.read_text(encoding='utf-8'))
-    vendors = json.loads(VENDOR_LOCK.read_text(encoding='utf-8'))
     archives = {name: download(entry, cache / 'sources') for name, entry in lock['sources'].items()}
     source_root = work / 'source'
     sources = {}
@@ -126,10 +163,7 @@ def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None, office_from=N
     if toolchain_licenses.is_dir():
         shutil.copytree(toolchain_licenses, output / 'tools/ffmpeg/licenses/toolchain')
 
-    if office_from:
-        office = Path(office_from).resolve()
-        require_file(office / 'program/soffice.com')
-    else:
+    if office is None:
         archive = download(vendors['libreoffice'], cache)
         office = extract_office(archive, work / 'office-extract', cache / 'libreoffice-source-engine-extract.log')
     shutil.copytree(office, output / 'tools/libreoffice')
@@ -154,6 +188,7 @@ def prepare(output=OUTPUT, cache=CACHE, work=WORK, msys_bash=None, office_from=N
                         'python packaging/build_windows_source_engines.py --cache downloads '
                         '--office-from "C:/path/to/Citrica/_internal/tools/libreoffice"\n'
                         'The provided archive/model cache is verified by SHA-256 before compilation.\n'
+                        '--office-from requires the intact Cítrica engine manifest and file inventory.\n'
                         'Without --office-from, the script explicitly downloads the pinned Office MSI.\n'
                         'Sources are unmodified; build configuration and toolchain records are included.\n')
         for file in (work / 'ffmpeg-build').rglob('*'):

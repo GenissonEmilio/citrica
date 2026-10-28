@@ -32,16 +32,24 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('executable', help='Packaged executable or --source')
     parser.add_argument('--same-folder', action='store_true')
+    parser.add_argument('--bundled-engines', action='store_true',
+                        help='also drag examples of every conversion family using the bundled engines')
     # Keep the existing --source invocation accepted as a positional value.
     arguments = parser.parse_args(['source' if arg == '--source' else arg for arg in sys.argv[1:]])
-    run_id = SCALE + ('-same-folder' if arguments.same_folder else '')
+    run_id = SCALE + ('-same-folder' if arguments.same_folder else '') + ('-bundled' if arguments.bundled_engines else '')
     STATE = ROOT / f'build/windows-explorer-{run_id}'
     STATE.mkdir(parents=True, exist_ok=True)
     (ROOT/'release').mkdir(exist_ok=True)
     os.environ['APPDATA'] = str(STATE/'config')
     os.environ['LOCALAPPDATA'] = str(STATE/'local')
-    os.environ['CITRICA_OFFICE_ENGINE'] = 'builtin'
-    faulthandler.dump_traceback_later(100, exit=True)
+    if arguments.bundled_engines:
+        assert arguments.executable != 'source', 'This test requires the packaged engines'
+        for name in ['CITRICA_OFFICE_ENGINE', 'CITRICA_WINDOWS_ENGINES', 'CITRICA_TOOL_DIR', 'CITRICA_OCR_DIR']:
+            os.environ.pop(name, None)
+        os.environ['PATH'] = str(Path(os.environ['SystemRoot']) / 'System32')
+    else:
+        os.environ['CITRICA_OFFICE_ENGINE'] = 'builtin'
+    faulthandler.dump_traceback_later(600 if arguments.bundled_engines else 100, exit=True)
     app = QApplication([])
     user = ctypes.WinDLL('user32', use_last_error=True)
     user.SendInput.argtypes = [wintypes.UINT, ctypes.POINTER(Input), ctypes.c_int]
@@ -62,7 +70,7 @@ def main():
         while time.monotonic() < until:
             app.processEvents()
             time.sleep(.01)
-    def wait(predicate, timeout=15):
+    def wait(predicate, timeout=30):
         until = time.monotonic()+timeout
         current = None
         while time.monotonic() < until:
@@ -91,12 +99,32 @@ def main():
     Image.new('RGB', (320, 200), 'orange').save(source_image)
     originals = {p: hashlib.sha256(p.read_bytes()).digest()
                  for p in [source_docx, source_pdf, source_image, source_tools]}
+    engine_examples = []
+    if arguments.bundled_engines:
+        from engine_parity import FORMATS, fixtures, run
+        cli = Path(arguments.executable).resolve().with_name('citrica-cli.exe')
+        doctor = json.loads(run([cli, '--doctor'], os.environ.copy()))
+        seed_dir = folder / 'engine-seeds'
+        seed_dir.mkdir(exist_ok=True)
+        examples = {'image': ('.png', 'jpg'), 'document': ('.odt', 'pdf'),
+                    'sheet': ('.xlsx', 'pdf'), 'slides': ('.pptx', 'pdf'),
+                    'video': ('.mp4', 'webm'), 'audio': ('.wav', 'mp3'),
+                    'subtitle': ('.srt', 'vtt'), 'archive': ('.zip', 'tar')}
+        for family, source in fixtures(seed_dir, doctor['dependencies']['ffmpeg'],
+                                       doctor['dependencies']['libreoffice'], os.environ.copy()):
+            if family in examples and source.suffix == examples[family][0]:
+                path = fixture('bundled-' + family, 'Citrica-' + family + source.suffix)
+                path.write_bytes(source.read_bytes())
+                engine_examples.append((family, path, examples[family][1], FORMATS[family]))
+                originals[path] = hashlib.sha256(path.read_bytes()).digest()
+        assert len(engine_examples) == len(examples)
     command = ([sys.executable, '-m', 'citrica'] if arguments.executable == 'source' else
                [str(Path(arguments.executable).resolve())])
     resident_log = (STATE/'resident.log').open('w', encoding='utf-8')
     resident = subprocess.Popen([*command, '--background'], stdout=resident_log, stderr=subprocess.STDOUT)
     hwnd = None
-    report = {'real_explorer': True, 'qt_scale_factor': SCALE, 'office_engine': 'builtin',
+    report = {'real_explorer': True, 'qt_scale_factor': SCALE,
+              'office_engine': 'bundled' if arguments.bundled_engines else 'builtin',
               'same_folder': arguments.same_folder, 'cases': {}}
     try:
         wait(lambda s: s['hotkey_active'])
@@ -124,7 +152,7 @@ def main():
         user.SetForegroundWindow(hwnd)
         pause(.5)
 
-        def drag(path, mode, vk, target):
+        def drag(path, mode, vk, target, formats=None):
             print(f'Explorer: selecionar {path.name}; modo {mode}.', flush=True)
             # In the shared-folder regression, stay in the same view while
             # conversion outputs arrive and Explorer asynchronously sorts them.
@@ -146,7 +174,8 @@ def main():
             for attempt in range(6):
                 window.Document.SelectItem(window.Document.Folder.ParseName(path.name), 1|4|8|16)
                 pause(.3)
-                info = subprocess.run(['powershell', '-NoProfile', '-File',
+                powershell = Path(os.environ['SystemRoot']) / 'System32/WindowsPowerShell/v1.0/powershell.exe'
+                info = subprocess.run([str(powershell), '-NoProfile', '-File',
                     str(ROOT/'tests/windows/explorer_item.ps1'), str(hwnd), path.name, path.stem],
                     capture_output=True, text=True, timeout=20)
                 if info.returncode:
@@ -180,6 +209,10 @@ def main():
             wheel = wait(lambda s: s['visible'] and s['mode'] == mode and
                          any(i['id'] == target for i in s['items']))
             assert wheel['paths'] == [str(path)]
+            if formats is not None:
+                actual = [item['id'] for item in wheel['items'] if item['kind'] != 'page']
+                expected = formats[:7] if len(formats) > 7 else formats
+                assert actual == expected, (path, actual, expected)
             print(f'Explorer: roda {mode} carregada sem novo movimento.', flush=True)
             index = next(i for i, item in enumerate(wheel['items']) if item['id'] == target)
             angle = -math.pi/2 + index*math.tau/len(wheel['items'])
@@ -217,13 +250,21 @@ def main():
         key(0x1b, True)
         key(0x1b, False)
         report['cases']['alt_tools'] = True
+        for family, path, target, formats in engine_examples:
+            previous = send({'op': 'status'})['counts']['converted']
+            drag(path, 'convert', 0x10, target, formats)
+            wait(lambda s: not s['busy'] and s['counts']['converted'] == previous + 1, timeout=60)
+            output = path.with_suffix('.' + target)
+            assert output.is_file() and output.stat().st_size > 0, output
+            report['cases']['bundled_' + family] = {'input': path.suffix, 'output': target,
+                                                    'palette_verified': True, 'converted': True}
         for path, digest in originals.items():
             assert hashlib.sha256(path.read_bytes()).digest() == digest
         report['originals_preserved'] = True
         report['result'] = 'passed'
         (ROOT/f'release/citrica-windows-explorer-{run_id}-validation.json').write_text(
             json.dumps(report, indent=2), encoding='utf-8')
-        print(f'Explorer real: Ctrl, Alt, Shift, DOCX/PDF sem Office e PDF→DOCX passaram ({run_id}).')
+        print(f'Explorer real: Ctrl, Alt, Shift, DOCX/PDF e PDF→DOCX passaram ({run_id}).')
         faulthandler.cancel_dump_traceback_later()
     except Exception:
         try:
