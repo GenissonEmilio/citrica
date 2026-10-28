@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "name": "Emilians.Ctrica",
+  "publisher": "CN=4F26C959-AACA-4166-BA27-5DE331C059E7",
+  "publisher_display_name": "Emilians",
+  "display_name": "Cítrica",
+  "store_id": "9NV389WMRJNC",
+  "package_family_name": "Emilians.Ctrica_dtz50gxq3qxna",
+  "store_version": "1.6.0.0",
+  "architecture": "x64",
+  "min_os_version": "10.0.19041.0",
+  "max_tested_os_version": "10.0.26100.0",
+  "startup_task_id": "CitricaStartup"
+}

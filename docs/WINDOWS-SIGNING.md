@@ -37,7 +37,7 @@ $env:CITRICA_SIGNING_REQUIRED = '1'
 $env:CITRICA_SIGNTOOL = 'C:\Program Files (x86)\Windows Kits\10\bin\VERSAO_DO_SDK\x64\signtool.exe'
 
 python packaging/sign_windows.py --sign --report build\assinatura-launchers.json `
-  dist\Citrica\Citrica.exe dist\Citrica\citrica-cli.exe dist\Citrica\citrica-stop.exe
+  dist\Citrica\Citrica.exe dist\Citrica\citrica-cli.exe dist\Citrica\citrica-stop.exe dist\Citrica\citrica-package.exe
 
 python packaging/sign_windows.py --verify --report build\assinatura-setup.json `
   release\citrica-VERSAO-windows-x86_64-setup.exe
@@ -50,7 +50,7 @@ Assinaturas válidas de fornecedores são preservadas. Uma assinatura já existe
 ## Ordem de empacotamento
 
 1. Compilar e testar os executáveis, com os metadados de produto/versão.
-2. Assinar os launchers próprios e o helper nativo `citrica-stop.exe`, antes de criar o ZIP ou compilar o instalador.
+2. Assinar os launchers próprios e os helpers nativos `citrica-stop.exe` e `citrica-package.exe`, antes de criar o ZIP ou compilar o instalador.
 3. Configurar Inno Setup com `inno_signing_arguments(config)`. O `windows.iss` habilita `SignTool=citrica` e `SignedUninstaller=yes` somente com `SigningEnabled`.
 4. Compilar: o callback assina e verifica Setup e o desinstalador embutido.
 5. Verificar o instalador final; instalar/desinstalar numa VM limpa; gerar checksums apenas após as assinaturas. Não modificar os binários depois.
@@ -66,3 +66,5 @@ O helper local não se conecta à SignPath. Depois da aprovação, configure o f
 MSIX é outro canal, que precisa usar a identidade real fornecida pelo Partner Center. Depois de verificar a conta e reservar o produto, os campos públicos necessários são **Package/Identity/Name**, **Package/Identity/Publisher** e **Package/Properties/PublisherDisplayName**, em Product management → Product identity. Não precisamos receber documento, selfie ou senha. [Identidade do aplicativo](https://learn.microsoft.com/en-us/windows/apps/publish/view-app-identity-details). Antes da submissão, validar o aplicativo desktop empacotado, roda global, tray, subprocessos, startup e preferências; não basta colocar uma assinatura em um manifesto fictício. A adaptação deve passar pelo Windows App Certification Kit e pela certificação da Store. [Requisitos de pacotes Microsoft](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/package-version-numbering).
 
 O produto Cítrica foi reservado em 28/10/2026 e os três campos oficiais de identidade foram obtidos. O pacote MSIX ainda será preparado e testado antes de uma submissão. Para repetir o cadastro em outro projeto, o fluxo no painel é **Novo produto → Aplicativo MSIX ou PWA**, verificar a disponibilidade de **Cítrica** e reservar o nome disponível escolhido pelo mantenedor. Depois, abrir **Gerenciamento de produtos → Identidade do produto** e fornecer os três campos acima para preparar o pacote MSIX. Criar o produto não publica o aplicativo; envio do pacote e certificação são etapas posteriores. [Fluxo oficial de cadastro e submissão](https://learn.microsoft.com/en-us/windows/apps/publish/get-started).
+
+O produto Cítrica já tem identidade reservada. O canal MSIX e sua variante de QA são descritos em [Microsoft Store](WINDOWS-STORE.md); os binários da release 0.6.0 publicada permanecem os mesmos, sem assinatura pública.

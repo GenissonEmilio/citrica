@@ -17,6 +17,11 @@ on:
         required: false
         type: string
         default: '12840413543'
+      build_msix:
+        description: Build separate unsigned Store and QA MSIX packages after packaged QA succeeds
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
@@ -75,3 +80,63 @@ jobs:
     with:
       source_run_id: ${{ inputs.source_run_id }}
       source_artifact_id: ${{ inputs.source_artifact_id }}
+
+  msix:
+    if: ${{ inputs.reuse_source_engines && inputs.build_msix }}
+    needs: repack
+    runs-on: windows-2022
+    timeout-minutes: 30
+    env:
+      PYTHONUTF8: '1'
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Dependencies for original logo rendering and manifest tests
+        run: python -m pip install -r requirements.lock
+      - name: Download only the successfully tested payload from this run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: citrica-windows-repack-unsigned-test
+          path: build/msix-artifact
+      - name: Extract one complete portable application without path traversal
+        shell: python
+        run: |
+          import shutil, stat, zipfile
+          from pathlib import Path, PurePosixPath
+          archives = list(Path('build/msix-artifact').rglob('*-portable-unsigned-test.zip'))
+          if len(archives) != 1:
+              raise SystemExit('Expected exactly one portable payload from successful packaged QA.')
+          destination = Path('build/msix-input')
+          destination.mkdir(exist_ok=False)
+          with zipfile.ZipFile(archives[0]) as archive:
+              for item in archive.infolist():
+                  name = item.filename
+                  if (not name.startswith('Citrica/') or '\\' in name or ':' in name or
+                          '..' in PurePosixPath(name).parts or item.orig_filename != name or
+                          stat.S_ISLNK(item.external_attr >> 16)):
+                      raise SystemExit('Unsafe portable archive member.')
+              archive.extractall(destination)
+          # The original QA artifact remains on GitHub. Remove only this job's
+          # downloaded copy so both MSIX variants fit on the hosted runner.
+          shutil.rmtree('build/msix-artifact')
+      - name: Manifest, identity and staging regression tests
+        run: python -m pytest tests/test_windows_msix.py tests/test_windows_package.py -q
+      - name: Build official-identity Store package and explicitly separate unsigned QA variant
+        run: >-
+          python packaging/build_msix.py --payload build/msix-input/Citrica
+          --identity packaging/windows-store-identity.json
+          --staging build/msix-stage --output release/msix --mode both
+      - name: Preserve packages and build reports without publishing or submitting
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: citrica-msix-store-and-qa-unsigned
+          path: |
+            release/msix/*
+            build/msix-stage/**/AppxManifest.xml
+          if-no-files-found: warn
+          retention-days: 14
