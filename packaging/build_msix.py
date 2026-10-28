@@ -244,7 +244,9 @@ def manifest(identity, mode):
                   Description='Conversão local de arquivos com roda global.', BackgroundColor='transparent',
                   Square150x150Logo=r'Assets\Square150x150Logo.png', Square44x44Logo=r'Assets\Square44x44Logo.png')
     startup = ET.SubElement(ET.SubElement(app, tag('Extensions')), tag('Extension', 'desktop'), {
-        'Category': 'windows.startupTask', 'Executable': r'Citrica\Citrica.exe',
+        # Inherit the application's executable and modern activation attributes.
+        # An explicit Executable here requires a separate legacy EntryPoint.
+        'Category': 'windows.startupTask',
         tag('Parameters', 'uap10'): '--background',
     })
     ET.SubElement(startup, tag('StartupTask', 'desktop'), TaskId='CitricaStartup', Enabled='false',

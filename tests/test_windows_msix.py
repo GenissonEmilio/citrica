@@ -90,6 +90,7 @@ def test_manifest_uses_full_trust_startup_and_safe_xml(builder, mode):
     assert app.get('EntryPoint') is None, 'Modern activation attributes do not need a redundant legacy entry point'
     startup = app.find('f:Extensions/desktop:Extension', namespaces)
     assert startup.get('Category') == 'windows.startupTask'
+    assert startup.get('Executable') is None, 'StartupTask must inherit the modern application activation'
     assert startup.get('{' + builder.NS['uap10'] + '}Parameters') == '--background'
     task = startup.find('desktop:StartupTask', namespaces)
     assert task.attrib == {'TaskId': 'CitricaStartup', 'Enabled': 'false',
