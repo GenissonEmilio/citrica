@@ -14,5 +14,8 @@
   "website": "https://github.com/GenissonEmilio/citrica",
   "support_url": "https://github.com/GenissonEmilio/citrica/issues",
   "privacy_url": "https://github.com/GenissonEmilio/citrica/blob/main/docs/PRIVACIDADE.md",
-  "full_trust_justification": "O Cítrica é um aplicativo desktop Qt/Win32. O menu radial acompanha arrastes reais do Explorador, usa atalhos globais, OLE e área de transferência, permanece na bandeja e executa motores locais de conversão em subprocessos. A aplicação usa o nível normal do usuário, acessa arquivos escolhidos por ele e não solicita execução como administrador."
+  "full_trust_justification": "O Cítrica é um aplicativo desktop Qt/Win32. O menu radial acompanha arrastes reais do Explorador, usa atalhos globais, OLE e área de transferência, permanece na bandeja e executa motores locais de conversão em subprocessos. A aplicação usa o nível normal do usuário, acessa arquivos escolhidos por ele e não solicita execução como administrador.",
+  "license": "AGPL-3.0-or-later",
+  "license_url": "https://github.com/GenissonEmilio/citrica/blob/main/LICENSE",
+  "license_text": "Este aplicativo é distribuído sob a licença GNU Affero GPL versão 3 ou posterior (AGPL-3.0-or-later). Código-fonte: https://github.com/GenissonEmilio/citrica . Texto da licença: https://github.com/GenissonEmilio/citrica/blob/main/LICENSE . As licenças e os avisos das dependências acompanham o aplicativo em THIRD_PARTY.md e na pasta licenses."
 }

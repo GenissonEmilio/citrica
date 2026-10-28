@@ -6,9 +6,12 @@ para adicionar suporte à Store. O pacote Store exige uma compilação que já
 contenha o adaptador `citrica-package.exe` e o runtime com suporte à identidade,
 StartupTask, preferências e IPC de MSIX.
 
-**Estado:** o builder e seus testes locais não comprovam compilação pelo
-Windows SDK, instalação na VM, aprovação no WACK, assinatura ou certificação da
-Store. Esses resultados são registrados separadamente pelos testes reais.
+**Estado:** as duas variantes `1.6.0.0` passaram pelo MakeAppx real do SDK
+Microsoft, com validação habilitada. O recibo em
+[`evidence/store/makeappx-1.6.0.0.json`](evidence/store/makeappx-1.6.0.0.json)
+registra hashes, commits, exclusões e limites dessa validação. Instalação na VM,
+WACK, assinatura e certificação são etapas separadas; não são comprovadas pelo
+empacotamento. O envio no Partner Center permanece em rascunho.
 
 ## Identidade pública
 

@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "scope": "Windows SDK MakeAppx only; installed runtime tests recorded separately",
+  "runtime_commit": "cf18e113f9498c41b6c3fe52cd7f639c62f7ebf0",
+  "builder_commit": "48d316a5cb9d28bbd3ee89d001f245d64073a255",
+  "source_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40778327745",
+  "source_artifact_id": 12858100727,
+  "source_run_result": "failure in first default-scale Explorer harness; subsequent successful cases do not override this failure",
+  "portable_sha256": "d4b777a056084f37ce2ff185602441b1b80a891035d56f49f3a71d06f30f00c4",
+  "makeappx": {
+    "source": "Microsoft.Windows.SDK.BuildTools 10.0.26100.9169",
+    "sha256": "4af1d305419ae4c6b5bbb7a0a2893dd893214dd337131378e8e21f7257d3fd19",
+    "arguments": [
+      "pack",
+      "/v",
+      "/d",
+      "<new-staging>",
+      "/p",
+      "<new-package>"
+    ],
+    "validation_disabled": false
+  },
+  "input_payload_unchanged_verified": true,
+  "runtime_files": {
+    "Citrica.exe": {
+      "size": 10245361,
+      "sha256": "55776d7de73c9712742eb8ee002924af994df1e84543005ebbe8d7175d0ffcca"
+    },
+    "citrica-cli.exe": {
+      "size": 10250481,
+      "sha256": "f3c0273a07ae354e19caa76f85023a116be9d7f3b8457e2cd1c2b685580c533e"
+    },
+    "citrica-package.exe": {
+      "size": 206848,
+      "sha256": "fe43e690e198f33b0ef60aaa3054e80666705ebe43d4b6068d2e9c9fef8985de"
+    },
+    "citrica-stop.exe": {
+      "size": 203264,
+      "sha256": "3bdb8922b1425fc201129c8afbb4195e0d6d3923339bc162a8cbf9564259581b"
+    }
+  },
+  "runtime_default_docx": {
+    "size": 38116,
+    "sha256": "2094b5bddffe9cf973d61fe03388413804f034160718494a65db7e98da40d35d"
+  },
+  "excluded_input_files": [
+    {
+      "path": "_internal/docx/templates/default-docx-template/[Content_Types].xml",
+      "size": 1782,
+      "sha256": "888a7cd9d95d0998436a499759f30530350ce1acf84d3c07ef47ed6aba489e9e",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/_rels/.rels",
+      "size": 748,
+      "sha256": "f8bc20b7e1d59262abbdc48f9ffa6aca57468688bbd40dc627817732732526b3",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/customXml/_rels/item1.xml.rels",
+      "size": 300,
+      "sha256": "32fa6ddf5bdffdeec97e77d0805928f4d2411f23a3335d1ee0449b740ce1d84d",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/customXml/item1.xml",
+      "size": 262,
+      "sha256": "a86086ffc5d8e83ebd6c71a55d1d2efaa31b137977f5f3a752366e1023612144",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/customXml/itemProps1.xml",
+      "size": 354,
+      "sha256": "c542307b13ec29a8b546217bb37936ab4822e044b265d2952985ec3d6afed24e",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/docProps/app.xml",
+      "size": 1132,
+      "sha256": "be664981c3141cddfc59362beb287ebf20d0773660e2dd6faac5968a5930a081",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/docProps/core.xml",
+      "size": 753,
+      "sha256": "10bfd20ea5d9c8ab0236a2f4e49f99cdb207aac6711e4780cf7a390b322a1d40",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/docProps/thumbnail.jpeg",
+      "size": 8324,
+      "sha256": "96367138dc44ce09bf2c8f0f8e49348a1478d2c5c0af69bbc2bbc38b63cdcead",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/_rels/document.xml.rels",
+      "size": 1253,
+      "sha256": "4f2b7b47d8a7d10d44e3bad6d03829ba2e755cc8b29a2d35a49eef79ed7b11d6",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/document.xml",
+      "size": 1594,
+      "sha256": "f5154b3c5dae749abb0e381e10ea02e19e137650065c4b1f11b059c6d75340bf",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/fontTable.xml",
+      "size": 2811,
+      "sha256": "79385fb7f60247507ecaffc292e9ebd52ea0657b8634f629ba6fccc54011d6bb",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/numbering.xml",
+      "size": 6747,
+      "sha256": "ca605d64e9ba232fd8ff401d700669f7b5c4351865b1c16b91fd5a4aac9be249",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/settings.xml",
+      "size": 2749,
+      "sha256": "31522d2d3c366aec5714c921ce556b4838ca7faa33fa795a66dc32575c710b27",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/styles.xml",
+      "size": 438677,
+      "sha256": "09e350b95e121e7b63841485a6adacf2facd496c189297b2dba634bbb2898a88",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/stylesWithEffects.xml",
+      "size": 438131,
+      "sha256": "463ae0928cf0d84775dbf8cf18d6c3029f6707c81bf590f6d6dd8757a5e93f15",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/theme/theme1.xml",
+      "size": 10939,
+      "sha256": "e3a8ab7db9ca7afca56f5f2820a56e8b660016c647773555b060b0a02ac76941",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/webSettings.xml",
+      "size": 438,
+      "sha256": "349d36de7434d09f86987ff671d8814964a0588c1e630c06e562cda7e75e9f95",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    }
+  ],
+  "packages": [
+    {
+      "variant": "store",
+      "identity": {
+        "schema": 1,
+        "name": "Emilians.Ctrica",
+        "publisher": "CN=4F26C959-AACA-4166-BA27-5DE331C059E7",
+        "publisher_display_name": "Emilians",
+        "display_name": "Cítrica",
+        "store_id": "9NV389WMRJNC",
+        "package_family_name": "Emilians.Ctrica_dtz50gxq3qxna",
+        "store_version": "1.6.0.0",
+        "architecture": "x64",
+        "min_os_version": "10.0.19041.0",
+        "max_tested_os_version": "10.0.26100.0",
+        "startup_task_id": "CitricaStartup"
+      },
+      "store_identity": true,
+      "unsigned_test_oid": false,
+      "makeappx_validation": "passed",
+      "makeappx_returncode": 0,
+      "package": "Citrica_1.6.0.0_x64_store-unsigned.msix",
+      "package_sha256": "1fbe9fcaaf64bab25a1afc247225ad55585e18433581e5f3e7db1b0a8c0654ac",
+      "signed": false,
+      "store_certified": false
+    },
+    {
+      "variant": "qa",
+      "identity": {
+        "schema": 1,
+        "name": "Emilians.Ctrica.UnsignedQA",
+        "publisher": "CN=4F26C959-AACA-4166-BA27-5DE331C059E7, OID.2.25.311729368913984317654407730594956997722=1",
+        "publisher_display_name": "Emilians",
+        "display_name": "Cítrica · QA unsigned",
+        "store_id": null,
+        "package_family_name": null,
+        "store_version": "1.6.0.0",
+        "architecture": "x64",
+        "min_os_version": "10.0.19041.0",
+        "max_tested_os_version": "10.0.26100.0",
+        "startup_task_id": "CitricaStartup"
+      },
+      "store_identity": false,
+      "unsigned_test_oid": true,
+      "makeappx_validation": "passed",
+      "makeappx_returncode": 0,
+      "package": "Citrica_1.6.0.0_x64_qa-unsigned-NOT-FOR-STORE.msix",
+      "package_sha256": "3a1bdfa3bb375f148fa612f4a568240c37561de56e78f7a5d5ccb503a774502c",
+      "signed": false,
+      "store_certified": false
+    }
+  ],
+  "sdk_artifact_receipts": [
+    {
+      "file": "msix-final-build-report-48d316a.json",
+      "size": 4179184,
+      "sha256": "5a45705fff9bd61cc248e1ba5c78fd3bd9c1fac1aa493663e38085b120fedc1d"
+    },
+    {
+      "file": "Citrica_1.6.0.0_x64_qa-unsigned-NOT-FOR-STORE.json",
+      "size": 1077,
+      "sha256": "776674bca7d33a67a486dddde18785c4d7d1da5dd9671d9f0581cc7335aaf1bc"
+    },
+    {
+      "file": "Citrica_1.6.0.0_x64_qa-unsigned-NOT-FOR-STORE.makeappx.log",
+      "size": 7746566,
+      "sha256": "051aea12720cd272bb09cf0b0e28691cd9405f08efc6c7b3e2d73b67c546347d"
+    },
+    {
+      "file": "Citrica_1.6.0.0_x64_qa-unsigned-NOT-FOR-STORE.msix",
+      "size": 801863522,
+      "sha256": "3a1bdfa3bb375f148fa612f4a568240c37561de56e78f7a5d5ccb503a774502c"
+    },
+    {
+      "file": "Citrica_1.6.0.0_x64_store-unsigned.json",
+      "size": 996,
+      "sha256": "5ee5f67346d653919da96510c5817a4e4bdb33278dbd1f2d2954bb1ded665c23"
+    },
+    {
+      "file": "Citrica_1.6.0.0_x64_store-unsigned.makeappx.log",
+      "size": 7321064,
+      "sha256": "15e8d74ebadbf04f3ebb64d37137bbafed9cf0a1dbde4ab33e1f4d129d5f14d0"
+    },
+    {
+      "file": "Citrica_1.6.0.0_x64_store-unsigned.msix",
+      "size": 801863446,
+      "sha256": "1fbe9fcaaf64bab25a1afc247225ad55585e18433581e5f3e7db1b0a8c0654ac"
+    }
+  ],
+  "windows_app_certification_kit": "not run; kit not installed",
+  "store_submission": "draft only; not submitted for certification",
+  "public_release_assets_modified": false
+}
