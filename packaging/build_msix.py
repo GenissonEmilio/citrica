@@ -234,8 +234,8 @@ def manifest(identity, mode):
     ET.SubElement(dependencies, tag('TargetDeviceFamily'), Name='Windows.Desktop',
                   MinVersion=data['min_os_version'], MaxVersionTested=data['max_tested_os_version'])
     resources = ET.SubElement(package, tag('Resources'))
-    for language in ['pt-br', 'en-us']:
-        ET.SubElement(resources, tag('Resource'), Language=language)
+    # The current UI is Portuguese; Store displays these declared languages.
+    ET.SubElement(resources, tag('Resource'), Language='pt-br')
     app = ET.SubElement(ET.SubElement(package, tag('Applications')), tag('Application'), {
         'Id': 'Citrica', 'Executable': r'Citrica\Citrica.exe',
         tag('RuntimeBehavior', 'uap10'): 'packagedClassicApp', tag('TrustLevel', 'uap10'): 'mediumIL',

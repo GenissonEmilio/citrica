@@ -30,6 +30,9 @@ independente: a orientação da Store exige primeiro componente acima de zero e
 quarto componente zero. `MaxVersionTested` é uma declaração do manifest, não um
 registro de que a VM ou o WACK já passaram.
 
+O manifest declara somente `pt-br`, idioma da interface atual. A Store apresenta
+os idiomas declarados aos clientes; tradução inglesa ainda não foi implementada.
+
 Não colocar senhas, certificados privados, tokens, arquivos de conta ou capturas
 do Partner Center nesse JSON, no payload ou nos artefatos públicos.
 

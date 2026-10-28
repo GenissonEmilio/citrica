@@ -96,6 +96,7 @@ def test_manifest_uses_full_trust_startup_and_safe_xml(builder, mode):
                            'DisplayName': builder.variant_identity(data, mode)['display_name']}
     capabilities = root.findall('f:Capabilities/rescap:Capability', namespaces)
     assert [item.get('Name') for item in capabilities] == ['runFullTrust']
+    assert [item.get('Language') for item in root.findall('f:Resources/f:Resource', namespaces)] == ['pt-br']
     assert [element.tag.rsplit('}', 1)[-1] for element in root] == [
         'Identity', 'Properties', 'Dependencies', 'Resources', 'Applications', 'Capabilities']
 
