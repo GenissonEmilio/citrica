@@ -62,9 +62,17 @@ build conhecidos antes de tentar novamente.
 
 O builder valida a presença dos executáveis x64, Python, Qt, plugin Windows,
 helper, motores, fontes correspondentes e inventário SHA-256 dos motores. Copia
-o payload inteiro e verifica hashes antes e depois, rejeitando links, colisões
+o runtime e verifica hashes antes e depois, rejeitando links, colisões
 de nomes Windows e contêineres de chaves privadas conhecidos. Essa verificação
 não substitui os testes de execução nem uma revisão do conteúdo fornecido.
+
+A única exclusão do staging é a árvore de desenvolvimento
+`_internal/docx/templates/default-docx-template/` do python-docx 1.2.0. Ela contém
+nomes OPC `_rels/*.rels`, reservados pelo MSIX. A biblioteca usa o arquivo
+`templates/default.docx`, que continua obrigatório e preservado byte a byte;
+os outros templates XML de runtime também permanecem. O inventário do relatório
+registra caminho, tamanho, SHA-256 e motivo de cada exclusão, sem modificar o
+payload de entrada. Outros caminhos OPC reservados causam falha explícita.
 
 O XML é gerado com ElementTree. Os logos PNG 44×44, 150×150 e 50×50 são
 rasterizados pelo Qt a partir do próprio `citrica/assets/citrica.svg`. O comando
@@ -163,6 +171,8 @@ demais requisitos do Partner Center. Este builder não faz submissões.
 - [desktop:Extension e uap10:Parameters](https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/uapmanifestschema/element-desktop-extension).
 - [Virtualização e diretórios de aplicativos desktop](https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-behind-the-scenes).
 - [MakeAppx do Windows SDK](https://learn.microsoft.com/en-us/windows/msix/package/create-app-package-with-makeappx-tool).
+- [Nomes OPC reservados no validador Microsoft](https://github.com/microsoft/msix-packaging/blob/eb2a53ca250ad236f6803a8b89e7a5ebac236993/src/msix/common/FileNameValidation.cpp#L248-L275).
+- [Template usado pelo python-docx 1.2.0](https://github.com/python-openxml/python-docx/blob/v1.2.0/src/docx/api.py#L34-L37).
 - [Unsigned, OID e permissões](https://learn.microsoft.com/en-us/windows/msix/package/unsigned-package).
 - [Certificados confiados para testes](https://learn.microsoft.com/en-us/windows/msix/app-installer/troubleshoot-appinstaller-issues#trusted-certificates).
 - [Windows App Certification Kit](https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/windows-app-certification-kit).

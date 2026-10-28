@@ -39,7 +39,9 @@ REQUIRED = {
     '_internal/tools/ffmpeg/bin/ffprobe.exe', '_internal/tools/libreoffice/program/soffice.com',
     '_internal/tools/libreoffice/program/soffice.exe', '_internal/ocr/tesseract.exe',
     '_internal/ocr/tessdata/eng.traineddata',
+    '_internal/docx/templates/default.docx',
 }
+SOURCE_TEMPLATE = '_internal/docx/templates/default-docx-template/'
 _qt_app = None
 
 
@@ -154,6 +156,26 @@ def pe_x64(path):
         signature = stream.read(6)
     if len(signature) != 6 or signature[:4] != b'PE\0\0' or struct.unpack_from('<H', signature, 4)[0] != 0x8664:
         raise ValueError(f'Runtime must be Windows x64: {path.name}')
+
+
+def package_inventory(files):
+    """Keep runtime data; omit python-docx's unused, unpacked source template.
+
+    python-docx 1.2.0 opens templates/default.docx. Its separate development
+    tree contains OPC _rels/*.rels names that MSIX forbids as payload files.
+    The input stays intact and every omission is recorded by name and hash.
+    """
+    packaged, exclusions = {}, []
+    for name, metadata in files.items():
+        if name.casefold().startswith(SOURCE_TEMPLATE):
+            exclusions.append(dict(path=name, **metadata,
+                reason='Unused python-docx source template; runtime uses templates/default.docx.'))
+            continue
+        parts = name.casefold().split('/')
+        if '_rels' in parts[:-1] and parts[-1].endswith('.rels'):
+            raise ValueError('MSIX reserves OPC relationship payload names: ' + name)
+        packaged[name] = metadata
+    return packaged, exclusions
 
 
 def validate_payload(payload, files):
@@ -308,19 +330,20 @@ def build(payload, staging, output, *, identity_path=IDENTITY, mode='both', make
     tool = None if stage_only else makeappx_path(makeappx)
     files = snapshot(payload)
     validate_payload(payload, files)
+    packaged_files, exclusions = package_inventory(files)
     staging.mkdir(parents=True)
     output.mkdir(parents=True)
     report = {'schema': 1, 'mode': mode, 'stage_only': stage_only, 'makeappx_ran': False,
               'authenticode_signed': False, 'store_certified': False, 'vm_validated': False,
               'input_payload_modified': False, 'input_payload_unchanged_verified': False,
-              'input_inventory': files, 'variants': []}
+              'input_inventory': files, 'excluded_input_files': exclusions, 'variants': []}
     try:
         for variant in (['store', 'qa'] if mode == 'both' else [mode]):
             data = variant_identity(identity, variant)
             stage = staging / ('store' if variant == 'store' else 'qa-unsigned-NOT-FOR-STORE')
             destination = stage / 'Citrica'
             destination.mkdir(parents=True)
-            for name, expected in files.items():
+            for name, expected in packaged_files.items():
                 target = destination / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 with (payload / name).open('rb') as source, target.open('xb') as target_file:

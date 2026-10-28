@@ -134,6 +134,34 @@ def test_never_overwrites_or_nests_output_in_payload(builder, payload, tmp_path,
     assert (payload / 'Citrica.exe').read_bytes() == pe()
 
 
+def test_only_unused_source_template_is_omitted_and_runtime_template_stays(builder, payload, tmp_path, monkeypatch):
+    for name in ['_rels/.rels', 'customXml/_rels/item1.xml.rels',
+                 'word/_rels/document.xml.rels', 'word/document.xml']:
+        path = payload / builder.SOURCE_TEMPLATE / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b'upstream source template')
+    original = builder.snapshot(payload)
+    monkeypatch.setattr(builder, 'logos', lambda path: path.mkdir())
+    stage, output = tmp_path / 'stage', tmp_path / 'output'
+    report = builder.build(payload, stage, output, mode='store', stage_only=True)
+    assert builder.snapshot(payload) == original
+    omitted = {entry['path']: {'size': entry['size'], 'sha256': entry['sha256']}
+               for entry in report['excluded_input_files']}
+    assert len(omitted) == 4
+    assert all(entry == original[name] for name, entry in omitted.items())
+    assert builder.snapshot(stage / 'store/Citrica') == {k: v for k, v in original.items() if k not in omitted}
+    runtime = '_internal/docx/templates/default.docx'
+    assert builder.digest(stage / 'store/Citrica' / runtime) == original[runtime]['sha256']
+
+
+def test_other_reserved_opc_paths_fail_instead_of_silently_losing_data(builder):
+    files = {'custom/_rels/data.xml.rels': {'size': 1, 'sha256': 'a' * 64}}
+    with pytest.raises(ValueError, match='OPC relationship'):
+        builder.package_inventory(files)
+    allowed = {'custom/_rels_data/data.xml.rels': files['custom/_rels/data.xml.rels']}
+    assert builder.package_inventory(allowed) == (allowed, [])
+
+
 def test_rejects_payload_symlinks(builder, payload):
     link = payload / 'linked.exe'
     try:
