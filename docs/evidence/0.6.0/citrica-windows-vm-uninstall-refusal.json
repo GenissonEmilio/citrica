@@ -1,0 +1,13 @@
+{
+  "app_source_commit": "8e86d5b",
+  "ordinary_user_token": true,
+  "uninstall_missing_helper_exit_code": 1,
+  "uninstall_rejected": true,
+  "gui_and_cli_preserved": true,
+  "resident_preserved": true,
+  "preferences_preserved": true,
+  "helper_restored_byte_identical": true,
+  "startup_entry_preserved": true,
+  "sendto_preserved": true,
+  "result": "passed"
+}

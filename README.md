@@ -15,6 +15,8 @@ Implementação independente inspirada no fluxo do [Tangerine](https://www.tange
 
 ## Windows x64
 
+**Candidata 0.6.0:** o [artifact de teste do Windows](https://github.com/GenissonEmilio/citrica/actions/runs/40760249570/artifacts/12848364933) contém o instalador e o portátil `unsigned-test`, com FFmpeg/ffprobe, LibreOffice e OCR incluídos. O CI completo passou por 304 conversões de 50 extensões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. O download exige conta GitHub; a assinatura pública ainda está pendente. [Validação da candidata](docs/VALIDACAO-0.6.0.md).
+
 Baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.5.0/citrica-0.5.0-windows-x86_64-setup.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.5.0/citrica-0.5.0-windows-x86_64-portable.zip). O instalador usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
 
 Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferramentas; **Ctrl**, ações. **Ctrl+Alt+C** abre/fecha a roda. O aplicativo permanece na bandeja ao fechar as configurações. O atalho e a inicialização automática são configuráveis.
@@ -55,7 +57,7 @@ Na versão estável **0.5.0**, a roda global Linux requer **GNOME Shell 50 / Way
 
 ## Ubuntu / candidata 0.6.0
 
-Baixe o artifact [citrica-native-packages do CI](https://github.com/GenissonEmilio/citrica/actions/runs/40604357125/artifacts/12779848087) e extraia o ZIP. Esse download de teste exige uma conta GitHub; ele contém **`citrica_0.6.0_amd64.deb`**.
+Baixe o artifact [citrica-native-packages do CI](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402/artifacts/12837118608) e extraia o ZIP. Esse download de teste exige uma conta GitHub; ele contém **`citrica_0.6.0_amd64.deb`**.
 
 Abra o DEB com o instalador de aplicativos do Ubuntu. Se a loja não abrir pacotes locais, abra um terminal na pasta do arquivo e execute:
 

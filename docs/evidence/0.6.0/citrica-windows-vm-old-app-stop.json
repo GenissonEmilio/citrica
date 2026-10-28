@@ -1,0 +1,42 @@
+{
+  "helper_sha256": "0b3ac88006226003b6dd05a4f1c54568b7218a0cb6ca5c31508ea7db04aab630",
+  "old_installer_sha256": "843e8f399f6875836714f4a84325849070759b7de91b72555439300b6b98cc56",
+  "old_gui_sha256": "a42316a133aaab58431a7238183491fa0d42d0ea42c88e2e5ed15d42e37eeb06",
+  "ordinary_user_token": true,
+  "old_cli_unavailable_during_test": true,
+  "old_cli_restored_byte_identical": true,
+  "helper_no_external_crt": true,
+  "cycles": [
+    {
+      "iteration": 1,
+      "helper_seconds": 0.765,
+      "helper_exit_code": 0,
+      "resident_exit_code": 0
+    },
+    {
+      "iteration": 2,
+      "helper_seconds": 0.047,
+      "helper_exit_code": 0,
+      "resident_exit_code": 0
+    },
+    {
+      "iteration": 3,
+      "helper_seconds": 0.031,
+      "helper_exit_code": 0,
+      "resident_exit_code": 0
+    },
+    {
+      "iteration": 4,
+      "helper_seconds": 0.047,
+      "helper_exit_code": 0,
+      "resident_exit_code": 0
+    },
+    {
+      "iteration": 5,
+      "helper_seconds": 0.047,
+      "helper_exit_code": 0,
+      "resident_exit_code": 0
+    }
+  ],
+  "result": "passed"
+}

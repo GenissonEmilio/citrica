@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
   "date": "2026-10-28",
-  "status": "candidate; async diagnostic crash isolated; final native regression checks in progress",
+  "status": "functional validation complete; exact rebuilt installer passed clean VM and CI; public signing identity still pending",
   "vm": {
     "os": "Windows 11 Pro x64, pt-BR, build 26300.9457",
     "memory_gb": 4,
@@ -115,7 +115,7 @@
     "initial_packaged_candidate": "failed; OpenCV narrow fopen could not open model under accented installation directory",
     "fix": "Python reads Unicode model path, then OpenCV loads XML from memory",
     "source_regression_in_windows_vm": "6 passed",
-    "fixed_packaged_candidate": "Passed in private VM build of ff90885 with byte-verified 2655984 engines; final CI installer check pending."
+    "fixed_packaged_candidate": "Passed in installed ff90885 candidate f3b984e7 and its 38-operation matrix in an accented installation directory."
   },
   "trust": {
     "existing_0_5_0_installation_warning_reproduced": "Open File security warning: unknown publisher, with Internet zone marker",
@@ -123,13 +123,21 @@
     "protections_disabled": false,
     "verified_publisher_provisioned": false,
     "smartscreen_reputation_resolved": false,
-    "remaining_external_step": "Maintainer must obtain an approved signing identity or Store enrollment/channel."
+    "remaining_external_step": "Maintainer must obtain an approved signing identity or Store enrollment/channel.",
+    "signing_helper_tests": {
+      "ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40749080833",
+      "source_commit": "01c4179",
+      "windows_powershell": "5.1",
+      "tests_passed": 14,
+      "actual_certificate_used": false,
+      "scope": "Mocked SignTool integration, UTF-8/Unicode arguments, module paths, and official Inno PE temporaries."
+    }
   },
   "limitations": [
-    "A clean Windows 11 VM and Windows Server CI do not represent every PC, GPU, monitor or document.",
-    "The source-only QA Python runtime needs its private Qt CRT loaded; frozen executables use their own runtime and are tested independently.",
-    "The 40725014510 source build passed package/matrix/install/upgrade checks but failed an Alt activation IPC check. This is being investigated, not reported as an overall pass.",
-    "Run 40735116402 failed with a native access violation during the bundled-family Explorer test. Passing earlier checks does not clear this regression."
+    "A clean Windows 11 VM and Windows Server CI do not represent every PC, GPU, monitor or complex document.",
+    "Qt scale 150% is tested separately from the Windows monitor DPI configuration.",
+    "The source QA Python uses its private Qt runtime; frozen application tests use the installed bundle independently.",
+    "The installer remains unsigned. Public publisher verification and SmartScreen reputation are not resolved by these functional tests."
   ],
   "source_native_repetition": {
     "sessions": 10,
@@ -191,8 +199,9 @@
       "Explorer builtin at 100%",
       "Explorer builtin at 150%"
     ],
-    "resolved": false,
-    "next_diagnostic": "Independent A/B reproduced access violation only with periodic CPython stack dumper; asynchronous snapshots removed; full native retest pending."
+    "resolved": true,
+    "next_diagnostic": "Periodic-dumper crash isolated and removed; separate Alt/OLE stall persists, tracked independently below.",
+    "resolution": "Removed the independently reproduced asynchronous diagnostic crash; subsequent full rebuilt package run 40760249570 passed all native and family checks."
   },
   "diagnostic_experiment": {
     "runtime": "CPython 3.12.10 / PySide6 6.12.0 / Windows 11",
@@ -205,7 +214,7 @@
     "interval_seconds": 0.02,
     "maximum_crash_latency_seconds": 0.281,
     "change": "Remove asynchronous periodic stack dumps; keep opt-in fatal capture and OLE boundary events.",
-    "full_native_retest": "pending",
+    "full_native_retest": "passed in full rebuilt package CI 40760249570, plus four private frozen VM sessions",
     "evidence": "evidence/0.6.0/windows-python312-watchdog-comparison.json"
   },
   "final_vm_upgrade": {
@@ -235,6 +244,136 @@
       "reopened_empty": true,
       "result": "passed",
       "evidence": "evidence/0.6.0/citrica-windows-vm-final-native.json"
+    },
+    "uninstall_reinstall": {
+      "result": "passed",
+      "launchers_removed": true,
+      "sendto_removed": true,
+      "startup_entry_removed": true,
+      "preferences_preserved": true,
+      "reinstalled": true,
+      "evidence": "evidence/0.6.0/citrica-windows-vm-final-uninstall.json"
     }
+  },
+  "fatal_only_native_repetition": {
+    "app_source_commit": "ffc5a81",
+    "qa_only_private_freeze": true,
+    "installer_built": false,
+    "sessions": 3,
+    "physical_explorer_drags": 36,
+    "all_supported_families": true,
+    "fatal_capture": true,
+    "periodic_stack_dump": false,
+    "originals_preserved": true,
+    "duration_seconds": 478.5,
+    "result": "passed",
+    "evidence": "evidence/0.6.0/citrica-windows-vm-fatal-only-families.json"
+  },
+  "native_alt_stall": {
+    "app_source_commit": "ffc5a81",
+    "installer_sha256": "843e8f399f6875836714f4a84325849070759b7de91b72555439300b6b98cc56",
+    "ci_runs": [
+      40748086416,
+      40754835708
+    ],
+    "stage": "activate:.pdf:tools",
+    "resident_remained_alive": true,
+    "resumed_after_cancel": true,
+    "pumped_qa_controller_alone_resolved": false,
+    "resolved": true,
+    "external_stack_capture_run": 40757334014,
+    "fix": "All wheel symbol-font painting replaced by original vector paths; captured C++ stack was in DirectWrite fallback-family enumeration.",
+    "private_frozen_validation": {
+      "app_source_commit": "8e86d5b",
+      "qa_controller_commit": "4a3c479",
+      "sessions": 4,
+      "physical_explorer_drags": 24,
+      "qt_scales": [
+        "1",
+        "1.5"
+      ],
+      "all_families": true,
+      "result": "passed",
+      "evidence": "evidence/0.6.0/citrica-windows-vm-vectors-summary.json"
+    },
+    "final_packaged_validation_run": 40760249570,
+    "final_packaged_validation": {
+      "ci_run": 40760249570,
+      "artifact_id": 12848364933,
+      "app_source_commit": "8e86d5b",
+      "installer_sha256": "efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc",
+      "result": "passed",
+      "explorer_basic_100": true,
+      "explorer_basic_150": true,
+      "all_supported_families": true,
+      "same_folder": true
+    }
+  },
+  "live_upgrade_modal": {
+    "new_installer_sha256": "843e8f399f6875836714f4a84325849070759b7de91b72555439300b6b98cc56",
+    "old_installed_candidate_sha256": "f3b984e723130a695e4da6d91fb924b563c0d44560c1f50fbe159a889de27c76",
+    "ordinary_user_token": true,
+    "resident_exited": true,
+    "old_cli_opened_hidden_qmessagebox": true,
+    "installer_timed_out_seconds": 600,
+    "external_python_and_native_stack_captured": true,
+    "correction_validation": "passed in exact installed final candidate, including live public 0.5.0 migration",
+    "evidence": "evidence/0.6.0/windows-old-cli-modal-upgrade.json",
+    "new_headless_cli": {
+      "real_vm_cycles": 20,
+      "result": "passed",
+      "evidence": "evidence/0.6.0/citrica-windows-vm-headless-quit.json"
+    },
+    "new_independent_helper": {
+      "ci_run": 40760247589,
+      "windows_tests": 19,
+      "old_installed_app_stop_cycles": 5,
+      "old_cli_unavailable_during_cycles": true,
+      "external_crt_required": false,
+      "result": "passed",
+      "evidence": "evidence/0.6.0/citrica-windows-vm-old-app-stop.json"
+    },
+    "ci_final_installer": {
+      "ci_run": 40760249570,
+      "upgrade_while_resident_running": true,
+      "uninstall_while_resident_running": true,
+      "result": "passed"
+    }
+  },
+  "latest_final_package": {
+    "app_source_commit": "8e86d5b",
+    "qa_controller_commit": "4a3c479",
+    "ci_run": 40760249570,
+    "artifact_id": 12848364933,
+    "installer_sha256": "efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc",
+    "gui_sha256": "e9a9aa1f42a8c2d355332381629ede4cb6cf532f9176bd9c6ee2fb39a1ab91e3",
+    "signature": "NotSigned",
+    "ci_result": "passed",
+    "vm_installed_result": "passed",
+    "vm_static_operations": 38,
+    "vm_explorer_sessions": 4,
+    "vm_physical_drags": 24,
+    "vm_all_supported_families": true,
+    "engine_hashes_verified": 19578,
+    "public_05_live_upgrade": "passed",
+    "normal_live_upgrade": "passed",
+    "failed_uninstall_preserves_installation": "passed",
+    "normal_uninstall_reinstall": "passed",
+    "global_shortcut": "Ctrl+Alt+C",
+    "shortcut_after_qa_controller_shutdown": "passed",
+    "temporary_qa_controller": "disabled and stopped",
+    "defender_realtime_enabled": true,
+    "vm_left_running_for_manual_testing": true,
+    "evidence": [
+      "evidence/0.6.0/citrica-windows-vm-public-05-upgrade.json",
+      "evidence/0.6.0/citrica-windows-vm-release-upgrade.json",
+      "evidence/0.6.0/citrica-windows-vm-installed-final-summary.json",
+      "evidence/0.6.0/citrica-windows-vm-installed-final-static-tools.json",
+      "evidence/0.6.0/citrica-windows-vm-uninstall-refusal.json",
+      "evidence/0.6.0/citrica-windows-vm-release-uninstall.json",
+      "evidence/0.6.0/citrica-windows-vm-final-state.json",
+      "evidence/0.6.0/citrica-windows-vm-controller-cleanup.json",
+      "evidence/0.6.0/windows-final-empty-wheel.png"
+    ]
   }
 }

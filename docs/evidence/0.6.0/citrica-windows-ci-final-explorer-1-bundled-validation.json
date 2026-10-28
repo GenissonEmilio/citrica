@@ -1,0 +1,63 @@
+{
+  "real_explorer": true,
+  "qt_scale_factor": "1",
+  "office_engine": "bundled",
+  "ipc_controller": "pumped-worker",
+  "same_folder": false,
+  "cases": {
+    "ctrl_actions_stationary_activation": true,
+    "docx_pdf_without_office": true,
+    "pdf_docx_editable": true,
+    "alt_tools": true,
+    "bundled_image": {
+      "input": ".png",
+      "output": "jpg",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_video": {
+      "input": ".mp4",
+      "output": "webm",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_audio": {
+      "input": ".wav",
+      "output": "mp3",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_document": {
+      "input": ".odt",
+      "output": "pdf",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_sheet": {
+      "input": ".xlsx",
+      "output": "pdf",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_slides": {
+      "input": ".pptx",
+      "output": "pdf",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_subtitle": {
+      "input": ".srt",
+      "output": "vtt",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_archive": {
+      "input": ".zip",
+      "output": "tar",
+      "palette_verified": true,
+      "converted": true
+    }
+  },
+  "originals_preserved": true,
+  "result": "passed"
+}

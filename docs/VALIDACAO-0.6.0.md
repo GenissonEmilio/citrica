@@ -1,37 +1,54 @@
 # Validação da candidata 0.6.0
 
-A candidata inclui os motores de conversão no Windows e corrige a instalação do DEB e a integração com GNOME 46/50/51. Ainda não é uma release pública assinada. O histórico da versão pública permanece em [VALIDACAO.md](VALIDACAO.md).
+A parte funcional passou no Windows e no Ubuntu. O pacote Windows continua **sem assinatura pública**; os testes não eliminam o aviso de fornecedor desconhecido. A versão pública estável permanece em 0.5.0 até a conclusão da distribuição assinada.
 
-## Windows 11 em máquina virtual
+## Pacote Windows final
 
-Foi usada uma VM separada com Windows 11 Pro x64 em português, build 26300.9457, 4 GB de RAM e dois processadores lógicos reconhecidos pelo Windows. A instalação e os testes usam o token comum do usuário, com Secure Boot e Defender em funcionamento. Não foram instalados FFmpeg, Office, Tesseract ou um redistribuível Visual C++ global para ajudar o aplicativo.
+O [CI completo 40760249570](https://github.com/GenissonEmilio/citrica/actions/runs/40760249570) passou com o código de produção `8e86d5b`. O instalador testado tem SHA-256:
 
-O instalador do [build por fontes 2655984](https://github.com/GenissonEmilio/citrica/actions/runs/40605616875) foi instalado em `Aplicação João/Citrica`. A matriz executou a CLI instalada com PATH reduzido ao sistema: **304 conversões de 50 extensões**, **23 operações de áudio/vídeo** e ocultação efetiva de texto por OCR. Os arquivos originais foram preservados. O [relatório completo](evidence/0.6.0/citrica-windows-vm-engine-parity.json) registra cada entrada e saída.
+```text
+efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc
+```
 
-O [teste nativo entre processos Qt/OLE](evidence/0.6.0/citrica-windows-native-validation.json) passou por Shift global, arraste, conversão, atalho, Esc e reabertura vazia. O [Explorer real](evidence/0.6.0/citrica-windows-explorer-1-bundled-validation.json) passou por Ctrl parado, Alt, DOCX→PDF e PDF→DOCX, além de exemplos de imagem, vídeo, áudio, ODT, XLSX, PPTX, legenda e arquivo compactado. Nesse relatório, o nome histórico `docx_pdf_without_office` significa sem Office instalado à parte; `office_engine: bundled` registra o motor incluído no pacote.
+O CI executou **304 conversões de 50 extensões**, **23 operações de mídia**, **38 operações avançadas de imagem/PDF**, instalação em caminho acentuado, atualização e remoção com o aplicativo aberto, arraste OLE e quatro percursos no Explorer. [Matriz de conversão](evidence/0.6.0/citrica-windows-ci-final-engine-parity.json), [ferramentas](evidence/0.6.0/citrica-windows-ci-final-static-tools-parity.json) e [instalador](evidence/0.6.0/citrica-windows-ci-final-installer-validation.json).
 
-QR também foi decodificado pela CLI instalada, com comparação exata do conteúdo e caminho com acentos. Um teste adicional encontrou falha de rostos no diretório de instalação com acentos: o OpenCV tentava abrir o XML por uma API de caminho estreito. O modelo passou a ser lido em memória pelo Python. Os seis testes dessa correção passaram no Windows. Um executável reconstruído na própria VM com o código ff90885 e motores anteriores verificados por SHA-256 passou pelas **38 operações de imagem/PDF**, incluindo rostos, OCR, QR, metadados e recusa de entradas inválidas. Esse build privado não é o instalador final do CI, cuja atualização ainda está em andamento.
+A VM usa Windows 11 Pro x64 em português, build 26300.9457, 4 GB e dois processadores lógicos reconhecidos pelo Windows. Os testes usam o token comum do usuário, com Secure Boot e Defender ativos, sem Office, FFmpeg, Tesseract ou redistribuível Visual C++ global instalado para ajudar o aplicativo. O caminho `Aplicação João/Citrica` contém espaços e acentos; caminhos longos do Windows permanecem desabilitados.
 
-Dez sessões adicionais do código-fonte passaram por 40 gestos no Explorer, alternando pastas separadas e a mesma pasta. O Python de QA e seus filhos carregaram seu próprio runtime privado; esse ajuste não foi instalado no sistema nem aplicado aos executáveis congelados. O executável reconstruído passou depois por mais **13 sessões e 52 gestos**, incluindo escala Qt de 150% e três sessões com logging padrão, sem watchdog. O travamento Alt não foi reproduzido nessas sessões.
+O **mesmo instalador final do CI** passou na VM por:
 
-O [CI 40725014510](https://github.com/GenissonEmilio/citrica/actions/runs/40725014510) passou pela matriz, smoke, instalação, atualização e remoção, mas falhou na ativação Alt do Explorer. O [CI seguinte, 40735116402](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402), passou pela matriz, instalação em caminho com acentos e Explorer básico em escalas de 100% e 150%, mas o residente encerrou com acesso inválido à memória (`0xC0000005`) durante o percurso de todas as famílias. Nenhum dos dois workflows está aprovado como um todo.
+- [Atualização da versão pública 0.5.0 com seu residente aberto](evidence/0.6.0/citrica-windows-vm-public-05-upgrade.json), preservando preferências e confirmando no log o helper novo.
+- [Atualização da instalação anterior](evidence/0.6.0/citrica-windows-vm-release-upgrade.json), com residente aberto, preferências e inicialização preservadas, arquivos obsoletos removidos e **19.578 arquivos de motores conferidos por SHA-256**.
+- [38 operações avançadas pela CLI instalada](evidence/0.6.0/citrica-windows-vm-installed-final-static-tools.json), incluindo rostos, OCR, QR, metadados e recusas de entradas inválidas.
+- [Quatro sessões e 24 arrastes reais](evidence/0.6.0/citrica-windows-vm-installed-final-summary.json): Ctrl, Alt, Shift, PDF↔DOCX, todas as oito famílias, mesma pasta e escala Qt de 150%. Os originais foram preservados.
+- [Recusa de desinstalação sem o helper](evidence/0.6.0/citrica-windows-vm-uninstall-refusal.json): exit code 1, sem remover aplicativo, preferências, entrada de inicialização ou Enviar para.
+- [Remoção e reinstalação normais](evidence/0.6.0/citrica-windows-vm-release-uninstall.json), preservando preferências e removendo os atalhos/registro apropriados.
 
-Um experimento separado isolou uma falha do diagnóstico periódico no CPython 3.12.10: **três controles encerraram normalmente; três processos com snapshots assíncronos encerraram com `0xC0000005` em menos de 0,3 segundo**. O experimento usa Qt/threads e trabalho em memória, sem importar o Cítrica, injetar entrada ou converter arquivos. [Comparação completa](evidence/0.6.0/windows-python312-watchdog-comparison.json) e [reprodutor](evidence/0.6.0/qa-watchdog-repro.py). A [issue primária do CPython](https://github.com/python/cpython/issues/116008#issuecomment-2034190548) descreve a leitura concorrente dos frames pelo dumper. O snapshot periódico foi removido; a captura fatal opt-in e os eventos OLE permanecem. Novos percursos completos do pacote continuam necessários para encerrar a investigação.
+A VM foi deixada ligada com os exemplos sintéticos em **Teste Cítrica**, atalho **Ctrl+Alt+C**, arraste com **Shift** e animações habilitadas. O atalho foi conferido novamente depois de desligar o controlador temporário de QA. [Estado final](evidence/0.6.0/citrica-windows-vm-final-state.json), [limpeza do controlador](evidence/0.6.0/citrica-windows-vm-controller-cleanup.json) e [roda vazia após o atalho](evidence/0.6.0/windows-final-empty-wheel.png).
 
-O instalador ff90885 também foi atualizado na VM como usuário comum: preservou preferências/entrada de inicialização, removeu arquivos antigos e teve **19.578 arquivos de motores verificados por SHA-256**. [Recibo da atualização](evidence/0.6.0/citrica-windows-vm-final-upgrade.json).
+Uma candidata inicial também executou a matriz completa na VM: 304 conversões, 23 operações de mídia e OCR, com PATH reduzido ao sistema e originais preservados. [Recibo dessa candidata anterior](evidence/0.6.0/citrica-windows-vm-engine-parity.json). O executável final foi verificado separadamente como descrito acima.
+
+## Regressões corrigidas
+
+Uma [captura externa](evidence/0.6.0/windows-symbol-font-native-stack.json) encontrou a interface na enumeração de fontes DirectWrite ao pintar símbolos da roda. Todos esses símbolos, inclusive centro e paginação, passaram a ser vetores próprios. O CI final e os percursos da instalação real passaram sem ampliar os timeouts. A hipótese de fontes frias explica o padrão anterior, mas continua sendo uma inferência.
+
+Outra [captura Python/C++](evidence/0.6.0/windows-old-cli-modal-upgrade.json) encontrou a CLI antiga parada em `QMessageBox::warning` depois de uma corrida no encerramento. O comando agora funciona sem GUI; o instalador extrai seu próprio helper nativo para encerrar inclusive versões antigas. O helper passou por **19 testes no Windows** e [cinco encerramentos da instalação anterior sem sua CLI disponível](evidence/0.6.0/citrica-windows-vm-old-app-stop.json). O comando sem GUI passou por [20 ciclos reais](evidence/0.6.0/citrica-windows-vm-headless-quit.json).
+
+O modelo de rostos passou a ser lido pelo Python e carregado em memória pelo OpenCV, evitando a API de caminho estreito que falhava em diretórios acentuados. As ferramentas de rosto passaram nas 38 operações do pacote final.
+
+Um experimento independente também isolou um problema do diagnóstico periódico do CPython 3.12.10: três controles passaram e três processos com snapshots assíncronos falharam com acesso inválido, sem importar o Cítrica. O snapshot periódico foi removido; a investigação posterior usa um observador externo. [Comparação e reprodutor](evidence/0.6.0/windows-python312-watchdog-comparison.json), [issue primária do CPython](https://github.com/python/cpython/issues/116008#issuecomment-2034190548).
 
 ## Ubuntu e GNOME
 
-O DEB foi instalado, aberto como usuário comum e removido em containers limpos Ubuntu **24.04, 26.04 e 26.10**, incluindo a primeira configuração e PNG→PDF→DOCX. O menu usa o executável nativo mesmo quando existe um portátil antigo antes dele no PATH.
+O DEB foi instalado, aberto como usuário comum e removido em Ubuntu **24.04, 26.04 e 26.10**, incluindo primeira configuração e PNG→PDF→DOCX. O menu usa o executável do pacote mesmo com um portátil antigo antes dele no PATH.
 
-O DEB final do CI ff90885 também passou por **38 operações avançadas como usuário comum no Ubuntu 26.10**, após instalação: imagens, PDFs, rostos, OCR e QR, com cinco paletas exatas e originais preservados. O SHA-256 do DEB é `1e722fb36376c2a6086e7e4e4dadd463813c9c6a07f23aa4872429058ecb03f6`.
+O DEB também passou por **38 operações avançadas no Ubuntu 26.10**, com cinco paletas verificadas e originais preservados. Seu SHA-256 é `1e722fb36376c2a6086e7e4e4dadd463813c9c6a07f23aa4872429058ecb03f6`. As alterações posteriores são específicas do Windows; esse pacote Linux permanece o mesmo artefato validado.
 
-Compositores GNOME/Wayland reais e isolados validaram a roda no GNOME 46 e 51 do Ubuntu. GNOME 50 foi validado separadamente no Fedora com o backend congelado do Ubuntu 24.04, incluindo nove quadros intermediários de animação. Os containers Ubuntu desativaram animações por renderização em software; não se atribui a eles a medição de fluidez. [Escopo e recibos Ubuntu](validation-0.6.0-ubuntu.json).
+Compositores GNOME/Wayland reais e isolados validaram a roda nos GNOME 46 e 51 do Ubuntu. GNOME 50 foi validado no Fedora com o backend congelado do Ubuntu 24.04, incluindo nove quadros intermediários de animação. Os containers Ubuntu desativaram animações por renderização em software; não se atribui a eles uma medição de fluidez. [Escopo e recibos Ubuntu](validation-0.6.0-ubuntu.json).
 
-## Confiança do instalador
+## Assinatura e limites
 
-O instalador 0.5.0, com marcador de origem da Internet, exibiu o aviso de arquivo com fornecedor desconhecido na VM. A tela azul específica do SmartScreen relatada nos PCs externos não foi reproduzida. Os candidatos continuam sem assinatura; não há alegação de que o aviso foi eliminado.
+O instalador 0.5.0 com marcador de origem da Internet exibiu o aviso de fornecedor desconhecido na VM. A tela azul específica relatada externamente não foi reproduzida. O instalador final e o aplicativo apresentam `NotSigned`; não há alegação de aviso eliminado.
 
-A preparação de Authenticode verifica assinaturas e timestamp, mas uma identidade aprovada ainda depende do mantenedor. A Store oferece um caminho gratuito de cadastro individual e assinatura de MSIX; a SignPath Foundation avalia projetos abertos elegíveis. [Requisitos e links oficiais](WINDOWS-SIGNING.md). Nenhuma proteção do Windows foi desativada e não foi criado certificado autoassinado para simular confiança pública.
+Uma identidade pública aprovada ainda depende do mantenedor. [Requisitos, SignPath Foundation e cadastro individual da Store](WINDOWS-SIGNING.md). Nenhuma proteção foi desativada e nenhum certificado autoassinado foi instalado para simular confiança pública.
 
-Os [resultados estruturados Windows](validation-0.6.0-windows.json) distinguem o pacote inicialmente testado, regressões encontradas e verificações ainda pendentes. A VM e o CI não representam todos os computadores ou documentos.
+A VM e o CI não representam todos os PCs, GPUs ou documentos. A escala **Qt** de 150% não equivale a testar toda configuração de DPI do monitor Windows. [Resultados estruturados e histórico Windows](validation-0.6.0-windows.json).

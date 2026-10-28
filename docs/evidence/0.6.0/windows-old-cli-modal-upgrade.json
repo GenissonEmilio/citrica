@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-28",
+  "issue": "Live installer blocked in old installed CLI graphical exception handler",
+  "new_installer_sha256": "843e8f399f6875836714f4a84325849070759b7de91b72555439300b6b98cc56",
+  "old_installed_candidate_sha256": "f3b984e723130a695e4da6d91fb924b563c0d44560c1f50fbe159a889de27c76",
+  "ordinary_user_token": true,
+  "timeout_seconds": 600,
+  "resident_exited": true,
+  "cli_remained_alive": true,
+  "external_observer": "py-spy 0.4.2",
+  "python_stack": "Process 2808: \"C:\\CitricaVM\\Aplicação João\\Citrica\\citrica-cli.exe\" --quit\nPython v3.12.10 (C:\\CitricaVM\\Aplicação João\\Citrica\\citrica-cli.exe)\n\nThread 2348 (idle): \"MainThread\"\n    report_exception (app.py:597)\n",
+  "native_stack": "Process 2808: \"C:\\CitricaVM\\Aplicação João\\Citrica\\citrica-cli.exe\" --quit\nPython v3.12.10 (C:\\CitricaVM\\Aplicação João\\Citrica\\citrica-cli.exe)\n\nThread 2348 (idle): \"MainThread\"\n    NtUserMsgWaitForMultipleObjectsEx (win32u.dll)\n    QEventDispatcherWin32::processEvents (Qt6Core.dll)\n    QWindowsGuiEventDispatcher::processEvents (Qt6Gui.dll)\n    QEventLoop::exec (Qt6Core.dll)\n    QDialog::exec (Qt6Widgets.dll)\n    QMessageBox::showEvent (Qt6Widgets.dll)\n    QMessageBox::warning (Qt6Widgets.dll)\n    PyInit_QtWidgets (QtWidgets.pyd)\n    PyThread_acquire_lock_timed (python312.dll)\n    PyObject_Vectorcall (python312.dll)\n    PyObject_Vectorcall (python312.dll)\n    PyEval_EvalFrameDefault (python312.dll)\n    PyFunction_Vectorcall (python312.dll)\n    PyObject_Vectorcall (python312.dll)\n    PyObject_FastCall (python312.dll)\n    PyErr_PrintEx (python312.dll)\n    0x7ff78f983bf0 (citrica-cli.exe)\n    0x7ff78f984b5f (citrica-cli.exe)\n    0x7ff78f98dc7f (citrica-cli.exe)\n    report_exception (app.py:597)\n",
+  "exception": "RuntimeError: O Cítrica não respondeu. Verifique o diagnóstico.",
+  "cause_confirmed": "Old --quit CLI installed a GUI exception handler; a status/disconnect race opened a hidden modal QMessageBox which blocked the installer.",
+  "remediation_validation": "pending"
+}

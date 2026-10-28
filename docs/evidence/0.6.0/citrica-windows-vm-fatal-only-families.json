@@ -1,0 +1,15 @@
+{
+  "app_source_commit": "ffc5a81",
+  "qa_only_private_freeze": true,
+  "installer_built": false,
+  "engine_source": "byte-verified ff90885 CI40735116402",
+  "sessions": 3,
+  "physical_explorer_drags": 36,
+  "qt_scale": "1",
+  "all_families": true,
+  "fatal_capture": true,
+  "periodic_stack_dump": false,
+  "originals_preserved": true,
+  "gui_sha256": "777ab7344e0ec551ca1facaff18ce7e96eb95b75c2bf2fa88fd2551bfb1a611e",
+  "result": "passed"
+}

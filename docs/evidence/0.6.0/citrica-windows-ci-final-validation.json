@@ -1,0 +1,133 @@
+{
+  "version": "0.6.0",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "dependencies": {
+    "ffmpeg": "D:\\a\\citrica\\citrica\\dist\\Citrica\\_internal\\tools\\ffmpeg\\bin\\ffmpeg.exe",
+    "libreoffice": "D:\\a\\citrica\\citrica\\dist\\Citrica\\_internal\\tools\\libreoffice\\program\\soffice.com"
+  },
+  "tools": {
+    "faces": true,
+    "text": true,
+    "qr": true,
+    "share": false
+  },
+  "desktop": {
+    "platform": "windows",
+    "active": false
+  },
+  "validation": {
+    "runner": "Windows-2022Server-10.0.20348-SP0",
+    "github_actions": true,
+    "packaged_engine_smoke": true,
+    "offline_engines": {
+      "schema": 1,
+      "provenance": "compiled-from-pinned-sources",
+      "sources": {
+        "ffmpeg": {
+          "version": "9.0.2",
+          "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+          "size": 12040788,
+          "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+          "license": "GPL-3.0-or-later (configuration enables GPL and version3)"
+        },
+        "x264": {
+          "version": "b35605ace3ddf7c1a5d67a2eb553f034aef41d55",
+          "url": "https://code.videolan.org/videolan/x264/-/archive/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/x264-b35605ace3ddf7c1a5d67a2eb553f034aef41d55.tar.gz",
+          "size": 1040327,
+          "sha256": "cd71a7515b0e9a012e1ac9b1f8415bebcaf6fc97d4db32286642ac4c0fbe24f9",
+          "license": "GPL-2.0-or-later"
+        },
+        "vpx": {
+          "version": "1.17.0",
+          "url": "https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz",
+          "size": 5670546,
+          "sha256": "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a",
+          "license": "BSD-3-Clause plus PATENTS"
+        },
+        "opus": {
+          "version": "1.5.2",
+          "url": "https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz",
+          "size": 7839412,
+          "sha256": "65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1",
+          "license": "BSD-3-Clause plus patent grant"
+        },
+        "ogg": {
+          "version": "1.3.6",
+          "url": "https://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.xz",
+          "size": 439952,
+          "sha256": "5c8253428e181840cd20d41f3ca16557a9cc04bad4a3d04cce84808677fa1061",
+          "license": "BSD-3-Clause"
+        },
+        "vorbis": {
+          "version": "1.3.7",
+          "url": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz",
+          "size": 1203792,
+          "sha256": "b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b",
+          "license": "BSD-3-Clause"
+        },
+        "lame": {
+          "version": "3.100",
+          "url": "https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz",
+          "size": 1524133,
+          "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e",
+          "license": "LGPL-2.0-or-later"
+        },
+        "leptonica": {
+          "version": "1.87.0",
+          "url": "https://github.com/DanBloomberg/leptonica/releases/download/1.87.0/leptonica-1.87.0.tar.gz",
+          "size": 14802808,
+          "sha256": "c73363397f96eb1295602bf44d708a994ad42046c791bf03ea0505d829bdb6a7",
+          "license": "BSD-2-Clause"
+        },
+        "tesseract": {
+          "version": "5.5.3",
+          "url": "https://github.com/tesseract-ocr/tesseract/archive/db0ec62f81b0737fbbe184d8fea40af5738f8eef.tar.gz",
+          "size": 1918077,
+          "sha256": "21dbaff9867d937c156d0b898e90b726aa339129cfebd7e1365cd5fee5046d67",
+          "license": "Apache-2.0"
+        },
+        "dav1d": {
+          "version": "1.5.4",
+          "url": "https://code.videolan.org/videolan/dav1d/-/archive/54706fc6bc0cdecab7e9593974a4039cc038fca7/dav1d-54706fc6bc0cdecab7e9593974a4039cc038fca7.tar.gz",
+          "sha256": "9edb11a2108b375cc58370354e705feebc93430bb780130363815c1e1ac0c250",
+          "license": "BSD-2-Clause"
+        },
+        "zlib": {
+          "version": "1.3.2",
+          "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
+          "sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16",
+          "license": "Zlib"
+        }
+      },
+      "ocr_library": "tesseract55.dll",
+      "libreoffice": {
+        "version": "26.2.6",
+        "url": "https://download.documentfoundation.org/libreoffice/stable/26.2.6/win/x86_64/LibreOffice_26.2.6_Win_x86-64.msi",
+        "sha256": "f9877032fd908beb9c0ddf06df4af5c2e85f419c42e14876c4cce5aae5fb2660",
+        "license": "MPL-2.0; third-party notices in the original distribution",
+        "source": "https://download.documentfoundation.org/libreoffice/src/26.2.6/",
+        "provider": "https://www.libreoffice.org/download/download-libreoffice/"
+      },
+      "ocr_eng": {
+        "version": "tessdata_fast-87416418657359cb625c412a48b6e1d6d41c29bd",
+        "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/eng.traineddata",
+        "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+        "license": "Apache-2.0",
+        "source": "https://github.com/tesseract-ocr/tessdata_fast/tree/87416418657359cb625c412a48b6e1d6d41c29bd"
+      },
+      "corresponding_source": {
+        "file": "engine-sources.zip",
+        "sha256": "89e4b1b10d303b59d9ee9527ddc1074ba6dd80a08257aecaafe96779ce4e9c43",
+        "scope": [
+          "ffmpeg",
+          "linked-codec-libraries",
+          "tesseract",
+          "leptonica"
+        ]
+      },
+      "reproducible_bit_for_bit_verified": false
+    },
+    "conversion_matrix": "citrica-windows-engine-parity.json",
+    "explorer": "see separate citrica-windows-explorer-*-validation.json reports"
+  }
+}

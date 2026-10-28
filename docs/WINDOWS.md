@@ -4,6 +4,8 @@ Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. 
 
 ## Instalar e abrir
 
+A [candidata 0.6.0 do CI](https://github.com/GenissonEmilio/citrica/actions/runs/40760249570/artifacts/12848364933) inclui todos os motores descritos abaixo. Extraia o artifact e execute o arquivo terminado em `setup-unsigned-test.exe`. O pacote passou pelo CI completo e continua sem assinatura pública; [resultados e escopo dos testes](VALIDACAO-0.6.0.md).
+
 Baixe o arquivo `citrica-VERSÃO-windows-x86_64-setup.exe` da release. O instalador usa a conta atual, cria a entrada no menu Iniciar e adiciona **Enviar para → Cítrica** no Explorer. Atalho na área de trabalho e inicialização automática são opcionais.
 
 A assinatura Authenticode e a reputação do SmartScreen são verificações diferentes. O relatório `citrica-windows-signing.json` informa se aquele pacote está assinado; um candidato marcado `unsigned` ainda pode exibir **Editor desconhecido**. Não desative o Defender, SmartScreen ou Smart App Control. Consulte [assinatura e distribuição](WINDOWS-SIGNING.md) para os caminhos de certificação/loja e os limites dessa validação.

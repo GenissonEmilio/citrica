@@ -1,0 +1,11 @@
+{
+  "task_stop_requested": true,
+  "ok": true,
+  "id": "53-control-cleanup",
+  "keep_vm_running": true,
+  "task_disabled": true,
+  "host_controller_stopped": true,
+  "global_shortcut_validated_after_cleanup": true,
+  "reopened_empty_visually": true,
+  "screenshot": "windows-final-empty-wheel.png"
+}

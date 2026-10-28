@@ -1,0 +1,10 @@
+{
+  "uninstall": true,
+  "launchers_removed": true,
+  "sendto_removed": true,
+  "startup_entry_removed": true,
+  "preferences_preserved": true,
+  "reinstalled_for_manual_testing": true,
+  "version": "Cítrica 0.6.0",
+  "ordinary_user_token": true
+}

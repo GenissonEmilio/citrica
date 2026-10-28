@@ -1,0 +1,15 @@
+{
+  "old_version": "0.5.0",
+  "new_version": "0.6.0",
+  "old_installer_sha256": "c0181c8916f8883c9c67df1cf1587cb1b31bbeb02f51000f057f6c253485a54c",
+  "new_installer_sha256": "efc623505e0bd47d4b3c723d53c9ff60d45746e2bb5ba1cc701d703fa64d77bc",
+  "old_public_resident_was_running": true,
+  "old_resident_terminated_gracefully": true,
+  "new_independent_helper_confirmed_in_setup_log": true,
+  "preferences_preserved": true,
+  "bundled_advanced_tools_detected": true,
+  "ordinary_user_token": true,
+  "upgraded_fixture_uninstalled": true,
+  "elapsed_seconds": 147.0,
+  "result": "passed"
+}

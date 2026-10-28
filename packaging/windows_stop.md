@@ -65,6 +65,7 @@ A cancelled overlapped buffer is retained until helper process exit if cancellat
 has not yet completed, as required by
 [CancelIoEx](https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-cancelioex).
 
-The native helper compiled on MSVC 2022 and its process/pipe tests passed; an
-additional UNC-root hash correction and installer integration are undergoing
-fresh Windows validation. No public signing identity has been provisioned.
+The helper compiled on MSVC 2022, passed 19 Windows tests and live upgrades
+from the published 0.5.0 and earlier 0.6.0 candidate. Missing-helper uninstall
+fails before removing files or registration. See docs/VALIDACAO-0.6.0.md for
+exact package hashes and VM receipts. No public signing identity has been provisioned.
