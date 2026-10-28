@@ -261,7 +261,7 @@ jobs:
           QT_SCALE_FACTOR: '1.5'
         run: python tests/windows/explorer_flow.py dist/Citrica/Citrica.exe --same-folder
       - name: Identificar artefatos de teste não assinados
-        if: github.event_name == 'workflow_dispatch'
+        if: always() && github.event_name == 'workflow_dispatch' && hashFiles('release/citrica-windows-signing.json') != ''
         shell: pwsh
         run: |
           $trust = Get-Content release/citrica-windows-signing.json -Raw | ConvertFrom-Json
@@ -274,7 +274,7 @@ jobs:
           'BUILD DE TESTE NÃO ASSINADO. O editor não está verificado. Não é uma release pública. Consulte citrica-windows-signing.json e docs/WINDOWS-SIGNING.md.' | Out-File release/UNSIGNED-TEST-BUILD.txt -Encoding utf8
           python -c "import hashlib; from pathlib import Path; p=Path('release'); (p/'SHA256SUMS-windows.txt').write_text(''.join(f'{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.name}\n' for f in sorted(p.iterdir()) if f.is_file() and not f.name.startswith('SHA256SUMS')), encoding='utf-8')"
       - uses: actions/upload-artifact@v4
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: always() && (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') && hashFiles('release/*-setup*.exe') != ''
         with:
           name: citrica-windows-x86_64-${{ startsWith(github.ref, 'refs/tags/') && 'signed' || 'unsigned-test' }}
           path: release/*
@@ -286,7 +286,7 @@ jobs:
           path: |
             build/windows-native/**/*.json
             build/windows-native/**/*.log
-            build/windows-installer/*.log
+            build/windows-installer/**/*.log
             build/windows-engine-cache/*.log
             build/windows-source-build/**/config.log
             build/windows-source-build/**/CMakeCache.txt

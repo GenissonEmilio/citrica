@@ -61,6 +61,8 @@ CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
 
 ```powershell
 .\citrica-cli.exe --version
+# No Windows PowerShell 5.1, preserve o UTF-8 recebido da CLI antes de usar pipe:
+[Console]::OutputEncoding = New-Object Text.UTF8Encoding($false)
 .\citrica-cli.exe --doctor | Out-File -Encoding utf8 citrica-diagnostico.json
 .\citrica-cli.exe "C:\Teste com acentos\imagem.png" --to jpg
 ```

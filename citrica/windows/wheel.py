@@ -1,5 +1,6 @@
 """Transparent Qt/Win32 drop target with the same annular design as GNOME."""
 import math
+import logging
 import struct
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from PySide6.QtWidgets import QWidget
 
 SIZE, CENTER, INNER, OUTER, LABEL_RADIUS = 380, 190, 66, 170, 122
 TAU = math.tau
+QA = logging.getLogger('citrica.qa')
 GLYPHS = {'compress': '↙', 'crop': '✂', 'adjust': '◐', 'annotate': '✎', 'background': '▣',
           'redact': '◩', 'metadata': 'ⓘ', 'edit_metadata': '✎', 'strip': '⌫', 'images_pdf': '▧',
           'collage': '▦', 'qr': '▦', 'redact_faces': '◉', 'redact_text': 'T', 'target_size': '↔',
@@ -26,7 +28,9 @@ def hit_test(x, y, count):
 
 
 def offered_paths(mime):
+    QA.debug('ole.urls begin')
     urls = mime.urls() if mime.hasUrls() else []
+    QA.debug('ole.urls end count=%s', len(urls))
     if not urls:
         # Explorer and shell extensions may expose CF_HDROP/FileNameW without
         # Qt synthesizing text/uri-list. Read only these filesystem formats.
@@ -149,6 +153,7 @@ class Wheel(QWidget):
             self._closing = False
 
     def present(self, position, probing=False):
+        QA.debug('wheel.present begin probing=%s mapped=%s', probing, self.isVisible())
         self._motion.stop()
         self._closing, self._closing_frame = False, None
         self.probing = probing
@@ -156,8 +161,11 @@ class Wheel(QWidget):
         # Revealing an already mapped probe during DragEnter must not remap or
         # raise its HWND: that can invalidate Explorer's current OLE target.
         if not self.isVisible():
+            QA.debug('wheel.show begin')
             self.show()
+            QA.debug('wheel.show end; raise begin')
             self.raise_()
+            QA.debug('wheel.raise end')
         if self.animations() and not probing:
             self._motion.setStartValue(0.)
             self._motion.setEndValue(1.)
@@ -167,6 +175,7 @@ class Wheel(QWidget):
         else:
             self.progress = 1.
             self.update()
+        QA.debug('wheel.present end')
 
     def clear(self):
         self._hover.stop()
@@ -344,12 +353,16 @@ class Wheel(QWidget):
             painter.drawText(hint, Qt.AlignmentFlag.AlignCenter, 'Solte um arquivo aqui · Esc para fechar')
 
     def dragEnterEvent(self, event):
+        QA.debug('ole.drag_enter formats begin')
         self.offerObserved.emit(list(event.mimeData().formats()))
+        QA.debug('ole.drag_enter formats end; paths begin')
         paths = offered_paths(event.mimeData())
+        QA.debug('ole.drag_enter paths end files=%s', len(paths))
         if paths and not self._closing:
             event.setDropAction(Qt.DropAction.CopyAction)
             event.accept()
             self.filesOffered.emit(paths)
+            QA.debug('ole.drag_enter accepted')
         else:
             event.ignore()
             if self.probing:

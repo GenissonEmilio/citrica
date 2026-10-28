@@ -1,6 +1,6 @@
 # Candidatura SignPath Foundation — rascunho revisável
 
-**Não enviada. Não constitui aprovação, certificado ou política já aceita.** Preparada em 27 de outubro de 2026 para o mantenedor revisar em [SignPath: Apply](https://signpath.org/apply).
+**Não enviada. Não constitui aprovação, certificado ou política já aceita.** Atualizada em 28 de outubro de 2026 para o mantenedor revisar em [SignPath: Apply](https://signpath.org/apply).
 
 ## Dados públicos prontos
 
@@ -35,3 +35,7 @@ Antes de declarar a política final, revisar o comportamento de rede das integra
 Guardar as credenciais do serviço nos mecanismos aprovados do CI, limitar quem aprova assinaturas, selecionar os artefatos próprios e ligar a solicitação ao build/tag público. Configurar o callback do Inno para assinar o desinstalador durante a compilação, além do setup. Testar a instalação pelo canal final numa VM com as proteções do Windows ativadas.
 
 O script local `packaging/sign_windows.py` prepara o caminho para um certificado próprio de CA/HSM. Ele não configura nem substitui o serviço SignPath. A submissão deste rascunho ao serviço continua dependendo de uma ação explícita do mantenedor.
+
+## Pontos para confirmar com a Foundation
+
+O candidato por fontes testado tem instalador de aproximadamente **473 MiB** e ZIP portátil de **730 MiB**. Não há quota OSS específica confirmada para este projeto; informar esses tamanhos no pedido. A aceitação do desinstalador Inno precisa de confirmação explícita: ele contém código do gerador upstream. O callback de assinatura está preparado para um certificado autorizado, mas não constitui autorização da Foundation. Os componentes de terceiros mantêm suas assinaturas originais ou permanecem sem assinatura; não serão assinados como código próprio.

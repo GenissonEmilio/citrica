@@ -1,9 +1,12 @@
 """Resident Windows app, tray, preferences, IPC and asynchronous wheel actions."""
 import json
+import faulthandler
 import logging
+import os
 import platform
 import sys
 import threading
+from contextlib import contextmanager
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QPoint, QThread, QTimer, Signal, Slot
@@ -22,6 +25,43 @@ from citrica.gui import ICON, STYLE
 from citrica.windows import config
 from citrica.windows.ipc import MAX_REQUEST, send, server_name
 from citrica.windows.wheel import CENTER, SIZE, Wheel, hit_test
+
+QA = logging.getLogger('citrica.qa')
+
+
+@contextmanager
+def qa_tracebacks(args):
+    """Opt-in QA watchdog survives a blocked GUI or named-pipe timeout.
+
+    Only a resident launched explicitly by the desktop harness enables this.
+    No input paths or file contents are recorded by the boundary events.
+    """
+    destination = os.environ.get('CITRICA_QA_TRACEBACK_LOG')
+    if not destination or not args.background:
+        yield
+        return
+    path = Path(destination)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handler = logging.FileHandler(path.with_suffix('.events.log'), encoding='utf-8')
+    handler.setFormatter(logging.Formatter('%(asctime)s %(threadName)s %(message)s'))
+    previous_level, previous_propagate = QA.level, QA.propagate
+    QA.setLevel(logging.DEBUG)
+    QA.propagate = False
+    QA.addHandler(handler)
+    try:
+        with path.open('ab', buffering=0) as traces:
+            try:
+                faulthandler.dump_traceback_later(5, repeat=True, file=traces)
+                QA.debug('resident.watchdog start pid=%s', os.getpid())
+                yield
+            finally:
+                faulthandler.cancel_dump_traceback_later()
+                QA.debug('resident.watchdog stop')
+    finally:
+        QA.removeHandler(handler)
+        QA.setLevel(previous_level)
+        QA.propagate = previous_propagate
+        handler.close()
 
 
 class Job(QThread):
@@ -178,6 +218,7 @@ class Desktop(QObject):
         self.pointer_timer.start(20)
 
     def _accept(self):
+        QA.debug('ipc.accept')
         socket = self.server.nextPendingConnection()
         buffer = bytearray()
         def read():
@@ -188,7 +229,10 @@ class Desktop(QObject):
             if b'\n' not in buffer:
                 return
             try:
-                result = self.dispatch(json.loads(buffer.split(b'\n', 1)[0]))
+                payload = json.loads(buffer.split(b'\n', 1)[0])
+                QA.debug('ipc.dispatch begin op=%s', payload.get('op'))
+                result = self.dispatch(payload)
+                QA.debug('ipc.dispatch end')
             except Exception as error:
                 result = {'error': str(error)}
             socket.write(json.dumps(result, ensure_ascii=False).encode('utf-8') + b'\n')
@@ -295,12 +339,15 @@ class Desktop(QObject):
 
     def load_palette(self):
         token, paths = self.generation, list(self.paths)
+        QA.debug('palette.begin generation=%s files=%s', token, len(paths))
         def done(palette):
+            QA.debug('palette.done generation=%s current=%s active=%s', token, self.generation, self.active)
             if token != self.generation or not self.active:
                 return
             self.palette = palette
             self.render()
         def failed(error):
+            QA.debug('palette.failed generation=%s', token)
             if token == self.generation and self.active:
                 self.hide_wheel()
                 self.notify('Cítrica · seleção inválida', error)
@@ -332,16 +379,19 @@ class Desktop(QObject):
     def prepare_drag(self, hwnd):
         self.drag_epoch += 1
         epoch = self.drag_epoch
+        QA.debug('preview.begin epoch=%s hwnd=%s', epoch, hwnd)
         self.drag_candidates = []
         self.preview_error = ''
         from citrica.windows.explorer import preview_files
         def done(paths):
+            QA.debug('preview.done epoch=%s current=%s files=%s', epoch, self.drag_epoch, len(paths))
             if epoch != self.drag_epoch or not self.native.left_down():
                 return
             self.drag_candidates = paths
             if paths and self.armed:
                 self.show_wheel(paths, self.mode, dragging=True, verified=False)
         def failed(error):
+            QA.debug('preview.failed epoch=%s', epoch)
             if epoch == self.drag_epoch:
                 self.preview_error = error
             logging.getLogger('citrica').info('Prévia Explorer indisponível: %s', error)
@@ -362,6 +412,7 @@ class Desktop(QObject):
             self.render()
 
     def drag_mode(self, mode):
+        QA.debug('drag_mode.begin mode=%s active=%s armed=%s', mode, self.active, self.armed)
         if not self.active:
             if self.busy or self._quitting:
                 return
@@ -385,6 +436,7 @@ class Desktop(QObject):
         elif mode != self.mode:
             self.mode, self.page = mode, 0
             self.render()
+        QA.debug('drag_mode.end mode=%s active=%s armed=%s', self.mode, self.active, self.armed)
 
     def release(self):
         token = self.generation
@@ -521,6 +573,11 @@ def math_ceil(value, divisor):
 
 
 def launch(args):
+    with qa_tracebacks(args):
+        return _launch(args)
+
+
+def _launch(args):
     app = QApplication.instance() or QApplication([])
     app.setApplicationName('Cítrica')
     app.setOrganizationName('GenissonEmilio')
@@ -528,7 +585,6 @@ def launch(args):
     app.setStyle('Fusion')
     app.setStyleSheet(STYLE)
     app.setQuitOnLastWindowClosed(False)
-    import os
     from logging.handlers import RotatingFileHandler
     log_dir = Path(os.environ.get('LOCALAPPDATA', config.config_dir().parent)) / 'Citrica/Logs'
     log_dir.mkdir(parents=True, exist_ok=True)

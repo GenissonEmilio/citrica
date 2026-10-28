@@ -62,6 +62,9 @@ def main():
                                  ctypes.c_int, ctypes.c_int, wintypes.UINT]
     user.SetForegroundWindow.argtypes = [wintypes.HWND]
     user.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+    user.GetForegroundWindow.restype = wintypes.HWND
+    user.GetAsyncKeyState.argtypes = [ctypes.c_int]
+    user.GetAsyncKeyState.restype = ctypes.c_short
     def inject(event):
         assert user.SendInput(1, ctypes.byref(event), ctypes.sizeof(Input)) == 1
     def key(vk, down):
@@ -73,11 +76,15 @@ def main():
         while time.monotonic() < until:
             app.processEvents()
             time.sleep(.01)
+    last_status, stage = None, 'resident-start'
     def wait(predicate, timeout=30):
+        nonlocal last_status
         until = time.monotonic()+timeout
         current = None
         while time.monotonic() < until:
             current = send({'op': 'status'}, timeout=200)
+            if current:
+                last_status = current
             if current and predicate(current):
                 return current
             pause(.05)
@@ -124,7 +131,8 @@ def main():
     command = ([sys.executable, '-m', 'citrica'] if arguments.executable == 'source' else
                [str(Path(arguments.executable).resolve())])
     resident_log = (STATE/'resident.log').open('w', encoding='utf-8')
-    resident = subprocess.Popen([*command, '--background'], stdout=resident_log, stderr=subprocess.STDOUT)
+    resident = subprocess.Popen([*command, '--background'], stdout=resident_log, stderr=subprocess.STDOUT,
+                               env=dict(os.environ, CITRICA_QA_TRACEBACK_LOG=str(STATE/'resident-stacks.log')))
     hwnd = None
     report = {'real_explorer': True, 'qt_scale_factor': SCALE,
               'office_engine': 'bundled' if arguments.bundled_engines else 'builtin',
@@ -156,6 +164,8 @@ def main():
         pause(.5)
 
         def drag(path, mode, vk, target, formats=None):
+            nonlocal stage
+            stage = f'select:{path.suffix}:{mode}'
             print(f'Explorer: selecionar {path.name}; modo {mode}.', flush=True)
             # In the shared-folder regression, stay in the same view while
             # conversion outputs arrive and Explorer asynchronously sorts them.
@@ -208,6 +218,7 @@ def main():
             user.SetCursorPos(x+55, y+12)
             pause(.3)
             key(vk, True)
+            stage = f'activate:{path.suffix}:{mode}'
             # Deliberately no pointer movement after pressing the modifier.
             wheel = wait(lambda s: s['visible'] and s['mode'] == mode and
                          any(i['id'] == target for i in s['items']))
@@ -217,6 +228,7 @@ def main():
                 expected = formats[:7] if len(formats) > 7 else formats
                 assert actual == expected, (path, actual, expected)
             print(f'Explorer: roda {mode} carregada sem novo movimento.', flush=True)
+            stage = f'offer:{path.suffix}:{mode}'
             index = next(i for i, item in enumerate(wheel['items']) if item['id'] == target)
             angle = -math.pi/2 + index*math.tau/len(wheel['items'])
             ox, oy = wheel['origin']
@@ -228,6 +240,7 @@ def main():
                 str(ROOT/f'release/citrica-windows-explorer-{mode}-{path.suffix[1:]}-{run_id}.png'))
             key(vk, False)
             button(False)
+            stage = f'drop:{path.suffix}:{mode}'
             print('Explorer: botão liberado.', flush=True)
             return verified
 
@@ -269,13 +282,33 @@ def main():
             json.dumps(report, indent=2), encoding='utf-8')
         print(f'Explorer real: Ctrl, Alt, Shift, DOCX/PDF e PDF→DOCX passaram ({run_id}).')
         faulthandler.cancel_dump_traceback_later()
-    except Exception:
-        try:
-            snapshot = send({'op': 'status'})
-        except Exception as error:
-            snapshot = {'ipc_error': str(error)}
-        (STATE/'failed-state.json').write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
+    except Exception as failure:
+        snapshot = {'stage': stage, 'error': str(failure), 'last_status': last_status,
+                    'resident_pid': resident.pid, 'resident_exit_code': resident.poll(),
+                    'foreground_hwnd': user.GetForegroundWindow(),
+                    'input_down': {name: bool(user.GetAsyncKeyState(vk) & 0x8000)
+                                   for name, vk in [('left', 1), ('shift', 0x10), ('ctrl', 0x11), ('alt', 0x12)]}}
+        failure_file = STATE/'failed-state.json'
+        failure_file.write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
         app.primaryScreen().grabWindow(0).save(str(ROOT/f'release/citrica-windows-explorer-failure-{run_id}.png'))
+        try:
+            snapshot['status_before_cancel'] = send({'op': 'status'})
+        except Exception as error:
+            snapshot['ipc_error_before_cancel'] = str(error)
+        # Diagnose whether cancelling Explorer's OLE operation unblocks the
+        # resident. A recovery remains a failed test, never an automatic retry.
+        key(0x1b, True)
+        for vk in [0x10, 0x11, 0x12]:
+            key(vk, False)
+        button(False)
+        key(0x1b, False)
+        pause(.5)
+        try:
+            snapshot['status_after_cancel'] = send({'op': 'status'})
+        except Exception as error:
+            snapshot['ipc_error_after_cancel'] = str(error)
+        snapshot['resident_exit_code_after_cancel'] = resident.poll()
+        failure_file.write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
         raise
     finally:
         for vk in [0x10, 0x11, 0x12, 0x1b]:

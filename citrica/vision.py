@@ -120,8 +120,20 @@ def face_boxes(image):
     import cv2
     import numpy as np
     gray = cv2.cvtColor(np.array(image.convert('RGB')), cv2.COLOR_RGB2GRAY)
-    detector = cv2.CascadeClassifier(str(Path(cv2.data.haarcascades) / 'haarcascade_frontalface_default.xml'))
-    if detector.empty():
+    # OpenCV's native FileStorage loader uses narrow fopen on Windows. Read
+    # through Python so installed paths such as C:\Users\João also work.
+    model = Path(cv2.data.haarcascades) / 'haarcascade_frontalface_default.xml'
+    storage = cv2.FileStorage()
+    detector = cv2.CascadeClassifier()
+    try:
+        xml = model.read_text(encoding='utf-8')
+        opened = storage.open(xml, cv2.FILE_STORAGE_READ | cv2.FILE_STORAGE_MEMORY)
+        loaded = opened and detector.read(storage.getFirstTopLevelNode())
+    except (OSError, UnicodeError, cv2.error) as exc:
+        raise ConversionError('Não foi possível carregar o modelo local de rostos.') from exc
+    finally:
+        storage.release()
+    if not loaded or detector.empty():
         raise ConversionError('Modelo local de rostos não encontrado.')
     detections = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(24, 24))
     return [(int(x), int(y), int(x+w), int(y+h)) for x, y, w, h in detections]

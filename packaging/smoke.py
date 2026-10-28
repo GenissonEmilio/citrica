@@ -65,8 +65,14 @@ def verify(executable: Path):
         for tool, path in [('redact_faces', face), ('redact_text', text_file), ('background', source)]:
             payload = json.dumps({'op': 'tool', 'tool': tool, 'paths': [str(path)]})
             proc = subprocess.run([str(executable), '--desktop-request', payload],
-                                  check=True, capture_output=True, text=True)
-            assert all(Path(p).is_file() for p in json.loads(proc.stdout)['outputs'])
+                                  check=False, capture_output=True, text=True, timeout=120)
+            assert proc.returncode == 0, (tool, proc.stdout, proc.stderr)
+            outputs = [Path(p) for p in json.loads(proc.stdout)['outputs']]
+            assert outputs and all(p.is_file() for p in outputs)
+            if tool in ['redact_faces', 'redact_text']:
+                with Image.open(path) as original, Image.open(outputs[0]) as redacted:
+                    assert original.size == redacted.size
+                    assert original.convert('RGB').tobytes() != redacted.convert('RGB').tobytes(), tool
         if program('ffmpeg'):
             video = root / 'video.mp4'
             subprocess.run([program('ffmpeg'), '-v', 'error', '-f', 'lavfi', '-i', 'color=c=orange:s=160x120:d=2',

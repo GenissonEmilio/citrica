@@ -4,6 +4,7 @@ No keys are intercepted or injected. A Shift+mouse drag exposes a drop target;
 Qt's OLE data offer, not the mouse heuristic, supplies the actual file paths.
 """
 import ctypes
+import logging
 import sys
 from ctypes import wintypes
 
@@ -11,6 +12,8 @@ from PySide6.QtCore import QAbstractNativeEventFilter, QObject, QTimer, Signal
 from PySide6.QtGui import QCursor
 
 from citrica.windows.config import parse_shortcut
+
+QA = logging.getLogger('citrica.qa')
 
 
 class HotkeyFilter(QAbstractNativeEventFilter):
@@ -94,6 +97,7 @@ class NativeDesktop(QObject):
             self._anchor, self._mode, self._suppressed = point, None, False
             self._drag_started = False
             self._source_window = self.user.GetForegroundWindow()
+            QA.debug('native.press hwnd=%s', self._source_window)
             # Prefetch on press, before Explorer enters its modal OLE loop.
             self.dragStarted.emit(self._source_window)
         moved = abs(point.x() - self._anchor.x()) >= 6 or abs(point.y() - self._anchor.y()) >= 6
@@ -108,7 +112,9 @@ class NativeDesktop(QObject):
             mode = 'actions' if self.down(0x11) else 'tools' if self.down(0x12) else 'convert' if trigger else None
             if mode and mode != self._mode:
                 self._mode = mode
+                QA.debug('native.mode begin mode=%s', mode)
                 self.mode.emit(mode)
+                QA.debug('native.mode end mode=%s', mode)
             elif mode is None:
                 self._mode = None  # Releasing/repressing the same modifier can retry an offer.
         if self.visible:
@@ -120,6 +126,7 @@ class NativeDesktop(QObject):
         else:
             self._keys.clear()
         if self._left and not left:
+            QA.debug('native.release')
             self._suppressed, self._mode = False, None
             self.released.emit()
         self._left = left

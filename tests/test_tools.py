@@ -237,6 +237,32 @@ def test_redact_faces_positive_fixture(tmp_path):
             assert im.getpixel(((left+right)//2, (top+bottom)//2))[:3] == (0, 0, 0)
 
 
+def test_face_model_in_unicode_install_path(tmp_path, monkeypatch):
+    import cv2
+    from citrica.vision import face_boxes
+    model_name = 'haarcascade_frontalface_default.xml'
+    model = Path(cv2.data.haarcascades) / model_name
+    install = tmp_path / 'Aplicação João' / '人脸模型'
+    install.mkdir(parents=True)
+    shutil.copyfile(model, install / model_name)
+    monkeypatch.setattr(cv2.data, 'haarcascades', str(install))
+    with Image.open(Path(__file__).parent / 'fixtures/astronaut.png') as image:
+        assert face_boxes(image)
+    assert face_boxes(Image.new('RGB', (320, 200), 'white')) == []
+
+
+@pytest.mark.parametrize('model_data', [None, '', 'invalid XML',
+    '<?xml version="1.0"?><opencv_storage><other>1</other></opencv_storage>'])
+def test_face_model_load_error_is_explained(tmp_path, monkeypatch, model_data):
+    import cv2
+    from citrica.vision import face_boxes
+    if model_data is not None:
+        (tmp_path / 'haarcascade_frontalface_default.xml').write_text(model_data, encoding='utf-8')
+    monkeypatch.setattr(cv2.data, 'haarcascades', str(tmp_path))
+    with pytest.raises(ConversionError, match='modelo local de rostos'):
+        face_boxes(Image.new('RGB', (320, 200), 'white'))
+
+
 def test_redact_text_positive_fixture(tmp_path):
     from PIL import ImageDraw, ImageFont
     from citrica.vision import text_available, text_boxes

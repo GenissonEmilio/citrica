@@ -17,7 +17,7 @@ def run(*args, **kwargs):
 def main():
     import winreg
     setup = Path(sys.argv[1]).resolve()
-    target = ROOT / 'build/windows-installer/Citrica'
+    target = ROOT / 'build/windows-installer/Aplicação João/Citrica'
     target.parent.mkdir(parents=True, exist_ok=True)
     install_log = target.parent / 'install.log'
     run(setup, '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', f'/DIR={target}', f'/LOG={install_log}')
@@ -36,6 +36,9 @@ def main():
         f'/LOG={target.parent / "upgrade.log"}')
     assert not obsolete.exists(), 'An obsolete bundled DLL survived the upgrade'
     assert run(cli, '--version', capture_output=True, text=True, encoding='utf-8').stdout.strip() == version
+    sys.path.insert(0, str(ROOT / 'packaging'))
+    from smoke import verify
+    verify(cli)
     (ROOT / 'release').mkdir(exist_ok=True)
     run(gui, '--settings', '--screenshot', ROOT / 'release/citrica-windows-installed-preview.png',
         env=dict(os.environ, QT_QPA_PLATFORM='windows'))
@@ -57,6 +60,7 @@ def main():
             raise AssertionError('Startup entry remained after uninstall')
     result = {'per_user_install': True, 'installed_cli_version': version, 'sendto_shortcut': True,
               'installed_gui_launch': True, 'upgrade_replaces_runtime': True,
+              'unicode_install_path': True, 'installed_engine_smoke': True,
               'uninstall': True, 'startup_entry_removed': True}
     (ROOT / 'release/citrica-windows-installer-validation.json').write_text(json.dumps(result, indent=2),
                                                                           encoding='utf-8')
