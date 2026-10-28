@@ -191,7 +191,7 @@ def test_makeappx_command_validates_both_variants_and_keeps_reports_honest(build
     monkeypatch.setattr(builder, 'logos', lambda path: path.mkdir())
     def run(command, **options):
         calls.append(command)
-        assert command[1] == 'pack' and '/nv' not in command and '/o' not in command
+        assert command[1] == 'pack' and '/v' in command and '/nv' not in command and '/o' not in command
         Path(command[command.index('/p') + 1]).write_bytes(b'fixture MSIX; no actual compilation in this unit test')
         return SimpleNamespace(returncode=0, stdout='MakeAppx fixture', stderr='')
     monkeypatch.setattr(builder.subprocess, 'run', run)
@@ -211,7 +211,9 @@ def test_makeappx_failure_is_not_reported_as_a_package_success(builder, payload,
     with pytest.raises(RuntimeError, match='MakeAppx failed'):
         builder.build(payload, tmp_path / 'stage', tmp_path / 'output', mode='store')
     report = json.loads((tmp_path / 'output/build-report.json').read_text())
-    assert report['result'] == 'failed' and report['variants'][0]['makeappx_validation'] == 'not_run'
+    assert report['result'] == 'failed' and report['variants'][0]['makeappx_validation'] == 'failed'
+    assert report['variants'][0]['makeappx_returncode'] == 7
+    assert report['variants'][0]['makeappx_log'].endswith('.makeappx.log')
     assert 'schema error' in next((tmp_path / 'output').glob('*.makeappx.log')).read_text()
 
 

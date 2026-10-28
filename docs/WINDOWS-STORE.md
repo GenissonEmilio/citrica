@@ -68,7 +68,7 @@ não substitui os testes de execução nem uma revisão do conteúdo fornecido.
 
 O XML é gerado com ElementTree. Os logos PNG 44×44, 150×150 e 50×50 são
 rasterizados pelo Qt a partir do próprio `citrica/assets/citrica.svg`. O comando
-de compilação é `MakeAppx.exe pack /d <staging> /p <novo arquivo.msix>`; a
+de compilação é `MakeAppx.exe pack /v /d <staging> /p <novo arquivo.msix>`; a
 validação do SDK não é desativada com `/nv`.
 
 Em Linux, `--stage-only` permite inspecionar manifest, cópia e logos. Não produz
@@ -101,9 +101,11 @@ o pacote não solicita execução como administrador nem AppContainer.
 Os namespaces adicionais são `uap/windows10`, `desktop/windows10`,
 `uap/windows10/10` e `foundation/windows10/restrictedcapabilities`, todos sob
 `http://schemas.microsoft.com/appx/manifest/`. O StartupTask é declarado numa
-`desktop:Extension` com categoria `windows.startupTask`, executável
-`Citrica\Citrica.exe`, `uap10:Parameters="--background"`, TaskId **CitricaStartup**
-e `Enabled="false"`. Os atributos de ativação/trust são herdados da Application.
+`desktop:Extension` com categoria `windows.startupTask`,
+`uap10:Parameters="--background"`, TaskId **CitricaStartup** e `Enabled="false"`.
+O executável `Citrica\Citrica.exe` e os atributos de ativação/trust são herdados
+da Application. A extensão não repete `Executable`: o SDK exige `EntryPoint`
+quando esse atributo é declarado nela, mesmo com a ativação moderna no pai.
 
 O adaptador de runtime deve consultar e alterar o StartupTask pela API Windows,
 respeitando `DisabledByUser` e `DisabledByPolicy`; o checkbox não pode continuar

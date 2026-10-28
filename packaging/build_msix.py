@@ -340,11 +340,13 @@ def build(payload, staging, output, *, identity_path=IDENTITY, mode='both', make
                 raise ValueError('Input payload changed during staging; compilation was stopped.')
             if tool:
                 package = output / (basename + '.msix')
-                command = [str(tool), 'pack', '/d', str(stage), '/p', str(package)]
+                command = [str(tool), 'pack', '/v', '/d', str(stage), '/p', str(package)]
                 result = subprocess.run(command, check=False, capture_output=True, text=True,
                                         encoding='utf-8', errors='replace')
                 (output / (basename + '.makeappx.log')).write_text(result.stdout + result.stderr, encoding='utf-8')
                 report['makeappx_ran'] = True
+                variant_report.update(makeappx_validation='failed', makeappx_returncode=result.returncode,
+                                      makeappx_log=basename + '.makeappx.log')
                 if result.returncode or not package.is_file():
                     raise RuntimeError(f'MakeAppx failed for {variant} (exit {result.returncode}); inspect its log.')
                 variant_report.update(makeappx_validation='passed', package=package.name,
