@@ -1,4 +1,4 @@
-# Standalone stop helper proposal
+# Standalone installer stop helper
 
 `windows_stop.cpp` is a console-only WinAPI helper for the **new** setup to carry.
 It does not load Python, Qt, .NET, the installed CLI or external MSVC runtime DLLs.
@@ -20,19 +20,20 @@ Qt's actual pipe name, graceful exit, acknowledgement racing process exit,
 missing replies, acknowledgement without exit and another installation's
 isolation. Linux skips these native cases explicitly.
 
-## Proposed installer integration (not applied)
+## Installer integration
 
 1. Build the helper before compiling Inno Setup; include it in the publisher's
    own signing scope when signing is enabled.
-2. Embed this newly built file as a `dontcopy` temporary file in the **new**
-   setup, then call `ExtractTemporaryFile('citrica-stop.exe')` in
+2. Place this newly built file first in the **new**
+   setup payload, then call `ExtractTemporaryFile('citrica-stop.exe')` in
    `PrepareToInstall`.
 3. Execute **`{tmp}\citrica-stop.exe --install-dir "{app}"`**, hidden, with an
    explicitly quoted installation directory. Capture its stderr in the setup
    log. On nonzero exit, abort the upgrade and ask the user to close the tray
    application. Do not invoke `{app}\citrica-cli.exe` from the old installation.
-4. A future installed/uninstaller stop action can carry the same independent
-   helper, rather than invoking a Python/Qt CLI during teardown.
+4. The installed uninstaller uses the same independent helper before file removal,
+   aborting if it cannot confirm process exit. The old RunOnceId is retained to
+   supersede previously installed CLI-based stop entries.
 
 The helper's total default budget is 15 seconds, including the quit request and
 process waits; the optional `--timeout-ms` accepts 100–15000 milliseconds for
@@ -64,5 +65,6 @@ A cancelled overlapped buffer is retained until helper process exit if cancellat
 has not yet completed, as required by
 [CancelIoEx](https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-cancelioex).
 
-This is a source proposal awaiting an actual MSVC build and Windows test run;
-no existing release/build/installer workflow is changed by these new files.
+The native helper compiled on MSVC 2022 and its process/pipe tests passed; an
+additional UNC-root hash correction and installer integration are undergoing
+fresh Windows validation. No public signing identity has been provisioned.

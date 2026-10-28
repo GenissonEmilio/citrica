@@ -37,7 +37,7 @@ $env:CITRICA_SIGNING_REQUIRED = '1'
 $env:CITRICA_SIGNTOOL = 'C:\Program Files (x86)\Windows Kits\10\bin\VERSAO_DO_SDK\x64\signtool.exe'
 
 python packaging/sign_windows.py --sign --report build\assinatura-launchers.json `
-  dist\Citrica\Citrica.exe dist\Citrica\citrica-cli.exe
+  dist\Citrica\Citrica.exe dist\Citrica\citrica-cli.exe dist\Citrica\citrica-stop.exe
 
 python packaging/sign_windows.py --verify --report build\assinatura-setup.json `
   release\citrica-VERSAO-windows-x86_64-setup.exe
@@ -50,7 +50,7 @@ Assinaturas válidas de fornecedores são preservadas. Uma assinatura já existe
 ## Ordem de empacotamento
 
 1. Compilar e testar os executáveis, com os metadados de produto/versão.
-2. Assinar os launchers próprios, antes de criar o ZIP ou compilar o instalador.
+2. Assinar os launchers próprios e o helper nativo `citrica-stop.exe`, antes de criar o ZIP ou compilar o instalador.
 3. Configurar Inno Setup com `inno_signing_arguments(config)`. O `windows.iss` habilita `SignTool=citrica` e `SignedUninstaller=yes` somente com `SigningEnabled`.
 4. Compilar: o callback assina e verifica Setup e o desinstalador embutido.
 5. Verificar o instalador final; instalar/desinstalar numa VM limpa; gerar checksums apenas após as assinaturas. Não modificar os binários depois.

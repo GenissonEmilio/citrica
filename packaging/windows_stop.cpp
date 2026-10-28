@@ -52,6 +52,17 @@ std::wstring pipe_name() {
     spelling.push_back(L'\0');
     while (PathCchRemoveBackslash(spelling.data(), spelling.size()) == S_OK) {}
     profile.assign(spelling.data());
+    // PathCch regards a bare UNC share (\\server\share) as a root but
+    // removes its final separator. PureWindowsPath includes that separator
+    // in its UNC anchor, including when USERPROFILE omitted it originally.
+    size_t unc_start = _wcsnicmp(profile.c_str(), L"\\\\?\\UNC\\", 8) == 0 ? 8 :
+        (profile.rfind(L"\\\\", 0) == 0 ? 2 : std::wstring::npos);
+    if (unc_start != std::wstring::npos && !profile.empty() && profile.back() != L'\\' &&
+            PathCchIsRoot(profile.c_str())) {
+        size_t server_end = profile.find(L'\\', unc_start);
+        if (server_end != std::wstring::npos && server_end > unc_start && server_end + 1 < profile.size() &&
+                profile.find(L'\\', server_end + 1) == std::wstring::npos) profile += L'\\';
+    }
     int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, profile.data(),
         static_cast<int>(profile.size()), nullptr, 0, nullptr, nullptr);
     if (!size) fail("Cannot encode USERPROFILE as UTF-8");

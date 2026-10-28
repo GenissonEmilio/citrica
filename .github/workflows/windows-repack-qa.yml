@@ -99,6 +99,7 @@ jobs:
         run: |
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
+          python -m pip install --require-hashes --no-deps --only-binary=:all: -r tests/windows/requirements-debug.lock
           python -m pytest tests/test_windows_engine_reuse.py -q
       - name: Expose verified FFmpeg to source test fixtures
         shell: pwsh

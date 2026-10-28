@@ -44,7 +44,10 @@ Name: "desktopicon"; Description: "Criar atalho na área de trabalho"; Flags: un
 Name: "startup"; Description: "Iniciar na bandeja ao entrar no Windows"; Flags: unchecked
 
 [Files]
-Source: "..\dist\Citrica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Keep the new independent helper first in the solid stream so it can stop an
+; old resident before copying/replacing any installed application files.
+Source: "..\dist\Citrica\citrica-stop.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\Citrica\*"; DestDir: "{app}"; Excludes: "citrica-stop.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
 ; PrepareToInstall closes the resident first. Preferences live in AppData,
@@ -63,21 +66,51 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 Filename: "{app}\Citrica.exe"; Parameters: "--background"; Description: "Iniciar o Cítrica na bandeja"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "{app}\citrica-cli.exe"; Parameters: "--quit"; Flags: runhidden skipifdoesntexist; RunOnceId: "StopCitrica"
+; Retain this RunOnceId to supersede older installed CLI-based stop entries.
+; The mandatory pre-removal check below already verified a successful stop.
+Filename: "{app}\citrica-stop.exe"; Parameters: "--install-dir ""{app}"""; Flags: runhidden skipifdoesntexist; RunOnceId: "StopCitrica"
 
 [Code]
-function PrepareToInstall(var NeedsRestart: Boolean): String;
+function StopInstalledCitrica(const Helper: String): Boolean;
 var ExitCode: Integer;
 begin
+  Result := False;
+  if not FileExists(Helper) then begin
+    Log('Citrica stop helper is missing; application files will be preserved.');
+    Exit;
+  end;
+  if not Exec(Helper, '--install-dir ' + AddQuotes(ExpandConstant('{app}')), '',
+              SW_HIDE, ewWaitUntilTerminated, ExitCode) then begin
+    Log(Format('Citrica stop helper could not start (Windows error %d).', [ExitCode]));
+    Exit;
+  end;
+  Log(Format('Citrica stop helper returned exit code %d.', [ExitCode]));
+  Result := ExitCode = 0;
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
   Result := '';
-  if FileExists(ExpandConstant('{app}\citrica-cli.exe')) then
-    if not Exec(ExpandConstant('{app}\citrica-cli.exe'), '--quit', '', SW_HIDE,
-                ewWaitUntilTerminated, ExitCode) or (ExitCode <> 0) then
+  if FileExists(ExpandConstant('{app}\Citrica.exe')) then begin
+    ExtractTemporaryFile('citrica-stop.exe');
+    if not StopInstalledCitrica(ExpandConstant('{tmp}\citrica-stop.exe')) then
       Result := 'Feche o Cítrica pela bandeja antes de atualizar.';
+  end;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
+  { This event follows the user's confirmation and precedes all file removal.
+    Abort here is fatal to uninstall; a failed helper must never be ignored. }
+  if CurUninstallStep = usAppMutexCheck then begin
+    if not StopInstalledCitrica(ExpandConstant('{app}\citrica-stop.exe')) then begin
+      Log('Uninstall aborted: Cítrica could not be stopped; application files were preserved.');
+      if not UninstallSilent then
+        SuppressibleMsgBox('Não foi possível encerrar o Cítrica. Feche-o pela bandeja e tente desinstalar novamente. Os arquivos do aplicativo foram preservados.',
+                          mbError, MB_OK, IDOK);
+      Abort;
+    end;
+  end;
   if CurUninstallStep = usUninstall then
     RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Citrica');
 end;

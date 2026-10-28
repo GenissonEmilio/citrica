@@ -8,16 +8,11 @@ from PySide6.QtCore import QEasingCurve, QPointF, QRectF, Qt, QVariantAnimation,
 from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import QWidget
 
+from citrica.windows.icons import draw_icon
+
 SIZE, CENTER, INNER, OUTER, LABEL_RADIUS = 380, 190, 66, 170, 122
 TAU = math.tau
 QA = logging.getLogger('citrica.qa')
-GLYPHS = {'compress': '↙', 'crop': '✂', 'adjust': '◐', 'annotate': '✎', 'background': '▣',
-          'redact': '◩', 'metadata': 'ⓘ', 'edit_metadata': '✎', 'strip': '⌫', 'images_pdf': '▧',
-          'collage': '▦', 'qr': '▦', 'redact_faces': '◉', 'redact_text': 'T', 'target_size': '↔',
-          'trim': '✂', 'speed': '»', 'split_media': 'Ⅱ', 'join_media': '⋈', 'snapshot': '▣',
-          'normalize': '≋', 'bleep': '♪', 'channels': '♫', 'merge_pdf': '⋈', 'split_pdf': 'Ⅱ',
-          'reorder_pdf': '↕', 'copy': '▧', 'move': '↗', 'copy_path': '↗', 'terminal': '>_',
-          'float': '▣', 'share': '↗'}
 
 
 def hit_test(x, y, count):
@@ -311,9 +306,8 @@ class Wheel(QWidget):
                 center = point(LABEL_RADIUS, angle)
                 painter.setPen(QColor('#251e1a'))
                 if item['kind'] != 'format':
-                    painter.setFont(QFont('Segoe UI Symbol', 15))
-                    painter.drawText(QRectF(center.x()-40, center.y()-25, 80, 26),
-                                     Qt.AlignmentFlag.AlignCenter, '⋯' if item['kind'] == 'page' else GLYPHS.get(item['id'], '◇'))
+                    draw_icon(painter, 'page' if item['kind'] == 'page' else item['id'],
+                              QRectF(center.x()-11, center.y()-24, 22, 22))
                 font = QFont('Segoe UI')
                 font.setPixelSize(13 if item['kind'] == 'format' else 10)
                 font.setBold(True)
@@ -326,15 +320,11 @@ class Wheel(QWidget):
             if not preview.isNull():
                 painter.drawPixmap(QRectF(CENTER-32, CENTER-38, 64, 64), preview, QRectF(preview.rect()))
             else:
-                painter.setPen(QColor('#49372a'))
-                painter.setFont(QFont('Segoe UI Symbol', 26))
-                painter.drawText(QRectF(CENTER-35, CENTER-45, 70, 65), Qt.AlignmentFlag.AlignCenter, '▧')
+                draw_icon(painter, 'document', QRectF(CENTER-22, CENTER-35, 44, 44), '#49372a')
             size = self.info.get('bytes', 0)
             text = f'{size / 1024:.1f} KB' if size >= 1024 else f'{size} bytes'
         else:
-            painter.setPen(QColor('#49372a'))
-            painter.setFont(QFont('Segoe UI Symbol', 30))
-            painter.drawText(QRectF(CENTER-35, CENTER-45, 70, 65), Qt.AlignmentFlag.AlignCenter, '+')
+            draw_icon(painter, 'add', QRectF(CENTER-20, CENTER-31, 40, 40), '#49372a')
             text = 'Arraste um arquivo'
         if self.selected >= 0:
             text = self.items[self.selected]['label']

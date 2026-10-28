@@ -40,6 +40,9 @@ def main():
     parser.add_argument("--background", action="store_true", help="Windows: inicia somente na bandeja")
     parser.add_argument("--quit", action="store_true", help="Windows: encerra a instância na bandeja")
     args = parser.parse_args()
+    if args.quit and sys.platform == 'win32':
+        from citrica.windows.ipc import quit_resident
+        return quit_resident()
     if args.setup and sys.platform != 'win32':
         from citrica.desktop import setup_desktop
         try:

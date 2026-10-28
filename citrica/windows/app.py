@@ -591,6 +591,9 @@ def launch(args):
 
 
 def _launch(args):
+    if args.quit:
+        from citrica.windows.ipc import quit_resident
+        return quit_resident()
     app = QApplication.instance() or QApplication([])
     app.setApplicationName('Cítrica')
     app.setOrganizationName('GenissonEmilio')
@@ -609,17 +612,6 @@ def _launch(args):
         logging.getLogger('citrica').error('Falha na interface', exc_info=(kind, error, traceback))
         QMessageBox.warning(None, 'Cítrica · falha', str(error) + '\nUse as configurações para salvar um diagnóstico.')
     sys.excepthook = report_exception
-    if args.quit:
-        result = send({'op': 'quit'})
-        if not result:
-            return 0
-        import time
-        deadline = time.monotonic() + 15
-        while time.monotonic() < deadline:
-            if send({'op': 'status'}, timeout=100) is None:
-                return 0
-            QThread.msleep(100)
-        return 1
     payload = ({'op': 'show', 'paths': [str(p.resolve()) for p in args.files]} if args.files or args.wheel or args.dock
                else {'op': 'pick'} if args.pick else {'op': 'status'} if args.background else {'op': 'settings'})
     existing = send(payload)

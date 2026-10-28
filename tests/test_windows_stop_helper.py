@@ -28,7 +28,9 @@ def helper():
 
 
 @pytest.mark.parametrize('profile', ['C:\\Users\\CitricaTester', 'C:\\Users\\João ç',
-                                    'C:\\Users\\João ç\\', 'C:\\', '\\\\server\\share\\'])
+                                    'C:\\Users\\João ç\\', 'C:\\', '\\\\server\\share\\',
+                                    '\\\\server\\share', '\\\\server\\share\\João\\',
+                                    '\\\\?\\UNC\\server\\share', '\\\\?\\UNC\\server\\share\\'])
 def test_pipe_name_matches_python_home_utf8_and_qt_prefix(helper, profile):
     env = dict(os.environ, USERPROFILE=profile)
     result = subprocess.run([str(helper), '--pipe-name'], env=env, check=False,
