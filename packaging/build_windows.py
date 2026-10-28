@@ -125,6 +125,7 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
     from smoke import verify
     verify(cli)
     run(sys.executable, ROOT / 'tests/windows/engine_parity.py', cli)
+    run(sys.executable, ROOT / 'tests/windows/static_tools_parity.py', cli)
     doctor = run(cli, '--doctor', capture_output=True, text=True, encoding='utf-8')
     data = json.loads(doctor.stdout)
     data['validation'] = {'runner': platform.platform(), 'github_actions': bool(os.environ.get('GITHUB_ACTIONS')),

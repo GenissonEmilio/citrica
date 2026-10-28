@@ -1,0 +1,2257 @@
+{
+  "version": "0.6.0",
+  "offline": true,
+  "path_isolated": true,
+  "input_extensions": 50,
+  "conversions": 304,
+  "duration_seconds": 1266.38,
+  "ocr_redaction": true,
+  "originals_preserved": true,
+  "cases": [
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpg",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "jpeg",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "png",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webp",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tif",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tiff",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "bmp",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gif",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avif",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heic",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "webp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "avif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "heic",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "tiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "bmp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "heif",
+      "family": "image",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp4",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mov",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mkv",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "avi",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "webm",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wmv",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4v",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpeg",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "mp4",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "webm",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "mkv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "mov",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "gif",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mpg",
+      "family": "video",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mp3",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wav",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "flac",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ogg",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "opus",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "m4a",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aac",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "aiff",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "wma",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "mp3",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "wav",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "flac",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "ogg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "opus",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "m4a",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "mka",
+      "family": "audio",
+      "output": "aiff",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "txt",
+      "family": "document",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "txt",
+      "family": "document",
+      "output": "docx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "txt",
+      "family": "document",
+      "output": "odt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "txt",
+      "family": "document",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "doc",
+      "family": "document",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "doc",
+      "family": "document",
+      "output": "docx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "doc",
+      "family": "document",
+      "output": "odt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "doc",
+      "family": "document",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "docx",
+      "family": "document",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "docx",
+      "family": "document",
+      "output": "docx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "docx",
+      "family": "document",
+      "output": "odt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "docx",
+      "family": "document",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odt",
+      "family": "document",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odt",
+      "family": "document",
+      "output": "docx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odt",
+      "family": "document",
+      "output": "odt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odt",
+      "family": "document",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "rtf",
+      "family": "document",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "rtf",
+      "family": "document",
+      "output": "docx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "rtf",
+      "family": "document",
+      "output": "odt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "rtf",
+      "family": "document",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xls",
+      "family": "sheet",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xls",
+      "family": "sheet",
+      "output": "xlsx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xls",
+      "family": "sheet",
+      "output": "ods",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xls",
+      "family": "sheet",
+      "output": "csv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xlsx",
+      "family": "sheet",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xlsx",
+      "family": "sheet",
+      "output": "xlsx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xlsx",
+      "family": "sheet",
+      "output": "ods",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "xlsx",
+      "family": "sheet",
+      "output": "csv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ods",
+      "family": "sheet",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ods",
+      "family": "sheet",
+      "output": "xlsx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ods",
+      "family": "sheet",
+      "output": "ods",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ods",
+      "family": "sheet",
+      "output": "csv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "csv",
+      "family": "sheet",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "csv",
+      "family": "sheet",
+      "output": "xlsx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "csv",
+      "family": "sheet",
+      "output": "ods",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "csv",
+      "family": "sheet",
+      "output": "csv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tsv",
+      "family": "sheet",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tsv",
+      "family": "sheet",
+      "output": "xlsx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tsv",
+      "family": "sheet",
+      "output": "ods",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tsv",
+      "family": "sheet",
+      "output": "csv",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ppt",
+      "family": "slides",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ppt",
+      "family": "slides",
+      "output": "pptx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "ppt",
+      "family": "slides",
+      "output": "odp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pptx",
+      "family": "slides",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pptx",
+      "family": "slides",
+      "output": "pptx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pptx",
+      "family": "slides",
+      "output": "odp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odp",
+      "family": "slides",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odp",
+      "family": "slides",
+      "output": "pptx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "odp",
+      "family": "slides",
+      "output": "odp",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pdf",
+      "family": "pdf",
+      "output": "png",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pdf",
+      "family": "pdf",
+      "output": "jpg",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pdf",
+      "family": "pdf",
+      "output": "docx",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pdf",
+      "family": "pdf",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "pdf",
+      "family": "pdf",
+      "output": "pdf",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "srt",
+      "family": "subtitle",
+      "output": "srt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "srt",
+      "family": "subtitle",
+      "output": "vtt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "srt",
+      "family": "subtitle",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "vtt",
+      "family": "subtitle",
+      "output": "srt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "vtt",
+      "family": "subtitle",
+      "output": "vtt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "vtt",
+      "family": "subtitle",
+      "output": "txt",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "zip",
+      "family": "archive",
+      "output": "zip",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "zip",
+      "family": "archive",
+      "output": "tar",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "zip",
+      "family": "archive",
+      "output": "tar.gz",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tar",
+      "family": "archive",
+      "output": "zip",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tar",
+      "family": "archive",
+      "output": "tar",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tar",
+      "family": "archive",
+      "output": "tar.gz",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gz",
+      "family": "archive",
+      "output": "zip",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gz",
+      "family": "archive",
+      "output": "tar",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "gz",
+      "family": "archive",
+      "output": "tar.gz",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tgz",
+      "family": "archive",
+      "output": "zip",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tgz",
+      "family": "archive",
+      "output": "tar",
+      "files": 1,
+      "success": true
+    },
+    {
+      "input": "tgz",
+      "family": "archive",
+      "output": "tar.gz",
+      "files": 1,
+      "success": true
+    }
+  ],
+  "media_tools": [
+    {
+      "family": "video",
+      "tool": "compress",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "strip",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "metadata",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "edit_metadata",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "target_size",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "trim",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "speed",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "split_media",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "join_media",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "crop",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "snapshot",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "compress",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "strip",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "metadata",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "edit_metadata",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "target_size",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "trim",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "speed",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "split_media",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "join_media",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "normalize",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "bleep",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "channels",
+      "success": true
+    }
+  ]
+}

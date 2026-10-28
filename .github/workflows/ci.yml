@@ -55,6 +55,9 @@ jobs:
       - name: Matriz completa de conversões Linux
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         run: python tests/windows/engine_parity.py dist/citrica/citrica --system-engines --report release/citrica-linux-engine-parity.json
+      - name: Ferramentas de imagem e PDF pelo pacote Linux
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        run: python tests/windows/static_tools_parity.py dist/citrica/citrica --report release/citrica-linux-static-tools-parity.json
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
@@ -70,6 +73,7 @@ jobs:
             release/*.deb
             release/*.png
             release/citrica-linux-engine-parity.json
+            release/citrica-linux-static-tools-parity.json
             release/SHA256SUMS
           retention-days: 14
   ubuntu-deb:

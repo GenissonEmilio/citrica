@@ -1,0 +1,141 @@
+{
+  "version": "0.6.0",
+  "date": "2026-10-28",
+  "status": "candidate; final packaged Unicode/upgrade checks still in progress",
+  "vm": {
+    "os": "Windows 11 Pro x64, pt-BR, build 26300.9457",
+    "memory_gb": 4,
+    "logical_processors_visible_to_windows": 2,
+    "ordinary_user_token": true,
+    "secure_boot_enabled": true,
+    "defender_antivirus_enabled": true,
+    "defender_realtime_enabled": true,
+    "external_ffmpeg_office_tesseract_installed": false,
+    "global_vc_redistributable_installed_for_tests": false,
+    "long_paths_enabled": false,
+    "install_directory_contains_spaces_and_accents": true
+  },
+  "tested_initial_candidate": {
+    "source_commit": "2655984",
+    "ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40605616875",
+    "installer_sha256": "ea3f741a63e17a6b1d8371d6f42c16c097f4c53feb16c1e8aa092789fa896549",
+    "signature_status": "NotSigned",
+    "engine_provenance": "compiled-from-pinned-sources",
+    "corresponding_source_zip_sha256": "74fc371ede2f6c3d610dc9349960bf413a0a7eeea703398337ad0fdd1bbaffd0"
+  },
+  "conversion_matrix": {
+    "input_extensions": 50,
+    "conversions": 304,
+    "duration_seconds": 1266.38,
+    "path_isolated": true,
+    "originals_preserved": true,
+    "ocr_redaction": true
+  },
+  "media_tool_cases": 23,
+  "native": {
+    "native_input_test": "passed",
+    "cross_process_qt_ole_drag": true,
+    "global_shift": true,
+    "real_conversion": true,
+    "original_preserved": true,
+    "global_hotkey": true,
+    "reopened_empty": true,
+    "global_escape": true,
+    "manual_explorer": "pending external tester"
+  },
+  "explorer": {
+    "real_explorer": true,
+    "qt_scale_factor": "1",
+    "office_engine": "bundled",
+    "same_folder": false,
+    "cases": {
+      "ctrl_actions_stationary_activation": true,
+      "docx_pdf_without_office": true,
+      "pdf_docx_editable": true,
+      "alt_tools": true,
+      "bundled_image": {
+        "input": ".png",
+        "output": "jpg",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_video": {
+        "input": ".mp4",
+        "output": "webm",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_audio": {
+        "input": ".wav",
+        "output": "mp3",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_document": {
+        "input": ".odt",
+        "output": "pdf",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_sheet": {
+        "input": ".xlsx",
+        "output": "pdf",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_slides": {
+        "input": ".pptx",
+        "output": "pdf",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_subtitle": {
+        "input": ".srt",
+        "output": "vtt",
+        "palette_verified": true,
+        "converted": true
+      },
+      "bundled_archive": {
+        "input": ".zip",
+        "output": "tar",
+        "palette_verified": true,
+        "converted": true
+      }
+    },
+    "originals_preserved": true,
+    "result": "passed"
+  },
+  "qr": {
+    "packaged_decoder": true,
+    "unicode_input_path": true,
+    "isolated_path": true,
+    "exact_decoded_text": true
+  },
+  "unicode_face_regression": {
+    "initial_packaged_candidate": "failed; OpenCV narrow fopen could not open model under accented installation directory",
+    "fix": "Python reads Unicode model path, then OpenCV loads XML from memory",
+    "source_regression_in_windows_vm": "6 passed",
+    "fixed_packaged_candidate": "pending"
+  },
+  "trust": {
+    "existing_0_5_0_installation_warning_reproduced": "Open File security warning: unknown publisher, with Internet zone marker",
+    "blue_smartscreen_screen_reproduced": false,
+    "protections_disabled": false,
+    "verified_publisher_provisioned": false,
+    "smartscreen_reputation_resolved": false,
+    "remaining_external_step": "Maintainer must obtain an approved signing identity or Store enrollment/channel."
+  },
+  "limitations": [
+    "A clean Windows 11 VM and Windows Server CI do not represent every PC, GPU, monitor or document.",
+    "The source-only QA Python runtime needs its private Qt CRT loaded; frozen executables use their own runtime and are tested independently.",
+    "The 40725014510 source build passed package/matrix/install/upgrade checks but failed an Alt activation IPC check. This is being investigated, not reported as an overall pass."
+  ],
+  "source_native_repetition": {
+    "sessions": 10,
+    "gestures": 40,
+    "same_folder_sessions": 5,
+    "duration_seconds": 184.7,
+    "result": "passed",
+    "note": "Source app with an explicit private QA Python CRT bootstrap; frozen application is validated independently."
+  }
+}
