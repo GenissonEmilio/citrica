@@ -102,6 +102,24 @@ Cada variante tem seu próprio manifest, staging, pacote, log e relatório JSON.
 O relatório distingue staging, validação MakeAppx, assinatura, teste na VM e
 certificação. Um MakeAppx bem-sucedido não marca os demais como aprovados.
 
+## Rascunho no Partner Center
+
+O produto `9NV389WMRJNC` tem um envio em rascunho com o pacote Store `1.6.0.0`
+aceito como **Validated**, para Windows Desktop x64. As propriedades, política
+de privacidade, descrição em português, logotipo original, licença
+AGPL-3.0-or-later e justificativa de `runFullTrust` foram salvas. A aprovação
+dessa capability ainda depende da revisão Microsoft.
+
+A listagem precisa de capturas reais do aplicativo Windows com a resolução
+mínima exigida pela Store, 1366×768 para desktop. A captura da VM em 1280×800
+serve para evidência de teste, mas não atende a esse requisito; ampliá-la não
+substitui uma captura válida. A classificação IARC e seus termos também
+precisam ser concluídos pelo mantenedor antes do envio para certificação.
+
+O cadastro não é uma página pública de download aprovada. Até a certificação,
+os downloads de teste continuam na release GitHub e o EXE continua sem
+assinatura pública, aguardando a avaliação da SignPath.
+
 ## Runtime e integrações
 
 O manifest usa `uap10:RuntimeBehavior="packagedClassicApp"`,
@@ -181,3 +199,4 @@ demais requisitos do Partner Center. Este builder não faz submissões.
 - [Windows App Certification Kit](https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/windows-app-certification-kit).
 - [Assinatura no fluxo Microsoft Store](https://learn.microsoft.com/en-us/windows/apps/publish/get-started).
 - [Capability runFullTrust e revisão da Store](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/app-capability-declarations).
+- [Capturas e imagens da listagem](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/screenshots-and-images).
