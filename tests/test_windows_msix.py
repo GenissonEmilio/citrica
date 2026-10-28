@@ -42,8 +42,7 @@ def payload(tmp_path, builder):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(data)
     inventory = {name.removeprefix('_internal/'): builder.digest(path / name)
-                 for name in builder.REQUIRED if name.startswith('_internal/')
-                 and not name.endswith('engine-files.sha256.json')}
+                 for name in builder.ENGINE_REQUIRED}
     (path / '_internal/engine-files.sha256.json').write_text(json.dumps(inventory))
     return path
 
@@ -152,6 +151,17 @@ def test_only_unused_source_template_is_omitted_and_runtime_template_stays(build
     assert builder.snapshot(stage / 'store/Citrica') == {k: v for k, v in original.items() if k not in omitted}
     runtime = '_internal/docx/templates/default.docx'
     assert builder.digest(stage / 'store/Citrica' / runtime) == original[runtime]['sha256']
+
+
+def test_python_template_is_required_outside_the_engine_inventory(builder, payload):
+    path = payload / '_internal/engine-files.sha256.json'
+    inventory = json.loads(path.read_text())
+    assert 'docx/templates/default.docx' not in inventory
+    builder.validate_payload(payload, builder.snapshot(payload))
+    inventory.pop('tools/ffmpeg/bin/ffmpeg.exe')
+    path.write_text(json.dumps(inventory))
+    with pytest.raises(ValueError, match='does not cover'):
+        builder.validate_payload(payload, builder.snapshot(payload))
 
 
 def test_other_reserved_opc_paths_fail_instead_of_silently_losing_data(builder):

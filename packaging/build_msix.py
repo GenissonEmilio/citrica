@@ -32,13 +32,16 @@ NS = {
 FIELDS = {'schema', 'name', 'publisher', 'publisher_display_name', 'display_name', 'store_id',
           'package_family_name', 'store_version', 'architecture', 'min_os_version',
           'max_tested_os_version', 'startup_task_id'}
-REQUIRED = {
-    'Citrica.exe', 'citrica-cli.exe', 'citrica-package.exe', 'LICENSE', 'THIRD_PARTY.md',
-    'requirements.lock', '_internal/engines.json', '_internal/engine-files.sha256.json',
+ENGINE_REQUIRED = {
+    '_internal/engines.json',
     '_internal/engine-sources.zip', '_internal/tools/ffmpeg/bin/ffmpeg.exe',
     '_internal/tools/ffmpeg/bin/ffprobe.exe', '_internal/tools/libreoffice/program/soffice.com',
     '_internal/tools/libreoffice/program/soffice.exe', '_internal/ocr/tesseract.exe',
     '_internal/ocr/tessdata/eng.traineddata',
+}
+REQUIRED = ENGINE_REQUIRED | {
+    'Citrica.exe', 'citrica-cli.exe', 'citrica-package.exe', 'LICENSE', 'THIRD_PARTY.md',
+    'requirements.lock', '_internal/engine-files.sha256.json',
     '_internal/docx/templates/default.docx',
 }
 SOURCE_TEMPLATE = '_internal/docx/templates/default-docx-template/'
@@ -214,8 +217,7 @@ def validate_payload(payload, files):
             raise ValueError(f'Invalid engine inventory entry: {name}')
         if actual['sha256'] != checksum:
             raise ValueError(f'Engine inventory SHA-256 mismatch: {name}')
-    engine_required = {name.removeprefix('_internal/') for name in REQUIRED if name.startswith('_internal/')}
-    engine_required.discard('engine-files.sha256.json')
+    engine_required = {name.removeprefix('_internal/') for name in ENGINE_REQUIRED}
     if not engine_required.issubset(inventory):
         raise ValueError('Engine inventory does not cover the required engines and corresponding sources.')
 
