@@ -1,10 +1,28 @@
 name: Validar Explorer Windows por código-fonte
 on:
   workflow_dispatch:
+    inputs:
+      reuse_source_engines:
+        description: Repackage current app with verified source-built engines and full packaged QA
+        required: false
+        type: boolean
+        default: false
+      source_run_id:
+        description: Same-repository source engine run for packaged QA
+        required: false
+        type: string
+        default: '40735116402'
+      source_artifact_id:
+        description: Explicit unsigned-test artifact ID for packaged QA
+        required: false
+        type: string
+        default: '12840413543'
 permissions:
   contents: read
+  actions: read
 jobs:
   explorer:
+    if: ${{ !inputs.reuse_source_engines }}
     runs-on: windows-2022
     timeout-minutes: 30
     env:
@@ -50,3 +68,10 @@ jobs:
             build/windows-explorer-*/**/*.log
             build/windows-engine-cache/*.log
           retention-days: 7
+
+  repack:
+    if: ${{ inputs.reuse_source_engines }}
+    uses: ./.github/workflows/windows-repack-qa.yml
+    with:
+      source_run_id: ${{ inputs.source_run_id }}
+      source_artifact_id: ${{ inputs.source_artifact_id }}

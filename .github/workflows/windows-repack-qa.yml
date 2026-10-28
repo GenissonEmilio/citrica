@@ -13,6 +13,20 @@ on:
         type: string
         default: '12840413543'
 
+
+  workflow_call:
+    inputs:
+      source_run_id:
+        description: Same-repository source engine run
+        required: false
+        type: string
+        default: '40735116402'
+      source_artifact_id:
+        description: Explicit unsigned-test artifact ID
+        required: false
+        type: string
+        default: '12840413543'
+
 # This manual diagnostic workflow cannot publish releases or sign applications.
 permissions:
   contents: read
