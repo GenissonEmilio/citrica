@@ -3,12 +3,14 @@
 Runs only on the CI's input desktop. No input is sent to a user's computer.
 """
 import argparse
+from concurrent.futures import Future
 import ctypes
 import faulthandler
 import hashlib
 import json
 import math
 import os
+from queue import Queue
 import shutil
 import subprocess
 import sys
@@ -19,25 +21,138 @@ from pathlib import Path
 
 from docx import Document
 from PIL import Image
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPoint, QThread
 from PySide6.QtGui import QCursor
+from PySide6.QtNetwork import QLocalSocket
 from PySide6.QtWidgets import QApplication
 
 # The clean VM has no system MSVC redistributable. Qt loads its own runtime
 # for the source test's PDF oracle; the frozen child uses its separate bundle.
 import pymupdf
 
-from native_flow import Input, InputUnion, Keyboard, Mouse
-from citrica.windows.ipc import send
+from citrica.windows.ipc import MAX_REQUEST, send, server_name
 
 ROOT = Path(__file__).resolve().parents[2]
 SCALE = os.environ.get('QT_SCALE_FACTOR', '1')
+
+
+def _blocking_request(payload, timeout, deadline):
+    """Run the entire local-socket transaction on the QA worker thread."""
+    def remaining(limit):
+        milliseconds = math.ceil((deadline - time.monotonic()) * 1000)
+        if milliseconds <= 0:
+            raise TimeoutError('QA IPC exceeded its request deadline')
+        return min(limit, milliseconds)
+
+    def wait_for(waiter, ready, limit):
+        phase_deadline = min(deadline, time.monotonic() + limit / 1000)
+        remaining(limit)
+        while not ready():
+            if socket.state() == QLocalSocket.LocalSocketState.UnconnectedState:
+                return False
+            remaining(10)  # The total deadline also covers fragmented replies.
+            milliseconds = math.ceil((phase_deadline - time.monotonic()) * 1000)
+            if milliseconds <= 0:
+                return False
+            # PySide's native wait can retain the GIL. Short bounded slices and
+            # an explicit yield let the Python main-thread Qt/COM pump run.
+            waiter(min(10, milliseconds))
+            time.sleep(.001)
+        return True
+
+    data = json.dumps(payload, ensure_ascii=False).encode('utf-8') + b'\n'
+    if len(data) > MAX_REQUEST:
+        raise ValueError('Seleção muito grande para enviar à roda.')
+    socket = QLocalSocket()
+    try:
+        socket.connectToServer(server_name())
+        if not wait_for(socket.waitForConnected,
+                        lambda: socket.state() == QLocalSocket.LocalSocketState.ConnectedState, timeout):
+            return None
+        socket.write(data)
+        if not wait_for(socket.waitForBytesWritten, lambda: not socket.bytesToWrite(), 1000):
+            raise RuntimeError('QA IPC could not write its request')
+        received = bytearray()
+        while b'\n' not in received:
+            if not wait_for(socket.waitForReadyRead, lambda: bool(socket.bytesAvailable()), 3000):
+                raise RuntimeError('O Cítrica não respondeu. Verifique o diagnóstico.')
+            received.extend(bytes(socket.readAll()))
+            if len(received) > MAX_REQUEST:
+                raise RuntimeError('Resposta inválida do Cítrica.')
+        return json.loads(received.split(b'\n', 1)[0])
+    finally:
+        socket.abort()
+
+
+class _IpcWorker(QThread):
+    def __init__(self, writer):
+        super().__init__()
+        self.requests = Queue()
+        self.writer = writer
+
+    def run(self):
+        while (request := self.requests.get()) is not None:
+            payload, timeout, deadline, result = request
+            if not result.set_running_or_notify_cancel():
+                continue
+            try:
+                result.set_result(self.writer(payload, timeout, deadline))
+            except Exception as error:
+                result.set_exception(error)
+
+
+class PumpedIpcClient:
+    """Keep the Explorer controller's Qt/COM STA responsive during IPC waits.
+
+    Explorer can call back into its controller during an OLE drag. Blocking its
+    owning thread in QLocalSocket.waitForReadyRead can prevent that callback.
+    Only the persistent worker owns sockets; the main thread keeps pumping.
+    """
+    def __init__(self, pump, writer=_blocking_request, request_timeout=5):
+        self.pump = pump
+        self.request_timeout = request_timeout
+        self.worker = _IpcWorker(writer)
+        self.failed = False
+        self.closed = False
+        self.worker.start()
+
+    def request(self, payload, timeout=500):
+        if self.closed or self.failed:
+            raise RuntimeError('QA IPC client is closed or a previous request exceeded its deadline')
+        deadline = time.monotonic() + self.request_timeout
+        result = Future()
+        self.worker.requests.put((payload, timeout, deadline, result))
+        while not result.done():
+            self.pump()
+            if time.monotonic() >= deadline:
+                self.failed = True
+                result.cancel()
+                raise TimeoutError('QA IPC exceeded its request deadline; no request was retried')
+            time.sleep(.005)
+        return result.result()
+
+    def close(self):
+        if self.closed:
+            return
+        self.closed = True
+        self.worker.requests.put(None)
+        deadline = time.monotonic() + self.request_timeout + .5
+        while not self.worker.isFinished():
+            self.pump()
+            if time.monotonic() >= deadline:
+                raise TimeoutError('QA IPC worker did not stop after its bounded request')
+            time.sleep(.005)
+        self.worker.wait()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('executable', help='Packaged executable or --source')
     parser.add_argument('--same-folder', action='store_true')
     parser.add_argument('--bundled-engines', action='store_true',
                         help='also drag examples of every conversion family using the bundled engines')
+    parser.add_argument('--blocking-ipc', action='store_true',
+                        help='A/B control: block the Explorer controller during IPC, as the old harness did')
     # Keep the existing --source invocation accepted as a positional value.
     arguments = parser.parse_args(['source' if arg == '--source' else arg for arg in sys.argv[1:]])
     run_id = SCALE + ('-same-folder' if arguments.same_folder else '') + ('-bundled' if arguments.bundled_engines else '')
@@ -55,6 +170,13 @@ def main():
         os.environ['CITRICA_OFFICE_ENGINE'] = 'builtin'
     faulthandler.dump_traceback_later(600 if arguments.bundled_engines else 100, exit=True)
     app = QApplication([])
+    from native_flow import Input, InputUnion, Keyboard, Mouse
+    import pythoncom
+
+    def pump():
+        app.processEvents()
+        pythoncom.PumpWaitingMessages()
+
     user = ctypes.WinDLL('user32', use_last_error=True)
     user.SendInput.argtypes = [wintypes.UINT, ctypes.POINTER(Input), ctypes.c_int]
     user.SendInput.restype = wintypes.UINT
@@ -75,7 +197,7 @@ def main():
     def pause(seconds=.15):
         until = time.monotonic()+seconds
         while time.monotonic() < until:
-            app.processEvents()
+            pump()
             time.sleep(.01)
     last_status, stage = None, 'resident-start'
     def wait(predicate, timeout=30):
@@ -83,7 +205,7 @@ def main():
         until = time.monotonic()+timeout
         current = None
         while time.monotonic() < until:
-            current = send({'op': 'status'}, timeout=200)
+            current = request({'op': 'status'}, timeout=200)
             if current:
                 last_status = current
             if current and predicate(current):
@@ -139,17 +261,19 @@ def main():
     resident_log = (STATE/'resident.log').open('w', encoding='utf-8')
     resident = subprocess.Popen([*command, '--background'], stdout=resident_log, stderr=subprocess.STDOUT,
                                env=dict(os.environ, CITRICA_QA_TRACEBACK_LOG=str(STATE/'resident-stacks.log')))
+    pythoncom.CoInitialize()
+    client = None if arguments.blocking_ipc else PumpedIpcClient(pump)
+    request = send if client is None else client.request
     hwnd = None
     report = {'real_explorer': True, 'qt_scale_factor': SCALE,
               'office_engine': 'bundled' if arguments.bundled_engines else 'builtin',
+              'ipc_controller': 'blocking-control' if arguments.blocking_ipc else 'pumped-worker',
               'same_folder': arguments.same_folder, 'cases': {}}
     try:
         wait(lambda s: s['hotkey_active'])
         print('Explorer: aplicativo residente pronto.', flush=True)
         subprocess.Popen(['explorer.exe', str(folder)])
-        import pythoncom
         from win32com.client.dynamic import Dispatch
-        pythoncom.CoInitialize()
         shell = Dispatch('Shell.Application')
         window = None
         until = time.monotonic()+20
@@ -273,7 +397,7 @@ def main():
         key(0x1b, False)
         report['cases']['alt_tools'] = True
         for family, path, target, formats in engine_examples:
-            previous = send({'op': 'status'})['counts']['converted']
+            previous = request({'op': 'status'})['counts']['converted']
             drag(path, 'convert', 0x10, target, formats)
             wait(lambda s: not s['busy'] and s['counts']['converted'] == previous + 1, timeout=60)
             output = path.with_suffix('.' + target)
@@ -298,7 +422,7 @@ def main():
         failure_file.write_text(json.dumps(snapshot, indent=2), encoding='utf-8')
         app.primaryScreen().grabWindow(0).save(str(ROOT/f'release/citrica-windows-explorer-failure-{run_id}.png'))
         try:
-            snapshot['status_before_cancel'] = send({'op': 'status'})
+            snapshot['status_before_cancel'] = request({'op': 'status'})
         except Exception as error:
             snapshot['ipc_error_before_cancel'] = str(error)
         # Diagnose whether cancelling Explorer's OLE operation unblocks the
@@ -310,7 +434,7 @@ def main():
         key(0x1b, False)
         pause(.5)
         try:
-            snapshot['status_after_cancel'] = send({'op': 'status'})
+            snapshot['status_after_cancel'] = request({'op': 'status'})
         except Exception as error:
             snapshot['ipc_error_after_cancel'] = str(error)
         snapshot['resident_exit_code_after_cancel'] = resident.poll()
@@ -324,7 +448,7 @@ def main():
             user.PostMessageW(hwnd, 0x10, 0, 0)  # Close only our controlled Explorer window.
         try:
             try:
-                send({'op': 'quit'})
+                request({'op': 'quit'})
             except RuntimeError:
                 pass
             resident.wait(timeout=15)
@@ -337,6 +461,11 @@ def main():
                 resident.wait(timeout=5)
             resident_log.close()
             faulthandler.cancel_dump_traceback_later()
+            try:
+                if client:
+                    client.close()
+            finally:
+                pythoncom.CoUninitialize()
 
 
 if __name__ == '__main__':
