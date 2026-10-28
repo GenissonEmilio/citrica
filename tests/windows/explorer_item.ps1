@@ -12,6 +12,11 @@ foreach ($element in $elements) {
     try {
         $state = $element.Current
         if (($state.Name -eq $FileName -or $state.Name -eq $FileStem) -and -not $state.IsOffscreen) {
+            # Hidden extensions can give a source DOCX and its previous PDF
+            # output the same visible name. COM selected the exact filesystem
+            # item; locate that selected UIA item rather than the first stem.
+            $selection = $element.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern)
+            if (-not $selection.Current.IsSelected) { continue }
             $rectangle = $state.BoundingRectangle
             if ($rectangle.Width -gt 5 -and $rectangle.Height -gt 5) {
                 $candidates += [PSCustomObject]@{x=$rectangle.X; y=$rectangle.Y;
@@ -21,6 +26,6 @@ foreach ($element in $elements) {
         }
     } catch { }
 }
-if ($candidates.Count -eq 0) { throw "O arquivo de teste não foi localizado na interface do Explorer." }
+if ($candidates.Count -eq 0) { throw "O arquivo selecionado não foi localizado na interface do Explorer." }
 $candidates | Sort-Object @{Expression={if ($_.type -eq 'ControlType.Text') {0} else {1}}} |
     Select-Object -First 1 | ConvertTo-Json -Compress

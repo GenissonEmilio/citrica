@@ -31,10 +31,12 @@ QA = logging.getLogger('citrica.qa')
 
 @contextmanager
 def qa_tracebacks(args):
-    """Opt-in QA watchdog survives a blocked GUI or named-pipe timeout.
+    """Opt-in fatal crash capture and operation boundaries for desktop QA.
 
     Only a resident launched explicitly by the desktop harness enables this.
     No input paths or file contents are recorded by the boundary events.
+    Never walk live frames from an asynchronous periodic watchdog: CPython3.12
+    can crash in that diagnostic itself while Qt/Python threads change frames.
     """
     destination = os.environ.get('CITRICA_QA_TRACEBACK_LOG')
     if not destination or not args.background:
@@ -53,18 +55,15 @@ def qa_tracebacks(args):
             fatal_was_enabled = faulthandler.is_enabled()
             try:
                 # Preserve an existing fatal handler and its destination. A
-                # frozen GUI normally has none; capture native crashes there
-                # in the same QA file as periodic watchdog snapshots.
+                # frozen GUI normally has none; capture native crashes there.
                 if not fatal_was_enabled:
                     faulthandler.enable(file=traces, all_threads=True)
-                faulthandler.dump_traceback_later(5, repeat=True, file=traces)
-                QA.debug('resident.watchdog start pid=%s', os.getpid())
+                QA.debug('resident.qa_fatal_capture start pid=%s', os.getpid())
                 yield
             finally:
-                faulthandler.cancel_dump_traceback_later()
                 if not fatal_was_enabled:
                     faulthandler.disable()
-                QA.debug('resident.watchdog stop')
+                QA.debug('resident.qa_fatal_capture stop')
     finally:
         QA.removeHandler(handler)
         QA.setLevel(previous_level)

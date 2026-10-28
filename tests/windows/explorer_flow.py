@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -90,6 +91,10 @@ def main():
             pause(.05)
         raise AssertionError(current)
     folder = (STATE/'Citrica-explorer-validation').resolve()
+    # Every run owns these synthetic fixtures. Previous outputs must not be
+    # accepted as this run's conversion result or confuse hidden extensions.
+    if folder.exists():
+        shutil.rmtree(folder)
     folder.mkdir(exist_ok=True)
     def fixture(case, name):
         parent = folder if arguments.same_folder else folder/case

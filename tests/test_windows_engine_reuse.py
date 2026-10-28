@@ -73,7 +73,15 @@ def package(tmp_path, reuse):
             archive.writestr(reuse.PREFIX + 'Qt6Core.dll', b'previous Qt MUST NOT be copied')
             archive.writestr(reuse.PREFIX + 'tools/libreoffice/program/__pycache__/uno.pyc', b'cache MUST NOT be copied')
             if extra:
-                archive.writestr(*extra)
+                name, data = extra
+                if isinstance(name, str):
+                    # Windows ZipInfo(name) normalizes backslashes before
+                    # writing. Preserve the deliberately malformed raw name
+                    # in both headers so the reader actually sees it.
+                    raw = zipfile.ZipInfo('placeholder')
+                    raw.filename = raw.orig_filename = name
+                    name = raw
+                archive.writestr(name, data)
         return path
     return make, root, tmp_path / 'engines', tmp_path / 'report.json'
 

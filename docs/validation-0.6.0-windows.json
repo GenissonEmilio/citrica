@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
   "date": "2026-10-28",
-  "status": "candidate; native Explorer access violation under investigation; final VM upgrade in progress",
+  "status": "candidate; async diagnostic crash isolated; final native regression checks in progress",
   "vm": {
     "os": "Windows 11 Pro x64, pt-BR, build 26300.9457",
     "memory_gb": 4,
@@ -192,6 +192,49 @@
       "Explorer builtin at 150%"
     ],
     "resolved": false,
-    "next_diagnostic": "Capture fatal native stack plus OLE drop/grab/job boundaries; retest exact installed candidate in Windows 11 VM."
+    "next_diagnostic": "Independent A/B reproduced access violation only with periodic CPython stack dumper; asynchronous snapshots removed; full native retest pending."
+  },
+  "diagnostic_experiment": {
+    "runtime": "CPython 3.12.10 / PySide6 6.12.0 / Windows 11",
+    "imports_citrica": false,
+    "input_injection": false,
+    "control_processes": 3,
+    "control_successes": 3,
+    "periodic_processes": 3,
+    "periodic_native_access_violations": 3,
+    "interval_seconds": 0.02,
+    "maximum_crash_latency_seconds": 0.281,
+    "change": "Remove asynchronous periodic stack dumps; keep opt-in fatal capture and OLE boundary events.",
+    "full_native_retest": "pending",
+    "evidence": "evidence/0.6.0/windows-python312-watchdog-comparison.json"
+  },
+  "final_vm_upgrade": {
+    "source_commit": "ff90885",
+    "installer_sha256": "f3b984e723130a695e4da6d91fb924b563c0d44560c1f50fbe159a889de27c76",
+    "ordinary_user_token": true,
+    "unicode_install_directory": true,
+    "engine_files_sha256_verified": 19578,
+    "obsolete_runtime_removed": true,
+    "preferences_preserved": true,
+    "startup_preference_preserved": true,
+    "sendto_shortcut": true,
+    "result": "passed",
+    "evidence": "evidence/0.6.0/citrica-windows-vm-final-upgrade.json",
+    "advanced_tools": {
+      "operations": 38,
+      "palettes": 5,
+      "originals_preserved": true,
+      "unicode_face_tools": true,
+      "result": "passed",
+      "evidence": "evidence/0.6.0/citrica-windows-vm-final-static-tools.json"
+    },
+    "native_flow": {
+      "ole_drag": true,
+      "global_shift": true,
+      "global_shortcut": true,
+      "reopened_empty": true,
+      "result": "passed",
+      "evidence": "evidence/0.6.0/citrica-windows-vm-final-native.json"
+    }
   }
 }
