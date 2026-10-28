@@ -180,7 +180,14 @@ def main():
     user = ctypes.WinDLL('user32', use_last_error=True)
     user.SendInput.argtypes = [wintypes.UINT, ctypes.POINTER(Input), ctypes.c_int]
     user.SendInput.restype = wintypes.UINT
-    user.SetCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
+    # UI Automation rectangles are physical screen coordinates, independent of
+    # the controller's Qt scale. Never drag a covered file/window by accident.
+    user.SetPhysicalCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
+    user.SetPhysicalCursorPos.restype = wintypes.BOOL
+    user.WindowFromPhysicalPoint.argtypes = [wintypes.POINT]
+    user.WindowFromPhysicalPoint.restype = wintypes.HWND
+    user.GetAncestor.argtypes = [wintypes.HWND, wintypes.UINT]
+    user.GetAncestor.restype = wintypes.HWND
     user.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND, ctypes.c_int, ctypes.c_int,
                                  ctypes.c_int, ctypes.c_int, wintypes.UINT]
     user.SetForegroundWindow.argtypes = [wintypes.HWND]
@@ -327,13 +334,20 @@ def main():
                     continue
                 rect = json.loads(info.stdout)
                 print(f'Explorer: ícone localizado: {rect}.', flush=True)
-                x = round(rect['x']+min(rect['width']/2, 30))
-                y = round(rect['y']+rect['height']/2)
+                # Large-icon item rectangles include their editable labels.
+                # Start at the actual icon; Details rows use their row centre.
+                large_icon = rect['height'] > 48
+                x = round(rect['x'] + (rect['width']/2 if large_icon else min(rect['width']/2, 30)))
+                y = round(rect['y'] + (min(32, rect['height']/3) if large_icon else rect['height']/2))
+                user.SetWindowPos(hwnd, None, 0, 0, 0, 0, 0x43)  # Top, show, preserve size/position.
                 user.SetForegroundWindow(hwnd)
-                user.SetCursorPos(x, y)
+                assert user.SetPhysicalCursorPos(x, y), 'Cannot position the physical QA pointer'
                 pause()
+                under_pointer = user.WindowFromPhysicalPoint(wintypes.POINT(x, y))
+                assert user.GetAncestor(under_pointer, 2) == hwnd, 'The QA file is covered by another window'
                 button(True)
                 pause()
+                assert user.GetForegroundWindow() == hwnd, 'The QA click did not activate its Explorer window'
                 # New conversion outputs can asynchronously reorder Details
                 # rows after UI Automation returns a rectangle. Confirm the
                 # actual item under the click before initiating OLE.
@@ -345,7 +359,7 @@ def main():
                 pause(.6)
             else:
                 raise AssertionError('O Explorer não selecionou o arquivo solicitado')
-            user.SetCursorPos(x+55, y+12)
+            assert user.SetPhysicalCursorPos(x+55, y+12), 'Cannot move the physical QA pointer'
             pause(.3)
             key(vk, True)
             stage = f'activate:{path.suffix}:{mode}'
