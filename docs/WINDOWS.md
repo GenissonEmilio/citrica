@@ -1,6 +1,6 @@
 # Cítrica no Windows
 
-Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. O aplicativo permanece na bandeja. A versão Linux continua usando a extensão do GNOME 50.
+Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. O aplicativo permanece na bandeja. A candidata Linux 0.6.0 usa a extensão do GNOME 46/50/51 com Wayland.
 
 ## Instalar e abrir
 

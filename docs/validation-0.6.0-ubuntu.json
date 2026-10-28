@@ -271,10 +271,20 @@
     }
   },
   "native_onboarding_additional_step": {
-    "status": "pending rerun",
-    "step": "Final --setup --settings --screenshot inside tests/desktop/run_session.py, after the native flow.",
-    "reason": "Added after the native 46/50/51 runs. No compositor was launched again while the Windows VM needed the available memory.",
-    "already_verified": "Unit tests for setup idempotence passed; the frozen package first launch passed offscreen on all three Ubuntu versions."
+    "status": "passed on GNOME 50",
+    "date": "2026-10-28",
+    "environment": "Fedora GNOME 50 / Wayland, isolated compositor and user directories",
+    "backend": "Frozen Ubuntu 24.04 candidate 0.6.0",
+    "step": "--setup --settings --screenshot with the isolated GNOME compositor active; settings rendered offscreen",
+    "assertions": {
+      "version": "0.6.0",
+      "shell": 50,
+      "wayland": true,
+      "supported": true,
+      "backend_command_matches": true
+    },
+    "evidence": "build/0.6.0-investigation/native-onboarding.log and isolated config/citrica/setup.json",
+    "scope": "The additional onboarding step was rerun on GNOME 50, not repeated on 46/51. Offscreen first launch passed on all three Ubuntu versions."
   },
   "gnome_50_animation_separate_validation": {
     "environment": "Fedora / GNOME 50 / Wayland, isolated compositor",
