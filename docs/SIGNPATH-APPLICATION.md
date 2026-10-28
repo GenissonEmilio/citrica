@@ -1,6 +1,6 @@
-# Candidatura SignPath Foundation — rascunho revisável
+# Candidatura SignPath Foundation — acompanhamento
 
-**Não enviada. Não constitui aprovação, certificado ou política já aceita.** Atualizada em 28 de outubro de 2026 para o mantenedor revisar em [SignPath: Apply](https://signpath.org/apply).
+**Enviada pelo mantenedor em 28 de outubro de 2026; aguardando retorno.** O comprovante apresentado mostra “Form submitted”. Isso confirma o envio, sem constituir aprovação, certificado ou política já aceita. Os dados abaixo preservam a referência preparada para a candidatura; o conteúdo efetivamente enviado não foi conferido.
 
 ## Dados públicos prontos
 
@@ -22,9 +22,9 @@
 
 > Cítrica is an open-source, local file converter for Linux and Windows. On Windows it runs in the system tray and shows a radial menu while users drag files in Explorer. Users choose an output format and receive a separate converted file; conversion does not require uploading files to a conversion service. The public repository includes source code, pinned Python dependencies, Windows packaging scripts and automated tests. We would like to apply for SignPath Foundation signing for our own Windows launchers and Inno Setup installer/uninstaller, linked to GitHub Actions builds. Upstream executable components would be included according to the Foundation's approved artifact configuration, without signing those binaries as our own code.
 
-## Confirmações do mantenedor antes de enviar
+## Requisitos a confirmar com o serviço
 
-O responsável precisa preencher seu contato diretamente no formulário e confirmar MFA, os integrantes responsáveis por alterações/revisão/aprovação e sua aceitação dos termos. Não inferimos dados de contato nem que a configuração de MFA esteja ativa. Os papéis propostos são **GenissonEmilio** como mantenedor, revisor e aprovador, sujeitos à aceitação da Foundation.
+O envio foi feito diretamente pelo mantenedor. A configuração de MFA, os integrantes responsáveis por alterações/revisão/aprovação e os termos precisam seguir as exigências do serviço. Não inferimos dados de contato nem que a configuração de MFA esteja ativa. Os papéis propostos são **GenissonEmilio** como mantenedor, revisor e aprovador, sujeitos à aceitação da Foundation.
 
 Os termos exigem origem verificável dos artefatos, aprovação manual por release, metadados e política pública de assinatura/privacidade. A Foundation avalia também a reputação e elegibilidade do projeto; o serviço pode recusar a solicitação. Consulte os [termos completos](https://signpath.org/terms).
 
@@ -34,7 +34,7 @@ Antes de declarar a política final, revisar o comportamento de rede das integra
 
 Guardar as credenciais do serviço nos mecanismos aprovados do CI, limitar quem aprova assinaturas, selecionar os artefatos próprios e ligar a solicitação ao build/tag público. Configurar o callback do Inno para assinar o desinstalador durante a compilação, além do setup. Testar a instalação pelo canal final numa VM com as proteções do Windows ativadas.
 
-O script local `packaging/sign_windows.py` prepara o caminho para um certificado próprio de CA/HSM. Ele não configura nem substitui o serviço SignPath. A submissão deste rascunho ao serviço continua dependendo de uma ação explícita do mantenedor.
+O script local `packaging/sign_windows.py` prepara o caminho para um certificado próprio de CA/HSM. Ele não configura nem substitui o serviço SignPath. A candidatura já foi enviada; a integração depende da aprovação e das configurações fornecidas pelo serviço.
 
 ## Pontos para confirmar com a Foundation
 

@@ -123,7 +123,7 @@
     "protections_disabled": false,
     "verified_publisher_provisioned": false,
     "smartscreen_reputation_resolved": false,
-    "remaining_external_step": "Maintainer must obtain an approved signing identity or Store enrollment/channel.",
+    "remaining_external_step": "SignPath approval and service configuration, or Store product identity followed by MSIX packaging and certification.",
     "signing_helper_tests": {
       "ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/40749080833",
       "source_commit": "01c4179",
@@ -131,6 +131,21 @@
       "tests_passed": 14,
       "actual_certificate_used": false,
       "scope": "Mocked SignTool integration, UTF-8/Unicode arguments, module paths, and official Inno PE temporaries."
+    },
+    "signpath_application": {
+      "submitted": true,
+      "date": "2026-10-28",
+      "evidence": "Maintainer provided the Form submitted confirmation.",
+      "approval_confirmed": false,
+      "service_integration_configured": false
+    },
+    "microsoft_store_account": {
+      "verification_reported_by_maintainer": true,
+      "date": "2026-10-28",
+      "presented_dashboard_product_count": 0,
+      "product_identity_received": false,
+      "msix_package_prepared": false,
+      "store_certification_confirmed": false
     }
   },
   "limitations": [

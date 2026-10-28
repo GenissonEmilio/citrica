@@ -49,6 +49,6 @@ Compositores GNOME/Wayland reais e isolados validaram a roda nos GNOME 46 e 51 d
 
 O instalador 0.5.0 com marcador de origem da Internet exibiu o aviso de fornecedor desconhecido na VM. A tela azul específica relatada externamente não foi reproduzida. O instalador final e o aplicativo apresentam `NotSigned`; não há alegação de aviso eliminado.
 
-Uma identidade pública aprovada ainda depende do mantenedor. [Requisitos, SignPath Foundation e cadastro individual da Store](WINDOWS-SIGNING.md). Nenhuma proteção foi desativada e nenhum certificado autoassinado foi instalado para simular confiança pública.
+Em 28 de outubro de 2026, o mantenedor informou que concluiu a verificação Microsoft e apresentou confirmação do envio da candidatura à SignPath. A aprovação da SignPath continua pendente; o painel Microsoft apresentado ainda não contém um produto Cítrica. A identidade do pacote, a adaptação MSIX e a certificação da Store são etapas posteriores. Os instaladores testados acima continuam sem assinatura. [Requisitos e próximos passos](WINDOWS-SIGNING.md). Nenhuma proteção foi desativada e nenhum certificado autoassinado foi instalado para simular confiança pública.
 
 A VM e o CI não representam todos os PCs, GPUs ou documentos. A escala **Qt** de 150% não equivale a testar toda configuração de DPI do monitor Windows. [Resultados estruturados e histórico Windows](validation-0.6.0-windows.json).

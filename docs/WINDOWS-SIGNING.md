@@ -12,8 +12,8 @@ Na VM limpa, baixe o instalador pelo Edge para preservar a origem da Internet, r
 
 | Canal | O que depende do mantenedor | Situação da Cítrica |
 | --- | --- | --- |
-| SignPath Foundation | Solicitação e aprovação do projeto; configuração do serviço e aprovação humana de cada assinatura. | [Candidatura preparada](SIGNPATH-APPLICATION.md), ainda não enviada. |
-| Microsoft Store com MSIX | Conta verificada, identidade de pacote, adaptação e testes do MSIX, certificação da loja. | Ainda não existe pacote/identidade MSIX aprovado. |
+| SignPath Foundation | Solicitação e aprovação do projeto; configuração do serviço e aprovação humana de cada assinatura. | [Candidatura enviada](SIGNPATH-APPLICATION.md) pelo mantenedor em 28/10/2026; aguardando retorno. |
+| Microsoft Store com MSIX | Conta verificada, identidade de pacote, adaptação e testes do MSIX, certificação da loja. | Mantenedor informou verificação da conta em 28/10/2026. O painel apresentado ainda não contém produtos; faltam identidade, pacote e certificação do Cítrica. |
 | Download EXE com certificado próprio | Certificado de assinatura de código emitido por CA, validação de identidade e acesso ao token/HSM ou serviço do emissor. | Ferramenta de assinatura preparada; certificado não provisionado. |
 | Azure Artifact Signing Public Trust | Elegibilidade geográfica e validação Microsoft. | Atualmente indisponível para pessoa física residente no Brasil. |
 
@@ -64,3 +64,5 @@ Inno precisa executar a assinatura durante a compilação para incluir um desins
 O helper local não se conecta à SignPath. Depois da aprovação, configure o fluxo oficial do serviço, restringindo assinatura aos artefatos próprios e vinculando-os ao build público do GitHub. A candidatura preparada lista os pontos ainda não confirmados; não publique uma declaração de patrocínio ou de certificado Foundation antes da aprovação.
 
 MSIX é outro canal, que precisa usar a identidade real fornecida pelo Partner Center. Depois de verificar a conta e reservar o produto, os campos públicos necessários são **Package/Identity/Name**, **Package/Identity/Publisher** e **Package/Properties/PublisherDisplayName**, em Product management → Product identity. Não precisamos receber documento, selfie ou senha. [Identidade do aplicativo](https://learn.microsoft.com/en-us/windows/apps/publish/view-app-identity-details). Antes da submissão, validar o aplicativo desktop empacotado, roda global, tray, subprocessos, startup e preferências; não basta colocar uma assinatura em um manifesto fictício. A adaptação deve passar pelo Windows App Certification Kit e pela certificação da Store. [Requisitos de pacotes Microsoft](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/package-version-numbering).
+
+Com a conta verificada, o próximo passo no painel é **Novo produto → Aplicativo MSIX ou PWA**, verificar a disponibilidade de **Cítrica** e reservar o nome disponível escolhido pelo mantenedor. Depois, abrir **Gerenciamento de produtos → Identidade do produto** e fornecer os três campos acima para preparar o pacote MSIX. Criar o produto não publica o aplicativo; envio do pacote e certificação são etapas posteriores. [Fluxo oficial de cadastro e submissão](https://learn.microsoft.com/en-us/windows/apps/publish/get-started).
