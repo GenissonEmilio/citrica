@@ -13,7 +13,8 @@ registra hashes, commits, exclusões e limites dessa validação. A variante QA
 instalada também passou pelos arrastes reais do Explorer, conversões de oito
 famílias de arquivos, atalhos e reabertura vazia da roda. Os resultados abaixo
 distinguem esses testes de WACK, assinatura e certificação. O envio no Partner
-Center permanece em rascunho.
+Center foi enviado para certificação em 29/10/2026; a aprovação ainda está
+pendente.
 
 ## Identidade pública
 
@@ -104,10 +105,12 @@ Cada variante tem seu próprio manifest, staging, pacote, log e relatório JSON.
 O relatório distingue staging, validação MakeAppx, assinatura, teste na VM e
 certificação. Um MakeAppx bem-sucedido não marca os demais como aprovados.
 
-## Rascunho no Partner Center
+## Envio no Partner Center
 
-O produto `9NV389WMRJNC` tem um envio em rascunho com o pacote Store `1.6.0.0`
-aceito como **Validated**, para Windows Desktop x64. As propriedades, política
+O produto `9NV389WMRJNC` foi enviado para certificação em 29/10/2026, com o
+pacote Store `1.6.0.0` aceito como **Validated**, para Windows Desktop x64. O
+Partner Center confirmou **Em certificação**, com pré-processamento em andamento.
+Isso não equivale à aprovação ou publicação. As propriedades, política
 de privacidade, descrição em português, logotipo original, licença
 AGPL-3.0-or-later e justificativa de `runFullTrust` foram salvas. A aprovação
 dessa capability ainda depende da revisão Microsoft.
@@ -128,7 +131,7 @@ O [roteiro de revisão](../packaging/store-review-notes.pt-BR.md) descreve a
 abertura pelo menu Iniciar, os gestos da roda, as conversões e a bandeja. Ele é
 texto de apoio para a equipe de certificação; não declara aprovação dos testes.
 
-O cadastro não é uma página pública de download aprovada. Até a certificação,
+O cadastro ainda não é uma página pública de download aprovada. Até a certificação,
 os downloads de teste continuam na release GitHub e o EXE continua sem
 assinatura pública. A candidatura à SignPath Foundation foi recusada em
 29/10/2026 por insuficiência de sinais públicos de adoção e visibilidade; isso
@@ -182,6 +185,15 @@ aprovação da identidade pública.
 - [Nova sessão em resolução nativa](evidence/store/msix-native-region-133.json):
   Ctrl, Alt, Shift, miniatura acima da roda, DOCX↔PDF e Ctrl+Alt+C reabrindo a roda
   vazia duas vezes após converter, no mesmo processo. Originais preservados.
+- [Atualização, login e escolha do usuário](evidence/store/msix-lifecycle-update-logon-disabledbyuser.json):
+  atualização de um fixture de versão de pacote 1.5.0.0 para 1.6.0.0 com SHA-256
+  das preferências idêntico e StartupTask habilitado preservado. Após reiniciar e
+  entrar no Windows, o aplicativo iniciou sozinho na bandeja, sem ativação
+  manual pelo AUMID. A desativação nas configurações do Windows produziu
+  `DisabledByUser`; tentar habilitar pelo app preservou a escolha e exibiu a
+  orientação correta. A remoção anterior do QA preservou seis arquivos externos,
+  entre originais e resultados. O fixture inferior usa o mesmo runtime 0.6.0;
+  não é uma release histórica do produto.
 
 Os controladores privados tiveram falhas registradas antes desses resultados:
 uma comparação de miniatura esperava a cor fixa de outro fixture, e uma nova
@@ -212,10 +224,18 @@ Roteiro completo, incluindo as etapas de ciclo de vida e WACK:
    persistência de preferências e caminhos novos de instalação; remover com
    residente aberto e conferir ausência de processos/atalhos órfãos e
    preservação dos arquivos originais e convertidos.
-6. Executar WACK na sessão interativa da VM: `appcert.exe reset`, seguido de
+6. Como verificação local adicional, executar WACK na sessão interativa da VM:
+   `appcert.exe reset`, seguido de
    `appcert.exe test -packagefullname <nome completo> -reportoutputpath <xml>`.
    Guardar XML/HTML e resolver falhas materiais; não tratar testes unitários
    como substitutos desse relatório.
+
+A [documentação atual de empacotamento](https://learn.microsoft.com/en-us/windows/msix/package/packaging-uwp-apps#validate-your-app-package-locally)
+classifica o WACK como ferramenta descontinuada, sem manutenção, disponível para
+checagens locais opcionais. A certificação oficial é executada pelo Partner
+Center após o envio. O resultado local, quando disponível, deve ser registrado
+separadamente e interpretado segundo os testes obrigatórios e opcionais de
+Desktop Bridge; não deve ser confundido com aprovação da Store.
 
 Para testar a identidade **real** fora da Store, a orientação para MSIX completo
 exige assinatura de desenvolvimento e confiança explícita no certificado da

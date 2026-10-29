@@ -1,0 +1,29 @@
+{
+  "head": "ec5b485",
+  "runtime_commit": "cf18e113f9498c41b6c3fe52cd7f639c62f7ebf0",
+  "test_only_change": "native bridge test honors the helper selected by the Windows build; no runtime payload change",
+  "code_ci": {
+    "url": "https://github.com/GenissonEmilio/citrica/actions/runs/40921784480",
+    "conclusion": "success",
+    "linux": {
+      "passed": 284,
+      "skipped": 21
+    },
+    "windows": {
+      "passed": 285,
+      "skipped": 20
+    }
+  },
+  "native_ci": {
+    "url": "https://github.com/GenissonEmilio/citrica/actions/runs/40921780832",
+    "conclusion": "success",
+    "package_helper_passed": 25,
+    "installer_stop_helper_passed": 19,
+    "signing_checks_passed": 14
+  },
+  "earlier_full_repack_run": {
+    "id": 40778327745,
+    "conclusion": "failure",
+    "reason": "Explorer test controller timeout after the first action; MSIX job skipped. Later VM results do not rewrite this run."
+  }
+}
