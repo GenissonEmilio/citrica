@@ -113,8 +113,12 @@ dessa capability ainda depende da revisão Microsoft.
 A listagem precisa de capturas reais do aplicativo Windows com a resolução
 mínima exigida pela Store, 1366×768 para desktop. A captura da VM em 1280×800
 serve para evidência de teste, mas não atende a esse requisito; ampliá-la não
-substitui uma captura válida. A classificação IARC e seus termos também
-precisam ser concluídos pelo mantenedor antes do envio para certificação.
+substitui uma captura válida.
+
+A classificação IARC 10.3 foi concluída em 29/10/2026, com autorização expressa
+do mantenedor para o envio dos dados de fornecedor e aceite dos termos. O
+resultado foi Livre no Brasil, ESRB Everyone e PEGI 3. Isso não substitui a
+certificação do pacote ou a revisão da capability restrita.
 
 O cadastro não é uma página pública de download aprovada. Até a certificação,
 os downloads de teste continuam na release GitHub e o EXE continua sem
