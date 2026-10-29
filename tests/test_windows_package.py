@@ -244,7 +244,11 @@ def test_package_native_builder_refuses_nonwindows_without_toolchain(monkeypatch
 def test_native_bridge_rejects_unpacked_context_headlessly():
     if sys.platform != 'win32':
         pytest.skip('Native Windows SDK helper executes only on Windows.')
-    helper = Path(__file__).parents[1] / 'build/windows-package/citrica-package.exe'
+    configured_helper = os.environ.get('CITRICA_PACKAGE_HELPER')
+    helper = Path(configured_helper) if configured_helper else (
+        Path(__file__).parents[1] / 'build/windows-package/citrica-package.exe')
+    if configured_helper:
+        assert helper.is_file(), f'Configured native helper is missing: {helper}'
     if not helper.is_file():
         pytest.skip('Compile windows_package.py before native bridge validation.')
     if package.package_family_name() is not None:

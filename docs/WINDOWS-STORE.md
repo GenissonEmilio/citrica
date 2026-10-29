@@ -152,10 +152,12 @@ quando esse atributo é declarado nela, mesmo com a ativação moderna no pai.
 
 O adaptador de runtime deve consultar e alterar o StartupTask pela API Windows,
 respeitando `DisabledByUser` e `DisabledByPolicy`; o checkbox não pode continuar
-dependendo de HKCU\Run em MSIX. Preferências devem usar LocalFolder, cache e
-logs LocalCache, e temporários TemporaryFolder. WindowsApps é somente leitura.
-O perfil temporário do LibreOffice e as saídas junto ao arquivo original também
-precisam ser exercitados no pacote instalado.
+dependendo de HKCU\Run em MSIX. As preferências usam LocalFolder e os logs usam
+LocalCache. O helper também informa TemporaryFolder, mas o runtime não
+redireciona globalmente `tempfile`: os temporários existentes continuam usando
+o TEMP fornecido pelo Windows. WindowsApps é somente leitura. As conversões de
+documentos acima exercitaram o perfil temporário do LibreOffice no pacote
+instalado.
 
 A roda Win32/Qt, bandeja, clipboard, motores filhos e comunicação com o Explorer
 precisam manter o mesmo nível de integridade do Explorer. Testar o namespace de
