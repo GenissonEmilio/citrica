@@ -1,0 +1,71 @@
+{
+  "real_explorer": true,
+  "qt_scale_factor": "1",
+  "office_engine": "bundled",
+  "ipc_controller": "pumped-worker",
+  "same_folder": false,
+  "cases": {
+    "image_thumbnail_actual_source": true,
+    "ctrl_actions_stationary_activation": true,
+    "docx_pdf_without_office": true,
+    "pdf_docx_editable": true,
+    "alt_tools": true,
+    "bundled_image": {
+      "input": ".png",
+      "output": "jpg",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_video": {
+      "input": ".mp4",
+      "output": "webm",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_audio": {
+      "input": ".wav",
+      "output": "mp3",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_document": {
+      "input": ".odt",
+      "output": "pdf",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_sheet": {
+      "input": ".xlsx",
+      "output": "pdf",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_slides": {
+      "input": ".pptx",
+      "output": "pdf",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_subtitle": {
+      "input": ".srt",
+      "output": "vtt",
+      "palette_verified": true,
+      "converted": true
+    },
+    "bundled_archive": {
+      "input": ".zip",
+      "output": "tar",
+      "palette_verified": true,
+      "converted": true
+    }
+  },
+  "installed_msix": true,
+  "real_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+  "runtime_commit": "cf18e113f9498c41b6c3fe52cd7f639c62f7ebf0",
+  "controller_attachment": "AUMID-activated actual package process",
+  "fixture_generation": "separate unpackaged CLI; application engines unchanged",
+  "originals_preserved": true,
+  "result": "passed",
+  "exit_code": 0,
+  "stderr_empty": true
+}

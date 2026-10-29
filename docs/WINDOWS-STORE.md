@@ -9,9 +9,11 @@ StartupTask, preferências e IPC de MSIX.
 **Estado:** as duas variantes `1.6.0.0` passaram pelo MakeAppx real do SDK
 Microsoft, com validação habilitada. O recibo em
 [`evidence/store/makeappx-1.6.0.0.json`](evidence/store/makeappx-1.6.0.0.json)
-registra hashes, commits, exclusões e limites dessa validação. Instalação na VM,
-WACK, assinatura e certificação são etapas separadas; não são comprovadas pelo
-empacotamento. O envio no Partner Center permanece em rascunho.
+registra hashes, commits, exclusões e limites dessa validação. A variante QA
+instalada também passou pelos arrastes reais do Explorer, conversões de oito
+famílias de arquivos, atalhos e reabertura vazia da roda. Os resultados abaixo
+distinguem esses testes de WACK, assinatura e certificação. O envio no Partner
+Center permanece em rascunho.
 
 ## Identidade pública
 
@@ -110,10 +112,12 @@ de privacidade, descrição em português, logotipo original, licença
 AGPL-3.0-or-later e justificativa de `runFullTrust` foram salvas. A aprovação
 dessa capability ainda depende da revisão Microsoft.
 
-A listagem precisa de capturas reais do aplicativo Windows com a resolução
-mínima exigida pela Store, 1366×768 para desktop. A captura da VM em 1280×800
-serve para evidência de teste, mas não atende a esse requisito; ampliá-la não
-substitui uma captura válida.
+Quatro capturas reais do aplicativo Windows e suas legendas foram salvas na
+listagem: configurações em 1920×1080 e três regiões nativas de 1440×900 mostrando
+ações/miniatura, PDF para DOCX e DOCX para PDF. A resolução foi medida dentro do
+Windows; a primeira imagem da saída VGA, ampliada de 1280×800 pelo QEMU, foi
+substituída antes da conclusão da listagem. As imagens finais atendem ao mínimo
+desktop de 1366×768 sem ampliação.
 
 A classificação IARC 10.3 foi concluída em 29/10/2026, com autorização expressa
 do mantenedor para o envio dos dados de fornecedor e aceite dos termos. O
@@ -160,6 +164,35 @@ ações do `windows.iss`; em particular, a entrada Enviar para do instalador Inn
 não é criada automaticamente por este manifest.
 
 ## Validação real na VM
+
+Em 29/10/2026, a variante instalada `Emilians.Ctrica.UnsignedQA` foi ativada pelo
+AUMID, com PFN real do processo, motores incluídos e execução mediumIL. Ela tem
+identidade distinta da candidata Store; os testes não comprovam assinatura nem
+aprovação da identidade pública.
+
+- [Explorer e oito famílias](evidence/store/msix-explorer-120.json): 12 arrastes
+  reais, paletas verificadas, PNG→JPG, MP4→WebM, WAV→MP3, ODT→PDF, XLSX→PDF,
+  PPTX→PDF, SRT→VTT, ZIP→TAR e DOCX↔PDF, incluindo texto editável no DOCX.
+- [Atalho e preferências](evidence/store/msix-startup-and-shortcut.json): alteração
+  para Ctrl+Alt+F8, abertura vazia e Esc duas vezes, persistência após encerrar e
+  reativar pelo AUMID, habilitar/desabilitar StartupTask pela interface. EXE e
+  configuração do Inno preservados. A execução após login é um teste separado.
+- [Nova sessão em resolução nativa](evidence/store/msix-native-region-133.json):
+  Ctrl, Alt, Shift, miniatura acima da roda, DOCX↔PDF e Ctrl+Alt+C reabrindo a roda
+  vazia duas vezes após converter, no mesmo processo. Originais preservados.
+
+Os controladores privados tiveram falhas registradas antes desses resultados:
+uma comparação de miniatura esperava a cor fixa de outro fixture, e uma nova
+verificação soltava Esc antes do intervalo de consulta usado pelo aplicativo.
+Foram corrigidos somente os controladores, preservando os recibos anteriores e
+sem alterar timeouts ou comportamento do produto para obter aprovação.
+
+O workflow completo `40778327745` continua registrado como falha por timeout do
+controlador na primeira sessão Explorer; sua etapa MSIX foi pulada. Esses
+resultados posteriores na VM não transformam aquele workflow em sucesso. O
+runtime instalado é `cf18e11`, empacotado com o builder `48d316a`.
+
+Roteiro completo, incluindo as etapas de ciclo de vida e WACK:
 
 1. Verificar versão do Windows, identidade e disponibilidade de `AllowUnsigned`
    antes de qualquer instalação. Não alterar Defender, SmartScreen, registro de

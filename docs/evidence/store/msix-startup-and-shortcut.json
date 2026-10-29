@@ -1,0 +1,42 @@
+{
+  "qa_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+  "runtime_commit": "cf18e113f9498c41b6c3fe52cd7f639c62f7ebf0",
+  "startup_enabled_registry_state": 2,
+  "startup_persisted_after_actual_quit_and_aumid_reactivation": true,
+  "startup_disabled_registry_state": 0,
+  "inno_gui_unchanged": true,
+  "inno_config_unchanged": true,
+  "physical_hotkey_probe": {
+    "result": "passed",
+    "real_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+    "physical_global_shortcut": "Ctrl+Alt+F8",
+    "reopens_empty_twice": [
+      {
+        "empty_paths": [],
+        "mode": "convert"
+      },
+      {
+        "empty_paths": [],
+        "mode": "convert"
+      }
+    ],
+    "global_escape_twice": true,
+    "settings_on_disk": {
+      "shortcut": "Ctrl+Alt+F8",
+      "drag_key": "Shift",
+      "animations": false
+    }
+  },
+  "hotkey_stderr_empty": true,
+  "restored_preferences": {
+    "startup_checked": false,
+    "animations": true,
+    "shortcut": "Ctrl+Alt+C",
+    "saved_status": [
+      "Preferências salvas. O atalho e a tecla de arraste já estão ativos."
+    ],
+    "mode": "restore-preferences",
+    "window_title": "Cítrica · configurações"
+  },
+  "logon_execution": "pending; no actual sign-in after enabling yet"
+}
