@@ -4,7 +4,9 @@ Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. 
 
 ## Instalar e abrir
 
-A [release 0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0) inclui todos os motores descritos abaixo. Baixe o [instalador Windows](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe) e execute o arquivo terminado em `setup-unsigned-test.exe`. O pacote passou pelo CI completo e pela VM Windows 11 e continua sem assinatura pública; [resultados e escopo dos testes](VALIDACAO-0.6.0.md).
+**[Instale pela Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR)** e abra **Cítrica** pelo menu Iniciar. O aplicativo está disponível na loja desde 29/10/2026. O canal MSIX inclui os motores descritos abaixo, usa preferências próprias e oferece inicialização automática pelas configurações do aplicativo ou do Windows. [Detalhes e testes do MSIX](WINDOWS-STORE.md).
+
+Como alternativa, a [release 0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0) oferece o [instalador Windows](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe), terminado em `setup-unsigned-test.exe`. Esse pacote passou pelo CI completo e pela VM Windows 11 e continua sem assinatura pública; [resultados e escopo dos testes](VALIDACAO-0.6.0.md).
 
 Os arquivos da 0.6.0 mantêm `unsigned-test` no nome para identificar o estado da assinatura. O instalador usa a conta atual, cria a entrada no menu Iniciar e adiciona **Enviar para → Cítrica** no Explorer. Atalho na área de trabalho e inicialização automática são opcionais.
 
@@ -57,7 +59,7 @@ Use cópias de arquivos de teste numa pasta com espaços e acentos no nome. Regi
 - [ ] Validar vídeo/áudio, Office, Tamanho alvo e ocultação de texto na VM limpa. Revisar as regiões detectadas antes de compartilhar.
 - [ ] Atualizar/reinstalar, desinstalar e confirmar a remoção de atalhos/inicialização automática.
 
-Em caso de erro, use **Configurações → Salvar diagnóstico para suporte**, informe os passos e envie uma captura/gravação. Logs locais ficam em `%LOCALAPPDATA%/Citrica/Logs/citrica.log`; preferências ficam em `%APPDATA%/Citrica/settings.json`.
+Em caso de erro, use **Configurações → Salvar diagnóstico para suporte**, informe os passos e envie uma captura/gravação. No EXE/portátil, os logs ficam em `%LOCALAPPDATA%/Citrica/Logs/citrica.log` e as preferências em `%APPDATA%/Citrica/settings.json`. O MSIX usa `LocalCache` para logs e `LocalState` para preferências dentro dos dados do pacote; prefira o diagnóstico exportado pelo aplicativo.
 
 CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
 
