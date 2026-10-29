@@ -120,6 +120,10 @@ do mantenedor para o envio dos dados de fornecedor e aceite dos termos. O
 resultado foi Livre no Brasil, ESRB Everyone e PEGI 3. Isso não substitui a
 certificação do pacote ou a revisão da capability restrita.
 
+O [roteiro de revisão](../packaging/store-review-notes.pt-BR.md) descreve a
+abertura pelo menu Iniciar, os gestos da roda, as conversões e a bandeja. Ele é
+texto de apoio para a equipe de certificação; não declara aprovação dos testes.
+
 O cadastro não é uma página pública de download aprovada. Até a certificação,
 os downloads de teste continuam na release GitHub e o EXE continua sem
 assinatura pública. A candidatura à SignPath Foundation foi recusada em
