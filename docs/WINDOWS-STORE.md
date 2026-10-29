@@ -12,9 +12,13 @@ Microsoft, com validação habilitada. O recibo em
 registra hashes, commits, exclusões e limites dessa validação. A variante QA
 instalada também passou pelos arrastes reais do Explorer, conversões de oito
 famílias de arquivos, atalhos e reabertura vazia da roda. Os resultados abaixo
-distinguem esses testes de WACK, assinatura e certificação. O envio no Partner
-Center foi enviado para certificação em 29/10/2026; a aprovação ainda está
-pendente.
+distinguem esses testes de WACK, assinatura e certificação. O Cítrica foi
+publicado na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR)
+em 29/10/2026. A página pública foi conferida com nome, editor, descrição e
+quatro capturas; o Partner Center do mantenedor confirmou **Na Microsoft Store**.
+O [recibo de publicação](evidence/store/publication-2026-10-29.json) registra o
+alcance dessa confirmação. A instalação do pacote entregue pela loja ainda não
+foi repetida na VM; os testes funcionais abaixo usaram a variante QA descrita.
 
 ## Identidade pública
 
@@ -109,11 +113,13 @@ certificação. Um MakeAppx bem-sucedido não marca os demais como aprovados.
 
 O produto `9NV389WMRJNC` foi enviado para certificação em 29/10/2026, com o
 pacote Store `1.6.0.0` aceito como **Validated**, para Windows Desktop x64. O
-Partner Center confirmou **Em certificação**, com pré-processamento em andamento.
-Isso não equivale à aprovação ou publicação. As propriedades, política
+Partner Center inicialmente confirmou **Em certificação**, com pré-processamento
+em andamento. Depois, em 29/10/2026, o painel passou a **Na Microsoft Store** e a
+[página pública do Cítrica](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR)
+ficou disponível. As propriedades, política
 de privacidade, descrição em português, logotipo original, licença
-AGPL-3.0-or-later e justificativa de `runFullTrust` foram salvas. A aprovação
-dessa capability ainda depende da revisão Microsoft.
+AGPL-3.0-or-later e justificativa de `runFullTrust` foram salvas na submissão
+publicada.
 
 Quatro capturas reais do aplicativo Windows e suas legendas foram salvas na
 listagem: configurações em 1920×1080 e três regiões nativas de 1440×900 mostrando
@@ -131,9 +137,9 @@ O [roteiro de revisão](../packaging/store-review-notes.pt-BR.md) descreve a
 abertura pelo menu Iniciar, os gestos da roda, as conversões e a bandeja. Ele é
 texto de apoio para a equipe de certificação; não declara aprovação dos testes.
 
-O cadastro ainda não é uma página pública de download aprovada. Até a certificação,
-os downloads de teste continuam na release GitHub e o EXE continua sem
-assinatura pública. A candidatura à SignPath Foundation foi recusada em
+O canal MSIX está disponível na Microsoft Store. Os downloads de teste da
+release GitHub permanecem disponíveis e o EXE continua sem assinatura pública;
+a publicação na loja não altera esses arquivos. A candidatura à SignPath Foundation foi recusada em
 29/10/2026 por insuficiência de sinais públicos de adoção e visibilidade; isso
 não interfere no canal MSIX da Store.
 

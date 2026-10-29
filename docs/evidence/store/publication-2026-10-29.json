@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "observed_on": "2026-10-29",
+  "timezone": "America/Fortaleza",
+  "store_id": "9NV389WMRJNC",
+  "public_url": "https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR",
+  "store_publication_confirmed": true,
+  "partner_center": {
+    "source": "Maintainer-provided screenshot of the product overview",
+    "status": "Na Microsoft Store",
+    "submission": 1,
+    "availability_confirmed_by_portal": true
+  },
+  "public_page": {
+    "verification": "Opened in a browser without signing in",
+    "title": "Cítrica - Download e instalação gratuitos no Windows | Microsoft Store",
+    "app_name": "Cítrica",
+    "publisher": "Emilians",
+    "category": "Utilitários e ferramentas",
+    "brazil_age_rating": "Livre",
+    "screenshots_count": 4,
+    "description_present": true
+  },
+  "scope": {
+    "store_package_version_from_submission": "1.6.0.0",
+    "public_store_installation_tested_in_vm": false,
+    "qa_runtime_tests": "See msix-explorer-120.json, msix-native-region-133.json and msix-lifecycle-update-logon-disabledbyuser.json",
+    "github_release_assets_replaced": false,
+    "github_exe_signature_changed": false
+  }
+}

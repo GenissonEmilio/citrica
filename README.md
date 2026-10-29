@@ -1,13 +1,13 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux e Windows.</p>
-<p align="center"><a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0">Baixar versão 0.6.0</a> · <a href="docs/UBUNTU.md">Instalar no Ubuntu</a> · <a href="docs/VALIDACAO-0.6.0.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR">Instalar pela Microsoft Store</a> · <a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0">Baixar versão 0.6.0</a> · <a href="docs/UBUNTU.md">Instalar no Ubuntu</a> · <a href="docs/VALIDACAO-0.6.0.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
 O Cítrica 0.6 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
 
-**Versão 0.6.0:** motores offline incluídos no Windows, correções de travamento da roda e atualização do instalador com o aplicativo aberto. O DEB passou em instalação, primeira abertura como usuário comum, conversão e remoção no Ubuntu **24.04, 26.04 e 26.10**. A roda foi testada separadamente nos GNOME 46/50/51. [Instalar no Ubuntu](docs/UBUNTU.md). **O Windows continua sem assinatura pública**. A candidatura à SignPath Foundation foi recusada em 29/10/2026 por insuficiência de sinais públicos de adoção e visibilidade. O MSIX foi instalado e testado na VM Windows 11 e enviado à Microsoft Store em 29/10/2026; a certificação está em andamento. [Detalhes e evidências](docs/WINDOWS-STORE.md).
+**Versão 0.6.0:** motores offline incluídos no Windows, correções de travamento da roda e atualização do instalador com o aplicativo aberto. O DEB passou em instalação, primeira abertura como usuário comum, conversão e remoção no Ubuntu **24.04, 26.04 e 26.10**. A roda foi testada separadamente nos GNOME 46/50/51. [Instalar no Ubuntu](docs/UBUNTU.md). **Disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026.** O MSIX tem integração de inicialização e preferências próprias e passou pelos testes na VM Windows 11. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes e evidências](docs/WINDOWS-STORE.md).
 
 **Na 0.5.0:** correções da roda no Explorer, DOCX→PDF/TXT sem Office, PDF→DOCX em ambas as plataformas e miniatura do arraste acima da roda no GNOME. A roda reabre vazia após converter ou cancelar e mantém as animações de abertura, seleção e fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
@@ -15,13 +15,15 @@ Implementação independente inspirada no fluxo do [Tangerine](https://www.tange
 
 ## Windows x64
 
-A 0.6.0 inclui FFmpeg/ffprobe, LibreOffice e OCR. O CI completo passou por 304 conversões de 50 extensões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. Os pacotes `unsigned-test` são os mesmos arquivos validados na VM Windows 11; estão disponíveis para teste público, com assinatura pública ainda pendente. [Validação e limites](docs/VALIDACAO-0.6.0.md).
+A 0.6.0 inclui FFmpeg/ffprobe, LibreOffice e OCR. O CI completo passou por 304 conversões de 50 extensões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. [Validação e limites](docs/VALIDACAO-0.6.0.md).
 
-Baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-portable-unsigned-test.zip). O instalador usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
+**[Instale pela Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR)** e abra **Cítrica** pelo menu Iniciar. A inicialização automática pode ser configurada no aplicativo ou nas Configurações do Windows.
+
+Como alternativas, baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-portable-unsigned-test.zip). Esses arquivos mantêm `unsigned-test` no nome e continuam sem assinatura pública. O instalador EXE usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
 
 Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferramentas; **Ctrl**, ações. **Ctrl+Alt+C** abre/fecha a roda. O aplicativo permanece na bandeja ao fechar as configurações. O atalho e a inicialização automática são configuráveis.
 
-Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **PDF→DOCX, DOCX→PDF/TXT, áudio/vídeo e OCR funcionam com os motores incluídos, sem instalar Office, FFmpeg ou Tesseract à parte.** O instalador ainda não tem assinatura digital. Os resultados e limites dos testes do Explorer estão na documentação de validação.
+Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **PDF→DOCX, DOCX→PDF/TXT, áudio/vídeo e OCR funcionam com os motores incluídos, sem instalar Office, FFmpeg ou Tesseract à parte.** Os resultados e limites dos testes do Explorer estão na documentação de validação.
 
 ![Roda em execução nativa no Windows do CI](docs/windows-wheel.png)
 
