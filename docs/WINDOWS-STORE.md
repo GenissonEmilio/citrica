@@ -118,7 +118,9 @@ precisam ser concluídos pelo mantenedor antes do envio para certificação.
 
 O cadastro não é uma página pública de download aprovada. Até a certificação,
 os downloads de teste continuam na release GitHub e o EXE continua sem
-assinatura pública, aguardando a avaliação da SignPath.
+assinatura pública. A candidatura à SignPath Foundation foi recusada em
+29/10/2026 por insuficiência de sinais públicos de adoção e visibilidade; isso
+não interfere no canal MSIX da Store.
 
 ## Runtime e integrações
 

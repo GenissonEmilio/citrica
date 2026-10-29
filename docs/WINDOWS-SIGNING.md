@@ -1,6 +1,6 @@
 # Assinatura e distribuição confiável no Windows
 
-Pesquisa e preparação: **28 de outubro de 2026**. Este documento não atesta que uma release esteja assinada: essa informação depende da verificação dos arquivos finais. Metadados, checksum SHA-256 e um instalador funcional não substituem Authenticode.
+Pesquisa e preparação: **28 de outubro de 2026**. Estado atualizado em **29 de outubro de 2026**. Este documento não atesta que uma release esteja assinada: essa informação depende da verificação dos arquivos finais. Metadados, checksum SHA-256 e um instalador funcional não substituem Authenticode.
 
 ## O aviso azul
 
@@ -12,8 +12,8 @@ Na VM limpa, baixe o instalador pelo Edge para preservar a origem da Internet, r
 
 | Canal | O que depende do mantenedor | Situação da Cítrica |
 | --- | --- | --- |
-| SignPath Foundation | Solicitação e aprovação do projeto; configuração do serviço e aprovação humana de cada assinatura. | [Candidatura enviada](SIGNPATH-APPLICATION.md) pelo mantenedor em 28/10/2026; aguardando retorno. |
-| Microsoft Store com MSIX | Conta verificada, identidade de pacote, adaptação e testes do MSIX, certificação da loja. | Mantenedor informou verificação da conta em 28/10/2026. Produto Cítrica reservado no Partner Center: Store ID `9NV389WMRJNC`. Identidade obtida; faltam pacote MSIX e certificação. |
+| SignPath Foundation | Solicitação e aprovação do projeto; configuração do serviço e aprovação humana de cada assinatura. | [Candidatura recusada](SIGNPATH-APPLICATION.md) em 29/10/2026 por insuficiência de sinais públicos de adoção e visibilidade; nenhum certificado emitido. |
+| Microsoft Store com MSIX | Conta verificada, identidade de pacote, adaptação e testes do MSIX, certificação da loja. | Mantenedor informou verificação da conta em 28/10/2026. Produto Cítrica reservado no Partner Center: Store ID `9NV389WMRJNC`. MSIX `1.6.0.0` aceito em rascunho; testes finais e certificação pendentes. |
 | Download EXE com certificado próprio | Certificado de assinatura de código emitido por CA, validação de identidade e acesso ao token/HSM ou serviço do emissor. | Ferramenta de assinatura preparada; certificado não provisionado. |
 | Azure Artifact Signing Public Trust | Elegibilidade geográfica e validação Microsoft. | Atualmente indisponível para pessoa física residente no Brasil. |
 
