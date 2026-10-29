@@ -206,6 +206,25 @@ controlador na primeira sessão Explorer; sua etapa MSIX foi pulada. Esses
 resultados posteriores na VM não transformam aquele workflow em sucesso. O
 runtime instalado é `cf18e11`, empacotado com o builder `48d316a`.
 
+O [WACK completo](evidence/store/wack-1.6.0.0.json) terminou normalmente com
+`PARTIAL_RUN=FALSE`, exit code 0 e resultado geral **WARNING**: 22 regras PASS,
+um FAIL opcional em Executáveis bloqueados e um WARNING de DPI. Entre as regras
+marcadas obrigatórias pelo XML, foram 12 PASS, um WARNING e nenhum FAIL. O XML
+original foi preservado, com seu tamanho e SHA-256 registrados no recibo.
+
+O teste opcional registra referências estáticas a APIs de criação de processos e
+a nomes de executáveis, incluindo binários do Cítrica e do LibreOffice. A
+[orientação Desktop Bridge](https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/windows-desktop-bridge-app-tests)
+trata essa checagem de Windows S como informativa. Seu FAIL continua registrado.
+
+O aviso de DPI não conseguiu processar o launcher para a validação estática.
+O manifest do executável não declara `dpiAware`/`dpiAwareness`; a janela real,
+ativada pelo AUMID, confirmou Per-Monitor V2 pelas APIs Windows, com o mesmo hash
+do payload. O aviso permanece WARNING, sem alterar binários ou manifest para
+silenciá-lo. O metadado `SecureBoot=FALSE` do WACK também divergiu da consulta
+direta `Confirm-SecureBootUEFI=True` e do registro com valor 1; Secure Boot, TPM e
+Defender foram conferidos ativos sem alterações de segurança.
+
 Roteiro completo, incluindo as etapas de ciclo de vida e WACK:
 
 1. Verificar versão do Windows, identidade e disponibilidade de `AllowUnsigned`

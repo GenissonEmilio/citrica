@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "tested_on": "2026-10-29",
+  "runtime_commit": "cf18e113f9498c41b6c3fe52cd7f639c62f7ebf0",
+  "builder_commit": "48d316a5cb9d28bbd3ee89d001f245d64073a255",
+  "qa_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+  "tool_version": "10.0.28000.2957",
+  "overall_result": "WARNING",
+  "partial_run": false,
+  "exit_code": 0,
+  "stderr_empty": true,
+  "xml_bytes": 5936394,
+  "xml_sha256": "f3702dac3b68afb8b5cf2cded686ff061efd00513a47e4c846e87d38f678f94b",
+  "test_counts": {
+    "PASS": 22,
+    "FAIL": 1,
+    "WARNING": 1
+  },
+  "required_counts": {
+    "PASS": 12,
+    "WARNING": 1
+  },
+  "optional_counts": {
+    "PASS": 10,
+    "FAIL": 1
+  },
+  "tests": [
+    {
+      "index": 2,
+      "name": "Instale drivers assinados e arquivos executáveis",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 11,
+      "name": "Nível de execução de controle de conta de usuário",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 77,
+      "name": "Conta do aplicativo",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 31,
+      "name": "Manifesto do aplicativo",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 87,
+      "name": "Verbos da associação de arquivo",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 86,
+      "name": "Verificações do Registro",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 91,
+      "name": "Recursos Empresariais",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 90,
+      "name": "Pacotes de Recursos",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 70,
+      "name": "Analisador de arquivos banidos",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 62,
+      "name": "Assinatura de código privado",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 45,
+      "name": "Recursos do aplicativo",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 61,
+      "name": "Identidade visual",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 46,
+      "name": "Configuração de depuração",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 52,
+      "name": "Recursos de uso especial",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 56,
+      "name": "Atributo ExclusiveTo",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 57,
+      "name": "Localização de tipo",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 55,
+      "name": "Diferenciação de maiúsculas e minúsculas de nome de tipo",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 54,
+      "name": "Correção de nome de tipo",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 58,
+      "name": "Correção de metadados gerais",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 53,
+      "name": "Propriedades",
+      "optional": false,
+      "result": "PASS"
+    },
+    {
+      "index": 89,
+      "name": "Uso de arquivo morto",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 88,
+      "name": "Executáveis bloqueados",
+      "optional": true,
+      "result": "FAIL"
+    },
+    {
+      "index": 63,
+      "name": "Arquivos adequados da plataforma",
+      "optional": true,
+      "result": "PASS"
+    },
+    {
+      "index": 92,
+      "name": "DPIAwarenessValidation",
+      "optional": false,
+      "result": "WARNING"
+    }
+  ],
+  "optional_blocked_executables": {
+    "index": 88,
+    "message_count": 599,
+    "scope": "Optional static process-creation API and blocked-executable reference scan for Desktop Bridge/Windows S; includes the application and bundled LibreOffice binaries.",
+    "message_forms": {
+      "absolute_payload_paths_with_process_api_references": 62,
+      "binary_names_with_blocked_executable_string_references": 537
+    }
+  },
+  "dpi_warning": {
+    "index": 92,
+    "optional": false,
+    "result": "WARNING",
+    "message": "WACK could not process the launcher for static DPI validation; executable manifest omits dpiAware/dpiAwareness.",
+    "observed_live_aumid_activated_gui": {
+      "package_identity_verified": true,
+      "GetProcessDpiAwareness": 2,
+      "GetProcessDpiAwareness_hresult": 0,
+      "GetAwarenessFromDpiAwarenessContext": 2,
+      "window_context_matches_PER_MONITOR_AWARE_V2": true,
+      "window_dpi": 96,
+      "gui_sha256": "55776d7de73c9712742eb8ee002924af994df1e84543005ebbe8d7175d0ffcca",
+      "gui_hash_matches_store_payload": true
+    },
+    "interpretation": "The live Qt window is per-monitor DPI aware; the static WACK warning remains in the original report. QScreen DPR was not queried."
+  },
+  "secure_boot": {
+    "wack_metadata": false,
+    "Confirm_SecureBootUEFI": true,
+    "UEFISecureBootEnabled": 1,
+    "tpm_present_and_ready": true,
+    "defender_and_realtime_protection": true,
+    "interpretation": "WACK metadata conflicts with direct Windows checks; no security settings were changed."
+  },
+  "store_certified": false,
+  "sources": [
+    "https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/windows-desktop-bridge-app-tests",
+    "https://learn.microsoft.com/en-us/windows/msix/package/packaging-uwp-apps#validate-your-app-package-locally"
+  ],
+  "post_wack_integrity": {
+    "inno_executable_and_preferences_unchanged": true,
+    "external_originals_and_outputs_verified_by_sha256": 6
+  }
+}
