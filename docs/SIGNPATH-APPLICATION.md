@@ -1,6 +1,8 @@
 # Candidatura SignPath Foundation — acompanhamento
 
-**Enviada pelo mantenedor em 28 de outubro de 2026; aguardando retorno.** O comprovante apresentado mostra “Form submitted”. Isso confirma o envio, sem constituir aprovação, certificado ou política já aceita. Os dados abaixo preservam a referência preparada para a candidatura; o conteúdo efetivamente enviado não foi conferido.
+**Recusada em 29 de outubro de 2026**, conforme resposta apresentada pelo mantenedor. A Foundation informou que o projeto ainda não reúne sinais públicos suficientes de adoção, visibilidade e atividade para emitir um certificado em seu nome. A resposta permite nova candidatura quando houver reconhecimento público mais amplo; não apontou defeito técnico no aplicativo. Nenhum certificado foi emitido.
+
+O pedido foi enviado pelo mantenedor em 28 de outubro de 2026. Os dados abaixo preservam a referência preparada para a candidatura; o conteúdo efetivamente enviado não foi conferido. A correspondência privada e os dados de contato não são reproduzidos aqui.
 
 ## Dados públicos prontos
 
@@ -34,7 +36,7 @@ Antes de declarar a política final, revisar o comportamento de rede das integra
 
 Guardar as credenciais do serviço nos mecanismos aprovados do CI, limitar quem aprova assinaturas, selecionar os artefatos próprios e ligar a solicitação ao build/tag público. Configurar o callback do Inno para assinar o desinstalador durante a compilação, além do setup. Testar a instalação pelo canal final numa VM com as proteções do Windows ativadas.
 
-O script local `packaging/sign_windows.py` prepara o caminho para um certificado próprio de CA/HSM. Ele não configura nem substitui o serviço SignPath. A candidatura já foi enviada; a integração depende da aprovação e das configurações fornecidas pelo serviço.
+O script local `packaging/sign_windows.py` prepara o caminho para um certificado próprio de CA/HSM. Ele não configura nem substitui o serviço SignPath. A candidatura atual foi recusada; qualquer integração futura depende de nova aprovação e das configurações fornecidas pelo serviço. O canal MSIX da Microsoft Store continua independente dessa candidatura.
 
 ## Pontos para confirmar com a Foundation
 

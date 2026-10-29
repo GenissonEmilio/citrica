@@ -9,12 +9,21 @@ from pathlib import Path
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtNetwork import QLocalSocket
 
+from citrica.windows.package import package_family_name
+
 MAX_REQUEST = 1024 * 1024
 _core_app = None
 
 
 def server_name():
-    return 'citrica-' + hashlib.sha256(str(Path.home()).encode()).hexdigest()[:20]
+    home = str(Path.home()).encode('utf-8')
+    family = package_family_name()
+    if family is not None:
+        # MSIX named pipes use the documented LOCAL namespace. Package + user
+        # identity keeps Store, Inno and distinct Store packages independent.
+        identity = family.encode('utf-8') + b'\0' + home
+        return 'LOCAL\\citrica-store-' + hashlib.sha256(identity).hexdigest()[:20]
+    return 'citrica-' + hashlib.sha256(home).hexdigest()[:20]
 
 
 def _application():

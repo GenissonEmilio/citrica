@@ -1,0 +1,68 @@
+{
+  "result": "passed",
+  "runtime_commit": "cf18e113f9498c41b6c3fe52cd7f639c62f7ebf0",
+  "builder_commit": "48d316a5cb9d28bbd3ee89d001f245d64073a255",
+  "qa_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+  "fixture_note": "1.5.0.0 is a synthetic package version using the same 0.6.0 runtime; not a historical product release.",
+  "from_package_version": "1.5.0.0",
+  "to_package_version": "1.6.0.0",
+  "settings_before_sha256": "c5fba46893899864a877c96cf54e14666f90a2efb0d9d9b89677220200adadfe",
+  "settings_after_sha256": "c5fba46893899864a877c96cf54e14666f90a2efb0d9d9b89677220200adadfe",
+  "preferences_preserved": {
+    "shortcut": "Ctrl+Alt+F8",
+    "drag_key": "Shift",
+    "animations": false
+  },
+  "startup_state_after_update": 2,
+  "actual_logon_startup": {
+    "result": "passed",
+    "real_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+    "manual_aumid_activation_after_logon": false,
+    "startup_process_medium_not_elevated": true,
+    "startup_hidden_in_tray": true,
+    "post_update_preferences_loaded": "Ctrl+Alt+F8",
+    "status": {
+      "visible": false,
+      "armed": false,
+      "paths": [],
+      "busy": false,
+      "elevated": false,
+      "shortcut": "Ctrl+Alt+F8",
+      "hotkey_active": true,
+      "hotkey_error": ""
+    }
+  },
+  "disabled_by_windows_user": {
+    "autostart_final_off": true,
+    "result": "passed",
+    "windows_registry_after_app_attempt": 1,
+    "windows_registry_disabledbyuser_before_attempt": 1,
+    "windows_registry_final_state": 1,
+    "warning_text": [
+      "",
+      "Ative o Cítrica em Configurações do Windows > Aplicativos > Inicialização.",
+      "",
+      "OK"
+    ],
+    "windows_user_choice_respected": true,
+    "restored": {
+      "startup_checked": false,
+      "animations": true,
+      "shortcut": "Ctrl+Alt+C",
+      "saved_status": [
+        "Preferências salvas. O atalho e a tecla de arraste já estão ativos."
+      ],
+      "mode": "restore-preferences",
+      "window_title": "Cítrica · configurações"
+    }
+  },
+  "removal_before_fixture": {
+    "external_files": 6,
+    "result": "qa16-uninstalled",
+    "no_certificates_or_policy_change": true,
+    "external_originals_and_outputs_unchanged": true
+  },
+  "wack_not_yet_run_at_this_receipt": true,
+  "source_receipts_retained": true,
+  "tested_on": "2026-10-29"
+}

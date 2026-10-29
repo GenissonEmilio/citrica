@@ -110,6 +110,10 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
     stop_helper = build_stop_helper(payload / 'citrica-stop.exe')
     run(sys.executable, '-m', 'pytest', ROOT / 'tests/test_windows_stop_helper.py', '-q',
         env=dict(os.environ, CITRICA_STOP_HELPER=str(stop_helper)))
+    from windows_package import build as build_package_helper
+    package_helper = build_package_helper(payload / 'citrica-package.exe')
+    run(sys.executable, '-m', 'pytest', ROOT / 'tests/test_windows_package.py', '-q',
+        env=dict(os.environ, CITRICA_PACKAGE_HELPER=str(package_helper)))
     # These are independent executables with their complete library trees.
     # Copy after collection to avoid PyInstaller treating Office/FFmpeg DLLs as
     # application imports or mixing their DLLs with Qt's dependencies.
@@ -142,9 +146,10 @@ COLLECT(gui, cli, a.binaries, a.datas, strip=False, upx=False, name='Citrica')
     run(payload / 'Citrica.exe', '--settings', '--screenshot', str(OUT / 'citrica-windows-preview.png'),
         env=dict(os.environ, QT_QPA_PLATFORM='windows'))
     trust = {'authenticode_verified': signing is not None,
-             'scope': ['Citrica.exe', 'citrica-cli.exe', 'citrica-stop.exe', 'setup.exe', 'uninstaller.exe'] if signing else [],
+             'scope': ['Citrica.exe', 'citrica-cli.exe', 'citrica-stop.exe', 'citrica-package.exe',
+                       'setup.exe', 'uninstaller.exe'] if signing else [],
              'smartscreen_reputation_verified': False,
-             'files': sign_files(signing, [payload / 'Citrica.exe', cli, stop_helper]) if signing else [],
+             'files': sign_files(signing, [payload / 'Citrica.exe', cli, stop_helper, package_helper]) if signing else [],
              'status': 'signed' if signing else 'unsigned'}
     # Only Cítrica's launchers are signed by our publisher. Upstream Office,
     # codec and OCR binaries retain their original signatures and hashes.

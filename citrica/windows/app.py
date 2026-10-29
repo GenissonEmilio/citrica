@@ -22,7 +22,7 @@ from citrica.companion import Shelf, ToolDialog, file_action
 from citrica.core import convert, dependencies
 from citrica.desktop import request
 from citrica.gui import ICON, STYLE
-from citrica.windows import config
+from citrica.windows import config, package
 from citrica.windows.ipc import MAX_REQUEST, send, server_name
 from citrica.windows.wheel import CENTER, SIZE, Wheel, hit_test
 
@@ -602,7 +602,8 @@ def _launch(args):
     app.setStyleSheet(STYLE)
     app.setQuitOnLastWindowClosed(False)
     from logging.handlers import RotatingFileHandler
-    log_dir = Path(os.environ.get('LOCALAPPDATA', config.config_dir().parent)) / 'Citrica/Logs'
+    log_dir = (package.application_paths()['local_cache'] / 'Citrica/Logs' if package.package_family_name()
+               else Path(os.environ.get('LOCALAPPDATA', config.config_dir().parent)) / 'Citrica/Logs')
     log_dir.mkdir(parents=True, exist_ok=True)
     handler = RotatingFileHandler(log_dir / 'citrica.log', maxBytes=1024*1024, backupCount=2, encoding='utf-8')
     handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))

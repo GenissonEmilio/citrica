@@ -1,0 +1,19 @@
+{
+  "product_id": "9NV389WMRJNC",
+  "submission_id": "1152921505702260717",
+  "product_name": "Cítrica",
+  "package_file": "Citrica_1.6.0.0_x64_store-unsigned.msix",
+  "package_version": "1.6.0.0",
+  "package_sha256": "1fbe9fcaaf64bab25a1afc247225ad55585e18433581e5f3e7db1b0a8c0654ac",
+  "submitted_at_utc": "2026-10-29T18:06:48.736145+00:00",
+  "store_certified": false,
+  "listing_language": "pt-BR",
+  "listing_screenshot_count": 4,
+  "status": "submitted-for-certification",
+  "observed_phase": "preprocessing-in-progress",
+  "observed_on": "2026-10-29",
+  "iarc_br": "L",
+  "restricted_capability_approval": "pending-Microsoft-review",
+  "public_github_release": "v0.6.0 unchanged; Windows EXE unsigned",
+  "local_wack": "running; no final report at submission"
+}
