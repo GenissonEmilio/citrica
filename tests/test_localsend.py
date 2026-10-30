@@ -1,6 +1,7 @@
 """LocalSend availability and safe argv construction across Linux installs."""
 
 import json
+import os
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -80,12 +81,29 @@ def test_flatpak_uninstalled_is_detected_without_stale_availability(linux_instal
     assert runtime.localsend_command() is None
 
 
+@pytest.mark.skipif(os.name == 'nt', reason='Windows chmod does not implement POSIX execute permissions')
 def test_downloaded_appimage_requires_executable_permission(linux_install):
     appimage = executable(linux_install / 'Downloads' / 'LocalSend-1.18.2-linux-x86-64.AppImage')
     source = linux_install / 'Apresentação final.pdf'
     assert runtime.localsend_command([source]) == [str(appimage), str(source)]
     appimage.chmod(0o644)
     assert runtime.localsend_command() is None
+
+
+def test_appimage_command_requires_a_successful_execute_permission_check(linux_install, monkeypatch):
+    appimage = executable(linux_install / 'Downloads' / 'LocalSend.AppImage')
+    permission = {'executable': False}
+    checked = []
+
+    def access(path, mode):
+        checked.append((path, mode))
+        return permission['executable']
+
+    monkeypatch.setattr(runtime.os, 'access', access)
+    assert runtime.localsend_command() is None
+    assert checked == [(appimage, os.X_OK)]
+    permission['executable'] = True
+    assert runtime.localsend_command() == [str(appimage)]
 
 
 def test_appimage_discovery_does_not_recurse_into_user_folders(linux_install):
