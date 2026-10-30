@@ -1,0 +1,51 @@
+{
+  "styles": [
+    {
+      "theme": "classic",
+      "live_update": true,
+      "selection_preserved": true,
+      "thumbnail_preserved": true,
+      "capture": "appearance-classic.png",
+      "sha256": "f1b3969e196abc6e1f9a920765cb4208e3d811bac14d606cbc577f417790a732"
+    },
+    {
+      "theme": "watercolor",
+      "live_update": true,
+      "selection_preserved": true,
+      "thumbnail_preserved": true,
+      "capture": "appearance-watercolor.png",
+      "sha256": "641af65473bc809f3bb48314936c9955f4c6da59e55fba629d1ccc06bf1cfd34"
+    },
+    {
+      "theme": "glass",
+      "live_update": true,
+      "selection_preserved": true,
+      "thumbnail_preserved": true,
+      "capture": "appearance-glass.png",
+      "sha256": "de405e1a3dd100196c742cdac3a10a3432c01ecffc9a8e732303e1bea32a0271"
+    },
+    {
+      "theme": "graphite",
+      "live_update": true,
+      "selection_preserved": true,
+      "thumbnail_preserved": true,
+      "capture": "appearance-graphite.png",
+      "sha256": "eae1e3de9bce099d0ba9b2c32a68a872e90e7532496ca24a7da0136d2c28832f"
+    },
+    {
+      "theme": "contrast",
+      "live_update": true,
+      "selection_preserved": true,
+      "thumbnail_preserved": true,
+      "capture": "appearance-contrast.png",
+      "sha256": "4d0c499d0052117593844e734e432f8100ede6f433d38e527f764503ee589c96"
+    }
+  ],
+  "conversion_after_live_theme_changes": true,
+  "reopen_empty": true,
+  "original_preserved": true,
+  "native_intermediate_frames": 14,
+  "scope": "source, GNOME 50 Wayland isolated compositor",
+  "production_commit": "8ef6ec44ae65a2c742ac9a83558f249ad7fef510",
+  "host_desktop_changed": false
+}

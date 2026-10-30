@@ -45,16 +45,16 @@ def main():
         # The complete window, including its title bar, fits the test monitor.
         step('PlaceWindow', TITLE, 200, 40)
         window = settings_window()
+        left, top, width, height = window['rect']
+        assert left >= 0 and top >= 0 and left + width <= 1280 and top + height <= 800, window
         (STATE / 'settings-window-layout.json').write_text(json.dumps(window))
         call('Test', 'Screenshot', str(STATE / 'settings-before-save.png'))
         click(window, 350, 142)  # Global-shortcut input on the General tab.
-        print('settings-input-focus', call('Test', 'State'), window, flush=True)
-        call('Test', 'Screenshot', str(STATE / 'settings-input-focus.png'))
+        click(window, 350, 142)  # The first press may activate a newly mapped Wayland surface.
         step('Key', 65507, 'true')
         step('Key', 97, 'true')
         step('Key', 97, 'false')
         step('Key', 65507, 'false')
-        call('Test', 'Screenshot', str(STATE / 'settings-input-selected.png'))
         for char in 'Super+F8':
             call('Test', 'Key', ord(char), 'true')
             call('Test', 'Key', ord(char), 'false')
@@ -98,7 +98,8 @@ def main():
         wait_for(lambda s: not s['visible'])
         (STATE / 'settings-result.json').write_text(json.dumps({'settings_save': True,
             'saved_shortcut_invoked': True, 'theme_saved_by_actual_ui': 'watercolor',
-            'theme_loaded_in_new_settings_process': True, 'save_and_test_opens_selected_theme': True}))
+            'theme_loaded_in_new_settings_process': True, 'save_and_test_opens_selected_theme': True,
+            'settings_window_fits_test_monitor': True, 'settings_window_rect': window['rect']}))
         print('Configurações reais: atalho e Aquarela salvos pela UI, recarregados e invocados no Wayland.')
     finally:
         subprocess.run(['gsettings', 'set', 'org.gnome.shell.extensions.citrica', 'toggle-wheel',

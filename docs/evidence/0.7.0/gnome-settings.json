@@ -1,0 +1,52 @@
+{
+  "settings_save": true,
+  "saved_shortcut_invoked": true,
+  "theme_saved_by_actual_ui": "watercolor",
+  "theme_loaded_in_new_settings_process": true,
+  "save_and_test_opens_selected_theme": true,
+  "settings_window_fits_test_monitor": true,
+  "settings_window_rect": [
+    200,
+    40,
+    592,
+    740
+  ],
+  "time_utc": "2026-10-30T23:52:01.562794+00:00",
+  "command": ".venv/bin/python tests/desktop/run_session.py tests/desktop/run_settings.py",
+  "production_commit": "8ef6ec4",
+  "environment": "GNOME50 Wayland headless isolated1280x800",
+  "host_desktop_changed": false,
+  "visual_review": {
+    "five_styles_visible": true,
+    "style_labels": [
+      "Cítrica",
+      "Aquarela",
+      "Vidro claro",
+      "Grafite",
+      "Alto contraste"
+    ],
+    "settings_bottom_buttons_visible": true
+  },
+  "captures": [
+    {
+      "path": "gnome-settings-before-save.png",
+      "sha256": "3a1edcdb2b16c854a09e2788a4fdfbf8d9e4f199f176cd3ccd4417117fe5c4fe"
+    },
+    {
+      "path": "gnome-settings-shortcut-typed.png",
+      "sha256": "b4d769ae4031ccbbbb655a5d89eaeac734f1e2dcd1c5ab203511787cea6e6f54"
+    },
+    {
+      "path": "gnome-settings-saved.png",
+      "sha256": "4408485d70d5381d18079df79687a2cda12bf728bb6fd8312f208bb16c000ad5"
+    },
+    {
+      "path": "gnome-settings-theme-reloaded.png",
+      "sha256": "9bb64b322373a7d84b555a444ea8095ee9eb1d824de7359ef3b7c324cef56b06"
+    },
+    {
+      "path": "gnome-settings-themed-wheel.png",
+      "sha256": "0ef088d6a053c04cb8e70ebdbe9d976ea0b1c6b785ea36dd27eda38bd2416ecb"
+    }
+  ]
+}
