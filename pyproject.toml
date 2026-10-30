@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "citrica"
-version = "0.6.0"
+version = "0.7.0"
 description = "Conversão de arquivos local e radial para Linux e Windows"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "AGPL-3.0-or-later"
 authors = [{name = "GenissonEmilio"}]
 dependencies = [
-  "PySide6-Essentials>=6.8,<7", "Pillow>=11,<13", "pillow-heif>=0.22,<2",
+  "PySide6-Essentials>=6.8,<7", "PySide6-Addons>=6.8,<7", "Pillow>=11,<13", "pillow-heif>=0.22,<2",
   "pypdf>=5,<7", "PyMuPDF>=1.25,<2",
   "zxing-cpp>=3.1,<4",
   "opencv-python-headless>=4.10,<5",

@@ -69,7 +69,10 @@ export default class Citrica extends Extension {
             return Clutter.EVENT_PROPAGATE;
         });
         this._binding();
-        this._settingsId = this._settings.connect('changed', () => this._binding());
+        this._settingsId = this._settings.connect('changed', (_settings, key) => {
+            if (key === 'wheel-theme') this._view?.setTheme(this._settings.get_string('wheel-theme'));
+            else if (key === 'toggle-wheel') this._binding();
+        });
         this._indicator = new PanelMenu.Button(0, 'Cítrica');
         this._indicator.add_child(new St.Icon({icon_name: 'view-refresh-symbolic', style_class: 'system-status-icon'}));
         this._indicator.menu.addAction('Mostrar roda', () => this.Show([], 'convert'));
@@ -267,6 +270,7 @@ export default class Citrica extends Extension {
             this._origin = [Math.max(monitor.x, Math.min(x - SIZE / 2, monitor.x + monitor.width - SIZE)),
                 Math.max(monitor.y + 32, Math.min(y - SIZE / 2, monitor.y + monitor.height - SIZE - 24))];
             this._view = new WheelView({animations: () => this._settings.get_boolean('animations'),
+                theme: this._settings.get_string('wheel-theme'),
                 activate: (px, py) => {
                     if (this._drag) return;
                     this._highlight(px, py);
@@ -414,16 +418,20 @@ export default class Citrica extends Extension {
     }
 
     Status() {
-        return JSON.stringify({version: 3, revision: 3, appearance: 'annular-sectors',
+        return JSON.stringify({version: 3, revision: 4, appearance: 'annular-sectors',
             visible: !!this._wheel, dragging: this._drag, closing: this._closingViews.size,
             animation: this._wheel ? {opacity: this._wheel.opacity, scale: this._wheel.scale_x} : null,
             motion: this._view?.motionState() ?? null, cachedSelection: !!this._palette,
             paths: this._paths, mode: this._mode, origin: this._origin, selected: this._selected,
             items: this._items, selection: this._selectionInfo, busy: this._busy, counts: this._counts,
-            shortcut: this._settings.get_strv('toggle-wheel'), dragKey: this._settings.get_string('drag-key')});
+            shortcut: this._settings.get_strv('toggle-wheel'), dragKey: this._settings.get_string('drag-key'),
+            wheelTheme: this._settings.get_string('wheel-theme')});
     }
 
-    ReloadSettings() { this._binding(); }
+    ReloadSettings() {
+        this._binding();
+        this._view?.setTheme(this._settings.get_string('wheel-theme'));
+    }
 
     disable() {
         this._enabled = false;

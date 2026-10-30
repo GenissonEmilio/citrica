@@ -6,7 +6,7 @@ para adicionar suporte à Store. O pacote Store exige uma compilação que já
 contenha o adaptador `citrica-package.exe` e o runtime com suporte à identidade,
 StartupTask, preferências e IPC de MSIX.
 
-**Estado:** as duas variantes `1.6.0.0` passaram pelo MakeAppx real do SDK
+**Histórico 1.6.0.0:** as duas variantes `1.6.0.0` passaram pelo MakeAppx real do SDK
 Microsoft, com validação habilitada. O recibo em
 [`evidence/store/makeappx-1.6.0.0.json`](evidence/store/makeappx-1.6.0.0.json)
 registra hashes, commits, exclusões e limites dessa validação. A variante QA
@@ -19,6 +19,12 @@ quatro capturas; o Partner Center do mantenedor confirmou **Na Microsoft Store**
 O [recibo de publicação](evidence/store/publication-2026-10-29.json) registra o
 alcance dessa confirmação. A instalação do pacote entregue pela loja ainda não
 foi repetida na VM; os testes funcionais abaixo usaram a variante QA descrita.
+
+## Atualização 0.7.0 / 1.7.0.0
+
+A identidade permanece a mesma e a versão MSIX aumenta para `1.7.0.0`. O payload é recompilado com os novos editores e QtMultimedia, mantendo os motores offline e as preferências do usuário. Build, validação e envio da atualização são registrados em [Validação 0.7.0](VALIDACAO-0.7.0.md); o histórico acima não comprova a publicação deste pacote novo.
+
+Uma release no GitHub não atualiza a Store automaticamente. O novo MSIX oficial precisa ser enviado em uma atualização do produto existente no Partner Center. Após a certificação e publicação, a Store distribui a atualização conforme as preferências do Windows. A variante QA de teste tem identidade separada e não deve ser enviada como pacote oficial.
 
 ## Identidade pública
 
@@ -33,9 +39,9 @@ do Partner Center:
 | Nome visível | `Cítrica` |
 | Store ID | `9NV389WMRJNC` |
 | Package Family Name | `Emilians.Ctrica_dtz50gxq3qxna` |
-| Versão do pacote Store | `1.6.0.0` |
+| Versão do pacote desta atualização | `1.7.0.0` |
 
-A versão do produto pode continuar sendo `0.6.0`. A versão do pacote é
+A versão desta atualização é `0.7.0`. A versão do pacote é
 independente: a orientação da Store exige primeiro componente acima de zero e
 quarto componente zero. `MaxVersionTested` é uma declaração do manifest, não um
 registro de que a VM ou o WACK já passaram.

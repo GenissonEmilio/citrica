@@ -2,12 +2,13 @@
   "locale": "pt-BR",
   "product_name": "Cítrica",
   "category": "UtilitiesAndTools",
-  "description": "Converta arquivos sem sair da pasta em que você trabalha. Arraste um arquivo no Explorador, pressione Shift e solte sobre o formato desejado na roda. A cópia convertida aparece ao lado do original.\n\nO Cítrica processa os arquivos no computador, sem enviá-los a um site de conversão. Os motores de imagem, PDF, documentos, planilhas, apresentações, áudio, vídeo, legendas e arquivos compactados acompanham a versão Windows.\n\nDurante o arraste, Alt mostra ferramentas e Ctrl mostra ações. Use Ctrl+Alt+C para abrir a roda, personalize o atalho nas configurações e mantenha o aplicativo disponível na bandeja.\n\nPDF para DOCX mantém texto editável quando disponível. PDFs escaneados permanecem como imagens, e documentos complexos podem ter diferenças de layout. As ferramentas de ocultação de texto e rostos funcionam localmente e exigem revisão do resultado.\n\nO Cítrica é um projeto de código aberto. O compartilhamento opcional exige o aplicativo LocalSend instalado separadamente.",
+  "description": "Converta arquivos sem sair da pasta em que você trabalha. Arraste um arquivo no Explorador, pressione Shift e solte sobre o formato desejado na roda. A cópia convertida aparece ao lado do original.\n\nO Cítrica processa os arquivos no computador, sem enviá-los a um site de conversão. Os motores de imagem, PDF, documentos, planilhas, apresentações, áudio, vídeo, legendas e arquivos compactados acompanham a versão Windows.\n\nDurante o arraste, Alt mostra ferramentas e Ctrl mostra ações. Use Ctrl+Alt+C para abrir a roda, personalize o atalho nas configurações e mantenha o aplicativo disponível na bandeja.\n\nPDF para DOCX mantém texto editável quando disponível. PDFs escaneados permanecem como imagens, e documentos complexos podem ter diferenças de layout. As ferramentas de ocultação de texto e rostos funcionam localmente e exigem revisão do resultado.\n\nEscolha entre cinco estilos de roda nas configurações, incluindo Aquarela e Vidro claro translúcidos. Edite imagens em um canvas com seleção e alças; ajuste vídeos e áudios com player e linha do tempo; navegue e reorganize páginas de PDF antes de salvar uma cópia.\n\nO Cítrica é um projeto de código aberto. O compartilhamento opcional exige o aplicativo LocalSend instalado separadamente.",
   "features": [
     "Roda junto ao ponteiro durante o arraste no Explorador",
     "Conversões locais com motores incluídos",
     "PDF para DOCX e DOCX para PDF sem instalar Word",
     "Ferramentas de imagem, PDF, áudio e vídeo",
+    "Cinco estilos de roda e editores visuais com player e linha do tempo",
     "Atalho global, bandeja e animações configuráveis",
     "Cópias convertidas junto aos arquivos originais"
   ],
@@ -17,5 +18,6 @@
   "full_trust_justification": "O Cítrica é um aplicativo desktop Qt/Win32. O menu radial acompanha arrastes reais do Explorador, usa atalhos globais, OLE e área de transferência, permanece na bandeja e executa motores locais de conversão em subprocessos. A aplicação usa o nível normal do usuário, acessa arquivos escolhidos por ele e não solicita execução como administrador.",
   "license": "AGPL-3.0-or-later",
   "license_url": "https://github.com/GenissonEmilio/citrica/blob/main/LICENSE",
-  "license_text": "Este aplicativo é distribuído sob a licença GNU Affero GPL versão 3 ou posterior (AGPL-3.0-or-later). Código-fonte: https://github.com/GenissonEmilio/citrica . Texto da licença: https://github.com/GenissonEmilio/citrica/blob/main/LICENSE . As licenças e os avisos das dependências acompanham o aplicativo em THIRD_PARTY.md e na pasta licenses."
+  "license_text": "Este aplicativo é distribuído sob a licença GNU Affero GPL versão 3 ou posterior (AGPL-3.0-or-later). Código-fonte: https://github.com/GenissonEmilio/citrica . Texto da licença: https://github.com/GenissonEmilio/citrica/blob/main/LICENSE . As licenças e os avisos das dependências acompanham o aplicativo em THIRD_PARTY.md e na pasta licenses.",
+  "release_notes": "Cinco estilos de roda nas configurações; novos editores visuais de imagem, PDF, áudio e vídeo; correção para fechar a roda ao soltar o arquivo fora de uma opção no Windows. Conversões locais e originais preservados."
 }

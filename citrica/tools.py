@@ -11,7 +11,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
 from citrica.core import ConversionError, Options, check_cancel, convert, family, merge_pdfs, publish, run_process
-from citrica.runtime import program, run_external
+from citrica.runtime import localsend_command, program, run_external
 
 # All geometry is explicit in source pixels; all times are seconds. No destructive
 # edits are performed: even metadata edits and compression publish a new copy.
@@ -103,7 +103,7 @@ def available_tools(paths, actions=False):
             from citrica.vision import text_available
             if not text_available():
                 continue
-        if name == 'share' and not program('localsend'):
+        if name == 'share' and not localsend_command():
             continue
         if name == 'join_media' and len(kinds) != 1:
             continue
@@ -139,6 +139,22 @@ def media_info(path):
                            '-show_format', '-show_streams', '-of', 'json', str(path)],
                           check=True, capture_output=True, text=True, encoding='utf-8', timeout=30)
     return json.loads(result.stdout)
+
+
+def oriented_video_size(stream):
+    """Source-pixel axes after FFmpeg's default display-matrix autorotation."""
+    width, height = int(stream['width']), int(stream['height'])
+    if width <= 0 or height <= 0:
+        raise ConversionError('A faixa de vídeo não contém dimensões válidas.')
+    rotation = next((item['rotation'] for item in stream.get('side_data_list', []) if 'rotation' in item),
+                    stream.get('tags', {}).get('rotate', 0))
+    try:
+        rotation = float(rotation)
+    except (ValueError, TypeError):
+        rotation = 0
+    if math.isfinite(rotation) and math.isclose(rotation % 180, 90, abs_tol=.01):
+        return height, width
+    return width, height
 
 
 def _image_tool(tool, path, params, target):
@@ -280,7 +296,7 @@ def _media_tool(tool, paths, params, folder, cancel):
         stream = next((s for s in info['streams'] if s['codec_type'] == 'video'), None)
         if not stream:
             raise ConversionError('Nenhuma faixa de vídeo encontrada.')
-        x, y, w, h = rectangle(params, stream['width'], stream['height'])
+        x, y, w, h = rectangle(params, *oriented_video_size(stream))
         if w % 2 or h % 2:
             raise ConversionError('Para vídeo, largura e altura devem ser pares.')
         args += ['-vf', f'crop={w}:{h}:{x}:{y}']

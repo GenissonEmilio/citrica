@@ -3,5 +3,12 @@
   <key name="toggle-wheel" type="as"><default>['&lt;Super&gt;&lt;Shift&gt;c']</default></key>
   <key name="drag-key" type="s"><default>'shift'</default></key>
   <key name="animations" type="b"><default>true</default></key>
+  <key name="wheel-theme" type="s">
+   <choices><choice value="classic"/><choice value="watercolor"/><choice value="glass"/>
+    <choice value="graphite"/><choice value="contrast"/></choices>
+   <default>'classic'</default>
+   <summary>Estilo visual da roda</summary>
+   <description>Altera cores, transparência e acabamento sem mudar as ações ou os atalhos.</description>
+  </key>
  </schema>
 </schemalist>

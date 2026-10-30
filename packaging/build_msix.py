@@ -189,7 +189,8 @@ def validate_payload(payload, files):
     if len(python) != 1:
         raise ValueError('Exactly one versioned PyInstaller Python DLL is required.')
     runtime = list(python)
-    for library in ['Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'Qt6Network.dll']:
+    for library in ['Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'Qt6Network.dll',
+                    'Qt6Multimedia.dll', 'Qt6MultimediaWidgets.dll']:
         candidates = [name for name in files if name in {
             '_internal/PySide6/' + library, '_internal/PySide6/Qt/bin/' + library}]
         if len(candidates) != 1:

@@ -42,6 +42,7 @@ run(sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--name", "ci
     "--copy-metadata", "fonttools", "--copy-metadata", "lxml",
     "--copy-metadata", "fire", "--copy-metadata", "termcolor", "--copy-metadata", "typing_extensions",
     "--copy-metadata", "PyMuPDF", "--copy-metadata", "PySide6-Essentials",
+    "--copy-metadata", "PySide6-Addons",
     "--copy-metadata", "zxing-cpp", "--copy-metadata", "numpy",
     "--copy-metadata", "shiboken6", *ocr, "packaging/entry.py")
 

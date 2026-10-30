@@ -1,8 +1,8 @@
-# Instalar o Cítrica 0.6.0 no Ubuntu
+# Instalar o Cítrica 0.7.0 no Ubuntu
 
-A [versão 0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0) oferece instalador DEB e roda global no GNOME 46/50/51 com Wayland. O mesmo DEB publicado passou nos testes de instalação e conversão descritos abaixo.
+A [versão 0.7.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.7.0) oferece instalador DEB, editores visuais e cinco estilos de roda no GNOME 46/50/51 com Wayland. A [validação da atualização](VALIDACAO-0.7.0.md) distingue os resultados novos do histórico da 0.6.0 descrito abaixo.
 
-1. Baixe diretamente [citrica_0.6.0_amd64.deb](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica_0.6.0_amd64.deb), sem precisar entrar no GitHub.
+1. Baixe diretamente [citrica_0.7.0_amd64.deb](https://github.com/GenissonEmilio/citrica/releases/download/v0.7.0/citrica_0.7.0_amd64.deb), sem precisar entrar no GitHub.
 2. Localize o DEB na pasta de downloads. Ele contém o aplicativo, Python, Qt e os motores de imagem/PDF; essas bibliotecas não precisam ser instaladas manualmente.
 3. Abra o DEB com o instalador de aplicativos do Ubuntu e confirme a instalação.
 
@@ -10,7 +10,7 @@ Se a loja da sua instalação não abrir arquivos DEB locais, abra um terminal n
 
 ```bash
 sudo apt update
-sudo apt install ./citrica_0.6.0_amd64.deb
+sudo apt install ./citrica_0.7.0_amd64.deb
 ```
 
 O `apt` resolve e instala automaticamente as bibliotecas do sistema exigidas pelo aplicativo. A conexão com a internet é usada para obter essas dependências. Usar somente `dpkg -i` pode deixar dependências pendentes; nesse caso, execute `sudo apt --fix-broken install`.

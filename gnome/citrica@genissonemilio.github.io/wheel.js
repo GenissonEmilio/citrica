@@ -4,6 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
+import {cssColor, getTheme} from './themes.js';
 
 export const SIZE = 380;
 export const INNER = 66;
@@ -76,8 +77,10 @@ function canvas(draw) {
 }
 
 export class WheelView {
-    constructor({animations, activate, pick}) {
+    constructor({animations, activate, pick, theme = 'classic'}) {
         this.animations = animations;
+        this.theme = getTheme(theme);
+        this._paintAreas = [];
         this.actor = new St.Widget({width: SIZE, height: SIZE, reactive: true,
             layout_manager: new Clutter.FixedLayout(), accessible_name: 'Cítrica · roda de arquivos'});
         this.actor.set_pivot_point(.5, .5);
@@ -85,14 +88,14 @@ export class WheelView {
             if (event.get_button() === 1) activate(...event.get_coords());
             return Clutter.EVENT_STOP;
         });
-        const halo = canvas(cr => {
+        this._halo = canvas(cr => {
             cr.arc(C, C, OUTER + 8, 0, TAU);
             cr.arcNegative(C, C, INNER - 6, TAU, 0);
             cr.closePath();
-            cr.setSourceRGBA(1, .89, .76, .24);
+            cr.setSourceRGBA(...this.theme.halo);
             cr.fill();
         });
-        this.actor.add_child(halo);
+        this.actor.add_child(this._halo);
         this._oldContents = new Set();
         this._segments = [];
         this._center = new St.Button({width: 116, height: 116, x: C - 58, y: C - 58,
@@ -101,25 +104,49 @@ export class WheelView {
         const middle = new St.Widget({width: 116, height: 116, layout_manager: new Clutter.FixedLayout()});
         this._preview = new St.Icon({icon_name: 'document-open-symbolic', icon_size: 42, x: 37, y: 19,
             style: 'color:#49372a;'});
-        const pill = new St.Bin({width: 148, x: -16, y: 74,
-            style: 'background-color:rgba(255,246,231,0.94);color:#291f1a;border-radius:17px;'
-                + 'padding:7px 9px;font-size:11px;font-weight:600;'});
+        this._pillBin = new St.Bin({width: 148, x: -16, y: 74});
         this._pill = new St.Label({text: 'Arraste um arquivo', x_align: Clutter.ActorAlign.CENTER});
-        pill.set_child(this._pill);
+        this._pillBin.set_child(this._pill);
         this._pill.get_clutter_text().set_ellipsize(Pango.EllipsizeMode.END);
         middle.add_child(this._preview);
-        middle.add_child(pill);
+        middle.add_child(this._pillBin);
         this._center.set_child(middle);
         this._center.connect('clicked', pick);
         this.actor.add_child(this._center);
         this._hint = new St.Bin({width: SIZE,
-            x: 0, y: SIZE - 5, reactive: false,
-            style: 'color:#3b2e26;background-color:rgba(255,246,231,0.95);border-radius:14px;'
-                + 'padding:6px;font-size:10px;'});
+            x: 0, y: SIZE - 5, reactive: false});
         this._hint.set_child(new St.Label({text: 'Solte um arquivo aqui · Esc para fechar',
             x_align: Clutter.ActorAlign.CENTER}));
         this.actor.add_child(this._hint);
+        this.setTheme(theme);
         this.setInfo(null);
+    }
+
+    setTheme(id) {
+        this.theme = getTheme(id);
+        this._halo.queue_repaint();
+        this._preview.set_style(`color:${cssColor(this.theme.icon)};`);
+        this._pillBin.set_style(`background-color:${cssColor(this.theme.pill)};`
+            + `color:${cssColor(this.theme.pill_text)};border-radius:17px;`
+            + 'padding:7px 9px;font-size:11px;font-weight:600;');
+        this._hint.set_style(`background-color:${cssColor(this.theme.pill)};`
+            + `color:${cssColor(this.theme.pill_text)};border-radius:14px;padding:6px;font-size:10px;`);
+        for (const area of this._paintAreas) area.queue_repaint();
+        for (let i = 0; i < this._segments.length; i++) this._styleLabel(this._segments[i], i === this._selected);
+    }
+
+    _styleLabel(segment, active) {
+        if (!segment.label) return;
+        const color = cssColor(active ? this.theme.active_text : this.theme.text);
+        segment.label.set_style(`color:${color};font-weight:700;text-align:center;`
+            + `font-size:${segment.isFormat ? 13 : 10}px;`);
+        segment.icon?.set_style(`color:${color};`);
+        const chip = this.theme.label_chip;
+        segment.labelGroup.set_style('spacing:3px;' + (chip ?
+            `background-color:${cssColor(chip)};border-radius:10px;padding:5px 3px;` : ''));
+        segment.labelGroup.width = chip ? 86 : 80;
+        segment.labelGroup.set_position(C + LABEL_RADIUS * Math.cos(segment.angle) - (chip ? 43 : 40),
+            C + LABEL_RADIUS * Math.sin(segment.angle) - (segment.isFormat ? (chip ? 16 : 10) : (chip ? 28 : 23)));
     }
 
     open() {
@@ -152,46 +179,60 @@ export class WheelView {
         this._content = content;
         this.actor.insert_child_below(content, this._center);
         this._segments = [];
+        this._paintAreas = [];
         const count = items.length || 8;
         for (let i = 0; i < count; i++) {
             const item = items[i];
             const group = new St.Widget({width: SIZE, height: SIZE, reactive: false,
                 layout_manager: new Clutter.FixedLayout()});
             group.set_pivot_point(.5, .5);
-            const draw = active => canvas(cr => {
+            const draw = active => {
+                const area = canvas(cr => {
                 sectorPath(cr, i, count);
                 const fill = new Cairo.LinearGradient(0, 0, SIZE, SIZE);
-                if (active) {
-                    fill.addColorStopRGBA(0, 1, .65, .30, .99);
-                    fill.addColorStopRGBA(1, .98, .30, .10, .99);
-                } else {
-                    fill.addColorStopRGBA(0, 1, .94, .80, item ? .94 : .28);
-                    fill.addColorStopRGBA(1, 1, .85, .80, item ? .94 : .28);
-                }
+                const theme = this.theme;
+                for (const [position, rgba] of [[0, active ? theme.selected_start : theme.start],
+                    [1, active ? theme.selected_end : theme.end]])
+                    fill.addColorStopRGBA(position, ...rgba.slice(0, 3), rgba[3] * (active || item ? 1 : .30));
                 cr.setSource(fill);
                 cr.fillPreserve();
-                cr.setLineWidth(1);
-                cr.setSourceRGBA(1, 1, 1, active ? .32 : .16);
+                if (!active && theme.gloss) {
+                    const sheen = new Cairo.LinearGradient(0, 0, 0, SIZE);
+                    sheen.addColorStopRGBA(0, 1, 1, 1, theme.gloss);
+                    sheen.addColorStopRGBA(.50, 1, 1, 1, 0);
+                    sheen.addColorStopRGBA(1, 1, 1, 1, 0);
+                    cr.setSource(sheen);
+                    cr.fillPreserve();
+                }
+                cr.setLineWidth(theme.border_width);
+                cr.setSourceRGBA(...theme.border);
                 cr.stroke();
-            });
+                });
+                this._paintAreas.push(area);
+                return area;
+            };
             group.add_child(draw(false));
             const overlay = draw(true);
             overlay.opacity = 0;
             group.add_child(overlay);
             const angle = -Math.PI / 2 + i * TAU / count;
+            let labelGroup, label, icon;
             if (item) {
-                const labelGroup = new St.BoxLayout({width: 80,
+                labelGroup = new St.BoxLayout({width: 80,
                     x: C + LABEL_RADIUS * Math.cos(angle) - 40,
                     y: C + LABEL_RADIUS * Math.sin(angle) - (item.kind === 'format' ? 10 : 23),
                     style: 'spacing:3px;'});
                 // GNOME 51 removed `vertical`; GNOME 46 predates `orientation`.
                 if ('orientation' in labelGroup) labelGroup.orientation = Clutter.Orientation.VERTICAL;
                 else labelGroup.vertical = true;
-                if (item.kind !== 'format') labelGroup.add_child(new St.Icon({icon_size: 20,
+                if (item.kind !== 'format') {
+                    icon = new St.Icon({icon_size: 20,
                     x_align: Clutter.ActorAlign.CENTER,
                     icon_name: item.kind === 'page' ? 'view-more-symbolic' : ICONS[item.id] || 'document-properties-symbolic',
-                    style: 'color:#2b211b;'}));
-                const label = new St.Label({text: item.label.toUpperCase(),
+                    style: 'color:#2b211b;'});
+                    labelGroup.add_child(icon);
+                }
+                label = new St.Label({text: item.label.toUpperCase(),
                     x_align: Clutter.ActorAlign.CENTER,
                     style: `color:#251e1a;font-weight:700;text-align:center;font-size:${item.kind === 'format' ? 13 : 10}px;`});
                 label.get_clutter_text().set_line_wrap(true);
@@ -206,7 +247,9 @@ export class WheelView {
                 label.width = Math.min(80, label.get_preferred_width(-1)[1]);
             }
             if (!group.get_parent()) content.add_child(group);
-            this._segments.push({group, overlay, angle});
+            const segment = {group, overlay, angle, labelGroup, label, icon, isFormat: item?.kind === 'format'};
+            this._segments.push(segment);
+            this._styleLabel(segment, false);
             if (this.animations() && item) {
                 group.opacity = 0;
                 group.scale_x = group.scale_y = .92;
@@ -238,6 +281,7 @@ export class WheelView {
             const sector = this._segments[i];
             if (!sector) continue;
             const active = i === index;
+            this._styleLabel(sector, active);
             const props = {translation_x: active ? 4 * Math.cos(sector.angle) : 0,
                 translation_y: active ? 4 * Math.sin(sector.angle) : 0,
                 scale_x: active ? 1.015 : 1, scale_y: active ? 1.015 : 1};
@@ -263,7 +307,7 @@ export class WheelView {
     motionState() {
         return {settled: this.actor.opacity === 255 && Math.abs(this.actor.scale_x - 1) < .001 &&
             this._segments.every(s => s.group.opacity === 255 && !s.group.get_transition('opacity')),
-        sectors: this._items?.length ?? 0, preview: !!this._info?.preview};
+        sectors: this._items?.length ?? 0, preview: !!this._info?.preview, theme: this.theme.id};
     }
 
     destroy() {

@@ -1,13 +1,15 @@
 <p align="center"><img src="citrica/assets/citrica.svg" width="88" alt="Cítrica"></p>
 <h1 align="center">Cítrica</h1>
 <p align="center">Arraste. Pressione Shift. Solte no formato.<br>Conversão local no desktop Linux e Windows.</p>
-<p align="center"><a href="https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR">Instalar pela Microsoft Store</a> · <a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0">Baixar versão 0.6.0</a> · <a href="docs/UBUNTU.md">Instalar no Ubuntu</a> · <a href="docs/VALIDACAO-0.6.0.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
+<p align="center"><a href="https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR">Instalar pela Microsoft Store</a> · <a href="https://github.com/GenissonEmilio/citrica/releases/tag/v0.7.0">Baixar versão 0.7.0</a> · <a href="docs/UBUNTU.md">Instalar no Ubuntu</a> · <a href="docs/VALIDACAO-0.7.0.md">Validação e limites</a> · <a href="docs/ANALISE.md">Referência e decisões</a></p>
 
 ![Roda nativa durante um arraste no GNOME 50/Wayland](docs/wheel.png)
 
-O Cítrica 0.6 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
+O Cítrica 0.7 oferece a roda nativa do GNOME Shell no Linux e uma integração Qt/Win32 no Windows. A roda aparece perto do ponteiro durante o arraste de arquivos. A janela do aplicativo serve para configurar o atalho; ferramentas que precisam de parâmetros abrem um diálogo específico.
 
-**Versão 0.6.0:** motores offline incluídos no Windows, correções de travamento da roda e atualização do instalador com o aplicativo aberto. O DEB passou em instalação, primeira abertura como usuário comum, conversão e remoção no Ubuntu **24.04, 26.04 e 26.10**. A roda foi testada separadamente nos GNOME 46/50/51. [Instalar no Ubuntu](docs/UBUNTU.md). **Disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026.** O MSIX tem integração de inicialização e preferências próprias e passou pelos testes na VM Windows 11. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes e evidências](docs/WINDOWS-STORE.md).
+**Versão 0.7.0:** aba **Personalizar a roda** com cinco estilos, incluindo Aquarela e Vidro claro translúcidos; editores com prévia ampla, ajustes visuais e linha do tempo de áudio/vídeo. Corrige Compartilhar com LocalSend Flatpak/AppImage no Linux e fecha a roda Windows ao soltar fora de uma opção. [Mudanças, testes e limites](docs/VALIDACAO-0.7.0.md).
+
+O Cítrica está disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026. Atualizações da Store têm pacote e certificação próprios. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes da distribuição](docs/WINDOWS-STORE.md).
 
 **Na 0.5.0:** correções da roda no Explorer, DOCX→PDF/TXT sem Office, PDF→DOCX em ambas as plataformas e miniatura do arraste acima da roda no GNOME. A roda reabre vazia após converter ou cancelar e mantém as animações de abertura, seleção e fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
@@ -15,11 +17,11 @@ Implementação independente inspirada no fluxo do [Tangerine](https://www.tange
 
 ## Windows x64
 
-A 0.6.0 inclui FFmpeg/ffprobe, LibreOffice e OCR. O CI completo passou por 304 conversões de 50 extensões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. [Validação e limites](docs/VALIDACAO-0.6.0.md).
+Desde a 0.6.0, o Windows inclui FFmpeg/ffprobe, LibreOffice e OCR. A validação de cada atualização distingue conversões, ferramentas e arrastes no Explorer. Os ícones da roda usam vetores e a atualização encerra versões antigas por um helper próprio. [Validação e limites](docs/VALIDACAO-0.7.0.md).
 
 **[Instale pela Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR)** e abra **Cítrica** pelo menu Iniciar. A inicialização automática pode ser configurada no aplicativo ou nas Configurações do Windows.
 
-Como alternativas, baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-portable-unsigned-test.zip). Esses arquivos mantêm `unsigned-test` no nome e continuam sem assinatura pública. O instalador EXE usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
+Como alternativas, baixe o [instalador .exe](https://github.com/GenissonEmilio/citrica/releases/download/v0.7.0/citrica-0.7.0-windows-x86_64-setup-unsigned-test.exe) ou o [ZIP portátil](https://github.com/GenissonEmilio/citrica/releases/download/v0.7.0/citrica-0.7.0-windows-x86_64-portable-unsigned-test.zip). Esses arquivos mantêm `unsigned-test` no nome e continuam sem assinatura pública. O instalador EXE usa a conta atual e cria a entrada **Enviar para → Cítrica**. No portátil, extraia tudo e abra `Citrica.exe` mantendo `_internal` ao lado.
 
 Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferramentas; **Ctrl**, ações. **Ctrl+Alt+C** abre/fecha a roda. O aplicativo permanece na bandeja ao fechar as configurações. O atalho e a inicialização automática são configuráveis.
 
@@ -35,10 +37,10 @@ Demonstração no Fedora: arraste o arquivo, escolha o formato na roda e receba 
 
 https://github.com/user-attachments/assets/812f2703-e781-4b44-a544-3829eae95688
 
-Baixe o RPM da [release v0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0):
+Baixe o RPM da [release v0.7.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.7.0):
 
 ~~~bash
-sudo dnf install ./citrica-0.6.0-1.x86_64.rpm
+sudo dnf install ./citrica-0.7.0-1.x86_64.rpm
 citrica --install-gnome
 ~~~
 
@@ -51,36 +53,36 @@ Na primeira instalação, **saia e entre novamente na sessão do GNOME** para el
 
 **Alt** durante o arraste mostra ferramentas. **Ctrl** mostra ações. **Esc** cancela. O atalho **Super+Shift+C** abre/fecha a roda sem iniciar um arraste. Sem seleção, arraste um arquivo para ela ou clique no centro para escolher arquivos. Para várias páginas de opções, use **Mais** e clique na ferramenta desejada. Setas e Enter também selecionam e aplicam opções.
 
-Abra **Cítrica** no menu de aplicativos ou execute `citrica --settings` para trocar o atalho, escolher Shift/Super durante o arraste e ligar/desligar a animação. O formulário verifica teclas inválidas e conflitos com atalhos registrados no GNOME.
+Abra **Cítrica** no menu de aplicativos ou execute `citrica --settings`. Em **Geral e atalhos**, configure o atalho, Shift/Super e animações. Em **Personalizar a roda**, escolha Cítrica, Aquarela, Vidro claro, Grafite ou Alto contraste e salve. O formulário verifica teclas inválidas e conflitos com atalhos registrados no GNOME.
 
-![Configurações do Cítrica](docs/settings.png)
+![Cinco estilos da roda](docs/appearance.png)
 
-A versão **0.6.0** oferece roda global em **GNOME Shell 46, 50 e 51 / Wayland**, incluindo Ubuntu 24.04, 26.04 e 26.10. A CLI funciona em outros ambientes; KDE, Cinnamon e X11 continuam sem roda global. Os pacotes oficiais são x86_64, com glibc >= 2.39.
+A versão **0.7.0** oferece roda global em **GNOME Shell 46, 50 e 51 / Wayland**, incluindo Ubuntu 24.04, 26.04 e 26.10. A CLI funciona em outros ambientes; KDE, Cinnamon e X11 continuam sem roda global. Os pacotes oficiais são x86_64, com glibc >= 2.39.
 
 ## Ubuntu 24.04 / 26.04 / 26.10
 
-Baixe diretamente o [instalador DEB 0.6.0](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica_0.6.0_amd64.deb). Não é preciso entrar no GitHub nem extrair um ZIP.
+Baixe diretamente o [instalador DEB 0.7.0](https://github.com/GenissonEmilio/citrica/releases/download/v0.7.0/citrica_0.7.0_amd64.deb). Não é preciso entrar no GitHub nem extrair um ZIP.
 
 Abra o DEB com o instalador de aplicativos do Ubuntu. Se a loja não abrir pacotes locais, abra um terminal na pasta do arquivo e execute:
 
 ~~~bash
 sudo apt update
-sudo apt install ./citrica_0.6.0_amd64.deb
+sudo apt install ./citrica_0.7.0_amd64.deb
 ~~~
 
 O `apt` resolve as dependências automaticamente. Abra **Cítrica** no menu para preparar a integração e o atalho. Quando as configurações pedirem, salve seu trabalho, **saia e entre novamente no GNOME** para carregar a extensão. Depois arraste um arquivo no **Arquivos**, toque **Shift** e solte no formato desejado. [Compatibilidade, dependências e resultados dos testes](docs/UBUNTU.md).
 
-## Pacotes 0.6.0 e dependências
+## Pacotes 0.7.0 e dependências
 
 ~~~bash
 # Ubuntu 24.04 ou mais recente
-sudo apt install ./citrica_0.6.0_amd64.deb
+sudo apt install ./citrica_0.7.0_amd64.deb
 # Portátil, sem precisar instalar Python
- tar -xzf citrica-0.6.0-linux-x86_64.tar.gz
+ tar -xzf citrica-0.7.0-linux-x86_64.tar.gz
  ./citrica/install.sh
 ~~~
 
-O instalador portátil registra o aplicativo em `~/.local/bin/citrica`, configura a extensão e instala menus de contexto no usuário atual. O RPM/DEB registra o aplicativo no sistema. Na 0.6.0, a primeira abertura pelo menu prepara a integração; `citrica --install-gnome` também permite configurá-la manualmente. Para menus de contexto opcionais, execute `citrica --install-integrations`. O script do Nautilus funciona sem plugin adicional; a entrada direta exige `nautilus-python`. A roda exige uma das versões de GNOME/Wayland indicadas acima.
+O instalador portátil registra o aplicativo em `~/.local/bin/citrica`, configura a extensão e instala menus de contexto no usuário atual. O RPM/DEB registra o aplicativo no sistema. A primeira abertura pelo menu prepara a integração; `citrica --install-gnome` também permite configurá-la manualmente. Para menus de contexto opcionais, execute `citrica --install-integrations`. O script do Nautilus funciona sem plugin adicional; a entrada direta exige `nautilus-python`. A roda exige uma das versões de GNOME/Wayland indicadas acima.
 
 Os pacotes Linux incluem Python, Qt, Pillow, motores PDF, leitor QR, modelo de rostos OpenCV e Tesseract com modelo de texto inglês. **FFmpeg e LibreOffice são programas opcionais do sistema**:
 
@@ -92,9 +94,19 @@ sudo apt install ffmpeg libreoffice
 citrica --doctor
 ~~~
 
-Mídia exige FFmpeg/ffprobe; codecs variam entre instalações. Falhas de codec são informadas sem alterar a origem. LocalSend é opcional para compartilhamento, aparece nas ações somente quando o comando `localsend` está disponível e abre o aplicativo para concluir o envio. AirDrop não está implementado.
+Mídia exige FFmpeg/ffprobe; codecs variam entre instalações. Falhas de codec são informadas sem alterar a origem. LocalSend é opcional para compartilhamento. No Linux, o Cítrica reconhece binário nativo, Flatpak de usuário/sistema e AppImage executável em pastas usuais ou registrado no menu. A ação abre o LocalSend com os arquivos; o envio é concluído nele. AirDrop não está implementado.
 
 Confira `SHA256SUMS` na pasta dos downloads. Mantenha `_internal` junto ao executável portátil. A extensão e seu backend precisam continuar no caminho registrado; reinstale a integração se mover o aplicativo.
+
+## Editores visuais
+
+Alt durante o arraste abre as ferramentas do arquivo. A imagem fica em um canvas amplo: arraste uma seleção, mova a área ou use as alças para recortar; os números usam os pixels do original. Brilho, contraste, saturação, nitidez, anotações e fundos têm controles próprios e prévia quando aplicável.
+
+Vídeo e áudio têm player interno, linha do tempo com miniaturas ou forma de onda, alças de seleção e campos de tempo sincronizados. É possível assistir, pausar, navegar e escolher o trecho antes de exportar. PDF tem navegação de páginas e seleção/reordenação visual. As ferramentas usam o mesmo espaço de trabalho, com **Salvar cópia**, cancelamento e **Abrir resultado**.
+
+![Editor visual de vídeo](docs/editor-video.png)
+
+A interface é inspirada em editores de mídia; não há montagem multipista, transições ou edição completa de documentos Office. Prévias usam um arquivo de referência quando a operação recebe vários arquivos. Codecs sem reprodução no player continuam com a alternativa de miniaturas/quadros quando FFmpeg consegue decodificá-los.
 
 ## Ferramentas
 
@@ -156,7 +168,7 @@ python tests/desktop/run_session.py
 python packaging/build.py
 ~~~
 
-O teste do desktop cria outro compositor GNOME/Wayland com barramento e configurações isolados. A extensão de teste nunca é instalada no desktop do usuário nem incluída nos pacotes. O CI verifica o motor, o executável empacotado e a instalação DEB nos três Ubuntu. Os percursos nativos da candidata foram executados separadamente em GNOME 46/51 nos containers Ubuntu e GNOME 50 no Fedora. [Resultados Ubuntu 0.6.0](docs/UBUNTU.md) e [histórico da estável 0.5.0](docs/VALIDACAO.md).
+O teste do desktop cria outro compositor GNOME/Wayland com barramento e configurações isolados. A extensão de teste nunca é instalada no desktop do usuário nem incluída nos pacotes. O CI verifica o motor, o executável empacotado e a instalação DEB nos três Ubuntu. Os percursos nativos da candidata foram executados separadamente em GNOME 46/51 nos containers Ubuntu e GNOME 50 no Fedora. [Resultados Ubuntu 0.7.0](docs/UBUNTU.md) e [histórico da estável 0.5.0](docs/VALIDACAO.md).
 
 ## Licença
 

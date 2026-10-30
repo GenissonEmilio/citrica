@@ -97,7 +97,7 @@ def main():
     if args.doctor:
         import importlib.util
         import platform
-        from citrica.runtime import program
+        from citrica.runtime import localsend_command
         from citrica.vision import text_available
         if sys.platform == 'win32':
             from citrica.windows.ipc import send
@@ -110,7 +110,7 @@ def main():
                           "tools": {"faces": importlib.util.find_spec('cv2') is not None,
                                     "text": text_available(),
                                     "qr": importlib.util.find_spec('zxingcpp') is not None,
-                                    "share": program('localsend') is not None},
+                                    "share": localsend_command() is not None},
                           "desktop": state}, ensure_ascii=False, indent=2))
         return 0
     if args.formats:

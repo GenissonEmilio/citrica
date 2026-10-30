@@ -31,7 +31,8 @@ def payload(tmp_path, builder):
     path = tmp_path / 'PyInstaller Aplicação João'
     files = {name: b'public runtime fixture' for name in builder.REQUIRED}
     files |= {f'_internal/PySide6/{library}.dll': pe()
-              for library in ['Qt6Core', 'Qt6Gui', 'Qt6Widgets', 'Qt6Network']}
+              for library in ['Qt6Core', 'Qt6Gui', 'Qt6Widgets', 'Qt6Network',
+                              'Qt6Multimedia', 'Qt6MultimediaWidgets']}
     files |= {'_internal/python312.dll': pe(), '_internal/PySide6/plugins/platforms/qwindows.dll': pe()}
     files['_internal/engines.json'] = json.dumps({'provenance': 'compiled-from-pinned-sources'}).encode()
     for name in files:
@@ -49,7 +50,7 @@ def payload(tmp_path, builder):
 
 def test_public_identity_and_qa_are_separate_without_secret_fields(builder):
     identity = builder.load_identity(builder.IDENTITY)
-    assert identity['name'] == 'Emilians.Ctrica' and identity['store_version'] == '1.6.0.0'
+    assert identity['name'] == 'Emilians.Ctrica' and identity['store_version'] == '1.7.0.0'
     assert identity['package_family_name'] == 'Emilians.Ctrica_dtz50gxq3qxna'
     qa = builder.variant_identity(identity, 'qa')
     assert qa['name'] != identity['name'] and qa['name'].endswith('.UnsignedQA')
