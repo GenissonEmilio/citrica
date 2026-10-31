@@ -9,7 +9,7 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
 import pytest
 from PIL import Image
-from PySide6.QtCore import QMimeData, QObject, QPoint, QPointF, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import QCoreApplication, QEvent, QMimeData, QObject, QPoint, QPointF, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -72,11 +72,9 @@ def desktop(tmp_path, monkeypatch):
     controller.pointer_timer.stop()
     yield controller
     controller.hide_wheel()
-    for job in list(controller.jobs):
-        job.cancel.set()
-        job.wait(5000)
-    QApplication.processEvents()
-    controller.close()
+    controller.prepare_shutdown()
+    controller.native.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     app._windows_test_controller = None
 
 

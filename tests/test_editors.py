@@ -11,7 +11,7 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
 import pytest
 from PIL import Image
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QCoreApplication, QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
@@ -43,7 +43,9 @@ def close_editor(app, dialog):
     until(app, lambda: not dialog.busy())
     app.processEvents()
     dialog.close()
-    app.processEvents()
+    dialog.prepare_shutdown()
+    dialog.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
 
 
 def export(app, dialog):

@@ -8,6 +8,7 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
 import pytest
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QCoreApplication, QEvent
 
 from citrica.companion import Settings, file_action
 from citrica.desktop import SHELL_REVISION, SHELL_VERSION
@@ -39,6 +40,7 @@ def linux_settings(tmp_path):
         yield dialog, values, writes
         dialog.close()
         dialog.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
         app.processEvents()
 
 
