@@ -26,6 +26,8 @@ A [verificação final de código-fonte](evidence/0.7.0/source-tests-final.json)
 
 A [regressão de evento tardio da prévia](evidence/0.7.0/late-preview-callback.json) reproduziu uma corrida estreita: a thread já reportava finalização, a janela recebia DeferredDelete e uma lambda ainda acessava o diálogo destruído. Os sinais de prévia agora usam slots com contexto do EditorDialog; Qt descarta a entrega se o receptor foi destruído. O teste falhou antes e passou depois da correção, incluindo sinais ready, failed e finished tardios, cancelamento e liberação da thread. Não houve perda de arquivo na reprodução.
 
+A [última checagem do PR no Linux](evidence/0.7.0/linux-ci-diagnostic.json) teve uma tentativa sem progresso visível por mais de nove minutos e foi cancelada, sem atribuir aprovação a essa execução. Uma única reprodução local isolada passou 357 testes e ignorou 21 em 49,41 s, com saída 0. O workflow passou a manter saída sem buffer, rastros periódicos e limite de dez minutos nessa etapa, preservando a mesma coleta e todas as assertions. Os resultados posteriores permanecem nos checks do PR; essa mudança é de diagnóstico do CI e não altera os binários congelados.
+
 ## Pacotes e publicação
 
 O [build Linux](evidence/0.7.0/linux-packages-ci.json) passou 304 conversões sobre 50 extensões e 38 operações estáticas de imagem/PDF (32 positivas e seis rejeições esperadas), com originais preservados. O DEB passou instalação, abertura, conversão e remoção em Ubuntu 24.04, 26.04 e 26.10 limpos.
