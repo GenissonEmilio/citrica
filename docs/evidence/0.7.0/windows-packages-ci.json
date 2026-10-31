@@ -1,0 +1,156 @@
+{
+  "product_version": "0.7.0",
+  "scope": "packaged Windows CI; separate Windows 11 VM and WACK results required",
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "run": "https://github.com/GenissonEmilio/citrica/actions/runs/41156230529",
+  "job": "repack / repack-qa",
+  "conclusion": "success",
+  "gui_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+  "conversions": 304,
+  "input_extensions": 50,
+  "media_operations": [
+    {
+      "family": "video",
+      "tool": "compress",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "strip",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "metadata",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "edit_metadata",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "target_size",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "trim",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "speed",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "split_media",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "join_media",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "crop",
+      "success": true
+    },
+    {
+      "family": "video",
+      "tool": "snapshot",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "compress",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "strip",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "metadata",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "edit_metadata",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "target_size",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "trim",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "speed",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "split_media",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "join_media",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "normalize",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "bleep",
+      "success": true
+    },
+    {
+      "family": "audio",
+      "tool": "channels",
+      "success": true
+    }
+  ],
+  "static_operations": 38,
+  "static_positive_operations": 32,
+  "static_expected_rejections": 6,
+  "originals_preserved": true,
+  "source_tests_passed": 357,
+  "source_tests_skipped": 21,
+  "authenticode_signed": false,
+  "provenance_reports": [
+    "citrica-windows-engine-origin.json",
+    "citrica-windows-engine-reuse.json"
+  ],
+  "binary_inputs": [
+    {
+      "name": "citrica-0.7.0-windows-engine-sources-unsigned-test.zip",
+      "size": 52100981,
+      "sha256": "89e4b1b10d303b59d9ee9527ddc1074ba6dd80a08257aecaafe96779ce4e9c43"
+    },
+    {
+      "name": "citrica-0.7.0-windows-x86_64-portable-unsigned-test.zip",
+      "size": 782461819,
+      "sha256": "f5054480cbced7ce25c862194b67674a15b6b9aee04adc6555ac12510f1bb426"
+    },
+    {
+      "name": "citrica-0.7.0-windows-x86_64-setup-unsigned-test.exe",
+      "size": 507713416,
+      "sha256": "c9e3ca27275731170db74080c67cb63f0c372b96ee511894cb397a0b944599f5"
+    }
+  ]
+}

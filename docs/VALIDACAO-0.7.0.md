@@ -34,7 +34,9 @@ O [TAR final do commit 027e785 no Fedora/GNOME 50](evidence/0.7.0/linux-frozen-g
 
 A [instalação local](evidence/0.7.0/local-install.json) foi atualizada para esse mesmo binário, com backup e preferências preservadas. A extensão revisão 4 está no disco; a sessão em execução mantém a revisão 2 até o próximo login, sem encerrar o trabalho do usuário.
 
-O pacote Windows e seu MSIX ainda estão em preparação nesta branch. As verificações Linux não são tratadas como validação do Windows nem como certificação da Microsoft.
+O [pacote Windows do commit 027e785](evidence/0.7.0/windows-packages-ci.json) passou no CI por 304 conversões sobre 50 extensões, 23 operações de mídia e 38 operações estáticas (32 positivas e seis rejeições esperadas), com originais preservados. O instalador passou instalação por usuário em caminho Unicode, abertura, atualização com residente ativo e remoção. Os testes reais do Explorer passaram em 100% e 150%, com motores offline, DOCX↔PDF editável e conversões repetidas na mesma pasta. Os relatórios mantêm a origem dos motores e a condição de pacote sem assinatura pública.
+
+Os testes funcionais desse binário na VM Windows 11 e a verificação local do MSIX ainda estão em andamento. O CI e as verificações Linux não são tratados como certificação da Microsoft.
 
 ## Limites
 

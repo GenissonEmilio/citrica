@@ -6,6 +6,7 @@ O **Cítrica 0.7.0** traz personalização da roda e novos espaços de edição 
 - **PDF e outras ferramentas:** prévia de páginas, seleção e reordenação visual, painel de parâmetros, cancelamento, **Salvar cópia** e **Abrir resultado**.
 - **Linux:** Compartilhar reconhece LocalSend via Flatpak de sistema/usuário, binário nativo e AppImage executável em locais usuais ou registrado no menu. Arquivos são encaminhados ao LocalSend para concluir o envio.
 - **Windows:** soltar fora de uma opção fecha e limpa a roda, inclusive com dados atrasados do Explorer ou um novo arraste depois de **Mais**. Drops válidos continuam aguardando a análise do arquivo antes de executar.
+- **Estabilidade:** fechar o editor enquanto a prévia está sendo preparada cancela o trabalho com segurança; sair do residente também encerra as configurações abertas pelo teste da roda.
 
 **Instalação:** Linux recebe DEB, RPM e TAR.GZ. No Ubuntu, use o instalador do sistema ou `sudo apt install ./citrica_0.7.0_amd64.deb`. A roda Linux exige GNOME 46/50/51 com Wayland. Após atualizar a extensão, saia e entre novamente na sessão para carregar o código novo.
 
