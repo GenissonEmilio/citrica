@@ -38,7 +38,7 @@ except ImportError:
 
 EDITOR_STYLE = """
 QDialog#CitricaEditor { background: #15171b; color: #eff1f5; }
-QDialog#CitricaEditor QWidget { color: #e5e8ee; font-size: 13px; }
+QDialog#CitricaEditor QWidget { background: transparent; color: #e5e8ee; font-size: 13px; }
 QDialog#CitricaEditor QLabel { background: transparent; }
 QDialog#CitricaEditor QLabel#EditorTitle { font-size: 23px; font-weight: 700; color: #fff; }
 QDialog#CitricaEditor QLabel#EditorMuted { color: #9aa3b2; }
@@ -88,6 +88,31 @@ def muted(text):
     label.setObjectName('EditorMuted')
     label.setWordWrap(True)
     return label
+
+
+class FittedPreview(QLabel):
+    """Keep the entire rendered page visible as the preview area changes."""
+
+    def __init__(self):
+        super().__init__()
+        self.source_pixmap = QPixmap()
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setMinimumSize(240, 200)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+
+    def setPixmap(self, pixmap):
+        self.source_pixmap = pixmap
+        self.fit_pixmap()
+
+    def fit_pixmap(self):
+        if not self.source_pixmap.isNull():
+            super().setPixmap(self.source_pixmap.scaled(
+                self.contentsRect().size(), Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.fit_pixmap()
 
 
 class ImageSelection(QWidget):
@@ -1181,10 +1206,8 @@ class EditorDialog(QDialog):
         if not self.pdf.page_count:
             raise ConversionError('O PDF não contém páginas.')
         self.fill_metadata(self.pdf.metadata or {})
-        self.pdf_image = QLabel()
-        self.pdf_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.pdf_image.setMinimumSize(240, 200)
-        self.pdf_image.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.pdf_image = FittedPreview()
+        self.pdf_image.setAccessibleName('Prévia da página inteira do PDF')
         self.preview_stack.addWidget(self.pdf_image)
         self.preview_stack.setCurrentWidget(self.pdf_image)
         navigation = QHBoxLayout()
@@ -1231,7 +1254,7 @@ class EditorDialog(QDialog):
         scale = min(1.7, 950 / max(1, page.rect.width), 650 / max(1, page.rect.height))
         pixmap = page.get_pixmap(matrix=__import__('pymupdf').Matrix(scale, scale), alpha=False)
         image = QImage(pixmap.samples, pixmap.width, pixmap.height, pixmap.stride, QImage.Format.Format_RGB888).copy()
-        self.pdf_image.setPixmap(QPixmap.fromImage(image).scaled(690, 490, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        self.pdf_image.setPixmap(QPixmap.fromImage(image))
 
     def sync_pdf_order(self, *args):
         self.fields['pages'].setText(','.join(str(self.pdf_order.item(i).data(Qt.ItemDataRole.UserRole)) for i in range(self.pdf_order.count())))
@@ -1356,6 +1379,30 @@ class EditorDialog(QDialog):
         if not self.cancel_export():
             self.close()
 
+    def prepare_shutdown(self):
+        """Release owned resources while QApplication is still alive.
+
+        Used after the standalone event loop stops, including screenshot mode,
+        which quits the application without delivering a window close event.
+        Keep every QThread owned until its native thread has actually finished.
+        """
+        self._close_pending = True
+        self.seek_timer.stop()
+        self.update_timer.stop()
+        if self.player is not None:
+            self.player.stop()
+            self.player.setSource(QUrl())
+        threads = [*self.preview_threads]
+        if self.worker is not None:
+            threads.append(self.worker)
+        for thread in threads:
+            thread.cancel.set()
+        for thread in threads:
+            thread.wait()
+        if self.pdf is not None:
+            self.pdf.close()
+            self.pdf = None
+
     def closeEvent(self, event):
         if self.cancel_export():
             event.ignore()
@@ -1374,6 +1421,10 @@ class EditorDialog(QDialog):
             if self.pdf is not None:
                 self.pdf.close()
                 self.pdf = None
+            # Accepting QCloseEvent alone only hides a QDialog. Complete its
+            # normal lifecycle so resident owners receive finished and can
+            # schedule deletion after this close event has returned.
+            super().done(QDialog.DialogCode.Rejected)
             event.accept()
 
     def reject(self):

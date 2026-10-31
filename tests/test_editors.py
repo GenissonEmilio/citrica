@@ -157,6 +157,41 @@ def test_pdf_reorder_controls_export_every_page_once(app, tmp_path):
     close_editor(app, dialog)
 
 
+def test_pdf_preview_fits_small_viewport_and_keeps_top_and_bottom_visible(app, tmp_path):
+    import pymupdf
+
+    source = tmp_path / 'página inteira.pdf'
+    with pymupdf.open() as document:
+        page = document.new_page(width=720, height=1024)
+        page.draw_rect((0, 0, 720, 40), color=None, fill=(1, 0, 0))
+        page.draw_rect((0, 984, 720, 1024), color=None, fill=(0, 0, 1))
+        document.save(source)
+    before = digest(source)
+    dialog = ToolDialog('edit_metadata', [source])
+    dialog.show()
+    heights = []
+    for width, height in [(1120, 760), (760, 570), (1280, 800)]:
+        dialog.resize(width, height)
+        app.processEvents()
+        preview = dialog.pdf_image.pixmap()
+        available = dialog.pdf_image.contentsRect()
+        assert 0 < preview.width() <= available.width()
+        assert 0 < preview.height() <= available.height()
+        assert abs(preview.width() / preview.height() - 720 / 1024) < .01
+        pixels = preview.toImage()
+        assert pixels.pixelColor(preview.width() // 2, 2).red() > 230
+        assert pixels.pixelColor(preview.width() // 2, preview.height() - 3).blue() > 230
+        heights.append(preview.height())
+    assert heights[1] < heights[0] < heights[2]
+    dialog.fields['author'].setText('QA preview')
+    output = export(app, dialog)
+    with pymupdf.open(output) as result:
+        assert tuple(result[0].rect) == (0, 0, 720, 1024)
+        assert result.metadata['author'] == 'QA preview'
+    assert digest(source) == before
+    close_editor(app, dialog)
+
+
 def test_timeline_handles_and_seek_are_separate(app):
     timeline = Timeline(selection=True)
     timeline.resize(700, 116)

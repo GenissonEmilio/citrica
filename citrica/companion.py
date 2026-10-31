@@ -382,4 +382,13 @@ def launch_companion(args):
             window.grab().save(str(args.screenshot))
             app.quit()
         QTimer.singleShot(400, capture)
-    return app.exec()
+    result = app.exec()
+    if isinstance(window, EditorDialog):
+        window.prepare_shutdown()
+    # Destroy the entire widget tree before PySide's QApplication teardown.
+    # Leaving Python-reference cycles for its atexit wrapper traversal can
+    # delete individual PDF editor children in an unsafe order.
+    from PySide6.QtCore import QCoreApplication, QEvent
+    window.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    return result

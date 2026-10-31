@@ -9,7 +9,7 @@ import threading
 from contextlib import contextmanager
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QPoint, QThread, QTimer, Signal, Slot
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QPoint, QThread, QTimer, Signal, Slot
 from PySide6.QtGui import QAction, QCursor, QIcon
 from PySide6.QtNetwork import QLocalServer
 from PySide6.QtWidgets import (
@@ -582,7 +582,11 @@ class Desktop(QObject):
 
     def keep_window(self, window):
         self.windows.add(window)
-        window.finished.connect(lambda: self.windows.discard(window))
+        # Retain the wrapper until Qt destroys the widget tree, outside the
+        # finished signal's call stack. Dropping it here can leave child
+        # wrappers to PySide's unsafe interpreter-exit destruction order.
+        window.finished.connect(window.deleteLater)
+        window.destroyed.connect(lambda: self.windows.discard(window))
         window.show()
         window.raise_()
         window.activateWindow()
@@ -623,7 +627,7 @@ class Desktop(QObject):
             job.cancel.set()
         for window in list(self.windows):
             window.close()
-        if self.jobs or any(getattr(w, 'worker', None) and w.worker.isRunning() for w in self.windows):
+        if self.jobs or self.windows:
             QTimer.singleShot(100, self.quit)
             return
         self.close()
@@ -636,6 +640,23 @@ class Desktop(QObject):
         self.server.close()
         self.tray.hide()
         self.wheel.hide()
+
+    def prepare_shutdown(self):
+        """Join editor threads and destroy widgets before QApplication teardown."""
+        self.close()
+        for job in list(self.jobs):
+            job.cancel.set()
+            job.wait()
+            job.deleteLater()
+        self.jobs.clear()
+        for window in list(self.windows):
+            if hasattr(window, 'prepare_shutdown'):
+                window.prepare_shutdown()
+            window.deleteLater()
+        self.wheel.deleteLater()
+        self.menu.deleteLater()
+        self.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
 
 
 def math_ceil(value, divisor):
@@ -686,4 +707,7 @@ def _launch(args):
                 window.grab().save(str(args.screenshot))
             desktop.quit()
         QTimer.singleShot(600, capture)
-    return app.exec()
+    try:
+        return app.exec()
+    finally:
+        desktop.prepare_shutdown()
