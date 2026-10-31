@@ -36,7 +36,25 @@ A [instalação local](evidence/0.7.0/local-install.json) foi atualizada para es
 
 O [pacote Windows do commit 027e785](evidence/0.7.0/windows-packages-ci.json) passou no CI por 304 conversões sobre 50 extensões, 23 operações de mídia e 38 operações estáticas (32 positivas e seis rejeições esperadas), com originais preservados. O instalador passou instalação por usuário em caminho Unicode, abertura, atualização com residente ativo e remoção. Os testes reais do Explorer passaram em 100% e 150%, com motores offline, DOCX↔PDF editável e conversões repetidas na mesma pasta. Os relatórios mantêm a origem dos motores e a condição de pacote sem assinatura pública.
 
-Os testes funcionais desse binário na VM Windows 11 e a verificação local do MSIX ainda estão em andamento. O CI e as verificações Linux não são tratados como certificação da Microsoft.
+Na [VM Windows 11](evidence/0.7.0/windows-frozen-vm.json), o mesmo binário final passou por recorte de imagem de 280×190 com comparação de todos os pixels, ajuste de brilho, reprodução/pausa/navegação e corte de vídeo de 2,5 s, substituição de trecho de áudio por tom de 1000 Hz e reordenação de PDF para 3,1,2. Três fechamentos durante a preparação real da prévia, dois de vídeo e um de áudio, encerraram com código 0 e stderr vazio. Os editores também encerraram normalmente após exportar.
+
+Os 12 percursos reais do Explorer passaram, incluindo soltura fora da roda em Ctrl/Alt/Shift sobre uma janela externa identificada por HWND/PID/classe, centro sem opção, Mais, Esc, reabertura vazia pelo atalho, ferramentas Alt e DOCX↔PDF com texto editável. O residente respondeu após o editor e encerrou normalmente com código 0, sem encerramento forçado; os originais foram preservados. Uma falha de impressão Unicode no runner privado ocorreu depois de gravar o resultado aprovado e não foi confundida com o código de saída do aplicativo.
+
+O [MSIX QA 1.7.0.0 instalado](evidence/0.7.0/windows-msix-vm.json) confirmou a identidade real do processo antes de salvar preferências. Os cinco estilos foram salvos e exibidos na roda, Esc limpou a seleção e as configurações reabriram pela operação oficial do aplicativo. A escolha persistiu após encerramento normal e novo processo. A escala Qt efetiva de 1,0 e 1,5 foi medida no tamanho físico dos cards; o DPI global do Windows permaneceu 96. Os botões couberam na área útil nas duas escalas e o fluxo Salvar e testar → configurações ocultas → Sair terminou com código 0. O Inno e sua inicialização foram preservados; não houve mudança de certificados, Developer Mode ou políticas de segurança. Esse teste usou a identidade QA separada, não o pacote entregue pela Store.
+
+O WACK do MSIX 1.7.0.0 está em andamento. O CI e as verificações funcionais não são tratados como certificação da Microsoft.
+
+## Capturas do pacote final no Windows
+
+As imagens abaixo foram capturadas no aplicativo real da VM. Imagem, PDF, vídeo e roda têm 1920×1080 pixels; configurações usam uma região nativa de 1440×900, sem redimensionar o PNG.
+
+![Personalizar a roda no MSIX instalado](evidence/0.7.0/windows-settings-five-themes.png)
+
+![Recorte visual de imagem](evidence/0.7.0/windows-editor-image.png)
+
+![Player e seleção de trecho de vídeo](evidence/0.7.0/windows-editor-video.png)
+
+![Reordenação de páginas PDF](evidence/0.7.0/windows-editor-pdf.png)
 
 ## Limites
 

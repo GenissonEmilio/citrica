@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "product_version": "0.7.0",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "github_actions_run": 41156230529,
+  "gui_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+  "environment": {
+    "os": "Windows 11 Pro",
+    "build": "26300",
+    "display_physical_pixels": [
+      1920,
+      1080
+    ],
+    "functional_process_integrity": "medium",
+    "Defender_antivirus_enabled_preflight": true,
+    "Defender_realtime_enabled_preflight": true,
+    "security_configuration_changed": false
+  },
+  "scope": "Actual final frozen GUI in a dedicated Windows VM; independent oracles. This does not assert Microsoft certification.",
+  "result": "passed",
+  "package_version": "1.7.0.0",
+  "package_identity": "Emilians.Ctrica.UnsignedQA",
+  "package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+  "msix_qa_sha256": "97dd2d63ddb14b0b69a575460b953942a234c9ace5e0e3e8239d429a1a4b2b2c",
+  "package_family_observed_on_actual_process_before_any_preferences_save": true,
+  "installed_variant": "separate unsigned QA identity only; official Store package was not installed",
+  "launch": "direct installed WindowsApps executable retaining the actual QA PFN; clean per-process PATH",
+  "scaling_scope": "Only QT_SCALE_FACTOR on the new process. Effective Qt1.0/1.5 observed via158px logical theme card physical width158/237. Windows DPI remained96; global Windows settings were not changed.",
+  "settings100": {
+    "result": "passed",
+    "stage": "all",
+    "initial_bounds": {
+      "frame_physical": [
+        654,
+        126,
+        592,
+        732
+      ],
+      "work_area_physical": [
+        0,
+        0,
+        1920,
+        1032
+      ],
+      "fits": true
+    },
+    "initial_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          666,
+          807,
+          281,
+          39
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          953,
+          807,
+          281,
+          39
+        ]
+      }
+    },
+    "actual_process_package_family_verified": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+    "native_os_window_dpi": 96,
+    "expected_qt_scale": 1.0,
+    "observed_qt_scale_from_fixed_card_physical_width": 1.0,
+    "first_card_physical_size": [
+      158,
+      184
+    ],
+    "default_size_preserved": false,
+    "themes": {
+      "classic": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "glass": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "graphite": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "contrast": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "watercolor": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      }
+    },
+    "final_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          189,
+          942,
+          661,
+          39
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          856,
+          942,
+          661,
+          39
+        ]
+      }
+    },
+    "inno_startup_not_touched": true
+  },
+  "persistence_after_normal_exit_and_new_process100": {
+    "result": "passed",
+    "stage": "reload",
+    "initial_bounds": {
+      "frame_physical": [
+        654,
+        126,
+        592,
+        732
+      ],
+      "work_area_physical": [
+        0,
+        0,
+        1920,
+        1032
+      ],
+      "fits": true
+    },
+    "initial_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          666,
+          807,
+          281,
+          39
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          953,
+          807,
+          281,
+          39
+        ]
+      }
+    },
+    "actual_process_package_family_verified": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+    "native_os_window_dpi": 96,
+    "expected_qt_scale": 1.0,
+    "observed_qt_scale_from_fixed_card_physical_width": 1.0,
+    "first_card_physical_size": [
+      158,
+      184
+    ],
+    "default_size_preserved": false,
+    "themes": {
+      "watercolor": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": true,
+        "scroll_steps": 0
+      }
+    },
+    "final_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          189,
+          942,
+          661,
+          39
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          856,
+          942,
+          661,
+          39
+        ]
+      }
+    },
+    "inno_startup_not_touched": true
+  },
+  "settings150": {
+    "result": "passed",
+    "stage": "all",
+    "initial_bounds": {
+      "frame_physical": [
+        502,
+        1,
+        887,
+        968
+      ],
+      "work_area_physical": [
+        0,
+        0,
+        1920,
+        1032
+      ],
+      "fits": true
+    },
+    "initial_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          519,
+          891,
+          421,
+          60
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          949,
+          891,
+          421,
+          60
+        ]
+      }
+    },
+    "actual_process_package_family_verified": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+    "native_os_window_dpi": 96,
+    "expected_qt_scale": 1.5,
+    "observed_qt_scale_from_fixed_card_physical_width": 1.5,
+    "first_card_physical_size": [
+      237,
+      276
+    ],
+    "default_size_preserved": true,
+    "themes": {
+      "classic": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "glass": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "graphite": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "contrast": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      },
+      "watercolor": {
+        "saved": true,
+        "actual_wheel_visible": true,
+        "escape_cleared": true,
+        "reloaded_process": false,
+        "scroll_steps": 0
+      }
+    },
+    "final_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          519,
+          891,
+          421,
+          60
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          949,
+          891,
+          421,
+          60
+        ]
+      }
+    },
+    "inno_startup_not_touched": true
+  },
+  "save_and_test_hidden_settings_then_native_quit150": {
+    "result": "passed",
+    "stage": "shutdown",
+    "initial_bounds": {
+      "frame_physical": [
+        502,
+        1,
+        887,
+        968
+      ],
+      "work_area_physical": [
+        0,
+        0,
+        1920,
+        1032
+      ],
+      "fits": true
+    },
+    "initial_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          519,
+          891,
+          421,
+          60
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          949,
+          891,
+          421,
+          60
+        ]
+      }
+    },
+    "actual_process_package_family_verified": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+    "native_os_window_dpi": 96,
+    "expected_qt_scale": 1.5,
+    "observed_qt_scale_from_fixed_card_physical_width": 1.5,
+    "first_card_physical_size": [
+      237,
+      276
+    ],
+    "default_size_preserved": true,
+    "themes": {},
+    "final_buttons": {
+      "SavePreferences": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          519,
+          891,
+          421,
+          60
+        ]
+      },
+      "SaveAndTestWheel": {
+        "visible": true,
+        "fits_work_area": true,
+        "rect": [
+          949,
+          891,
+          421,
+          60
+        ]
+      }
+    },
+    "save_and_test_hidden_settings_verified": true,
+    "actual_native_resident_exit_code": 0,
+    "inno_startup_not_touched": true
+  },
+  "original_inno_run_entry_present_before": false,
+  "original_inno_run_entry_present_after": false,
+  "certificate_trust_developer_mode_or_security_policy_changes": false,
+  "harness_history": [
+    {
+      "attempt": "first MSIX100 Settings probe",
+      "outcome": "lost UIA tree after driver hid/showed native QWidget; app verified alive and normally quit0",
+      "correction": "Use only real Save-and-test and official settings reopen operation; rediscover visible HWND."
+    },
+    {
+      "attempt": "next MSIX100 Settings probe",
+      "outcome": "premature assertion immediately after asynchronous UIAInvoke",
+      "correction": "Wait for preferences completion, actual wheel visible and Settings hidden before assertions. Product unchanged."
+    }
+  ]
+}

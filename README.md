@@ -27,7 +27,7 @@ Arraste no Explorer, pressione **Shift** e solte no formato. **Alt** abre ferram
 
 Python, Qt, motores de imagem/PDF, QR e detecção de rostos estão incluídos. **PDF→DOCX, DOCX→PDF/TXT, áudio/vídeo e OCR funcionam com os motores incluídos, sem instalar Office, FFmpeg ou Tesseract à parte.** Os resultados e limites dos testes do Explorer estão na documentação de validação.
 
-![Roda em execução nativa no Windows do CI](docs/windows-wheel.png)
+![Roda Aquarela durante um arraste real no Explorer do Windows 11](docs/evidence/0.7.0/windows-wheel-watercolor.png)
 
 Veja o [guia de instalação e roteiro de teste no Windows](docs/WINDOWS.md).
 

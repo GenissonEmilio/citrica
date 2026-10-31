@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "product_version": "0.7.0",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "github_actions_run": 41156230529,
+  "gui_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+  "environment": {
+    "os": "Windows 11 Pro",
+    "build": "26300",
+    "display_physical_pixels": [
+      1920,
+      1080
+    ],
+    "functional_process_integrity": "medium",
+    "Defender_antivirus_enabled_preflight": true,
+    "Defender_realtime_enabled_preflight": true,
+    "security_configuration_changed": false
+  },
+  "scope": "Actual final frozen GUI in a dedicated Windows VM; independent oracles. This does not assert Microsoft certification.",
+  "result": "passed",
+  "portable_zip_sha256": "f5054480cbced7ce25c862194b67674a15b6b9aee04adc6555ac12510f1bb426",
+  "editor_cases": {
+    "crop_actual_handle_export_normal_close": {
+      "result": "passed",
+      "normal_editor_process_exit_code": 0,
+      "selection": [
+        20,
+        30,
+        280,
+        190
+      ],
+      "oracle": "Export size and every RGB pixel equal the independently cropped source."
+    },
+    "brightness_slider_comparison_export_normal_close": {
+      "result": "passed",
+      "normal_editor_process_exit_code": 0,
+      "oracle": "Original gray80 exported as160; comparison toggled; contrast/saturation/sharpness normalized1."
+    },
+    "video_handle_play_pause_seek_trim_normal_close": {
+      "result": "passed",
+      "normal_editor_process_exit_code": 0,
+      "requested_seconds": 2.5,
+      "output_seconds": 2.5,
+      "actual_player_advanced_to_seconds": 1.439,
+      "oracle": "Physical timeline handle and play/pause; ffprobe export duration within160ms. Timeline seek click was issued, but its resulting position was not asserted in this original portable run.",
+      "seek_position_asserted_in_original_run": false
+    },
+    "audio_play_pause_bleep_pcm_oracle_normal_close": {
+      "result": "passed",
+      "normal_editor_process_exit_code": 0,
+      "actual_player_advanced_to_seconds": 1.557,
+      "oracle": "6s output; PCM1000Hz dominates inside1–3s,440Hz dominates outside by>10x."
+    },
+    "pdf_visual_reorder_export_normal_process_exit": {
+      "result": "passed",
+      "normal_editor_process_exit_code": 0,
+      "physical_page_click": 3,
+      "visible_order_before_export": [
+        3,
+        1,
+        2
+      ],
+      "independent_exported_text_order": [
+        3,
+        1,
+        2
+      ]
+    },
+    "immediate_media_close_and_observed_active_preview_exit0": {
+      "result": "passed",
+      "attempts": [
+        {
+          "normal_process_exit_code": 0,
+          "observed_owned_worker_names": [
+            "ffprobe.exe"
+          ]
+        },
+        {
+          "normal_process_exit_code": 0,
+          "observed_owned_worker_names": [
+            "ffmpeg.exe"
+          ]
+        },
+        {
+          "normal_process_exit_code": 0,
+          "observed_owned_worker_names": [
+            "ffprobe.exe"
+          ]
+        }
+      ]
+    }
+  },
+  "all_five_original_fixtures_hash_unchanged": true,
+  "explorer_cases": {
+    "outside_release_actions": {
+      "real_explorer_offer_verified": true,
+      "no_drop_target": true,
+      "closed_and_cleared": true,
+      "conversion_counts_unchanged": true
+    },
+    "outside_release_tools": {
+      "real_explorer_offer_verified": true,
+      "no_drop_target": true,
+      "closed_and_cleared": true,
+      "conversion_counts_unchanged": true
+    },
+    "outside_release_convert": {
+      "real_explorer_offer_verified": true,
+      "no_drop_target": true,
+      "closed_and_cleared": true,
+      "conversion_counts_unchanged": true
+    },
+    "escape_during_explorer_drag_clears": true,
+    "center_drop_without_option_clears": true,
+    "more_drop_remains_open_until_escape": true,
+    "actual_hotkey_reopens_empty_and_stays_until_escape": true,
+    "real_explorer_alt_crop_editor_normal_close": {
+      "actual_gui_process_id": 5820,
+      "resident_responsive_after_close": true,
+      "normal_close_through_UIA": true
+    },
+    "ctrl_actions_stationary_activation": true,
+    "docx_pdf_without_office": true,
+    "pdf_docx_editable": true,
+    "alt_tools": true
+  },
+  "explorer_case_count": 12,
+  "originals_preserved": true,
+  "resident_exit_code": 0,
+  "resident_forced_cleanup": false,
+  "native_desktop_shutdown_tested": true,
+  "outside_drop_guard": {
+    "target": "dedicated registered Win32 QA window without OLE/drop acceptance",
+    "physical_point_verified_inside_own_HWND": true,
+    "point_outside_wheel": true,
+    "no_generic_overlay_bypass": true
+  },
+  "harness_history": [
+    {
+      "attempt": "first editor driver",
+      "outcome": "failed before launching product",
+      "cause": "Mixed-case SystemRoot lookup in a copied environment dict. Corrected only driver."
+    },
+    {
+      "attempt": "first PDF driver",
+      "outcome": "failed assertion; product normal cleanup exit0",
+      "cause": "UIA SelectionItem.Select changed selection but not current QListWidget row. Replaced with physical page click and asserted visible order before export."
+    },
+    {
+      "attempt": "initial outside-drop target",
+      "outcome": "guard rejected attempt before intentional drop",
+      "cause": "STATIC helper window was not the HWND under the physical point. Replaced with registered visible dedicated QA class, keeping strict HWND guard."
+    },
+    {
+      "attempt": "final Explorer driver after all cases",
+      "outcome": "driver exit1; all12 product cases and resident exit0 already written",
+      "cause": "Final success print used arrow unsupported by the CP1252 console. Changed final print to ASCII; same console probe exit0. Original driver exit1 preserved; no product gestures rerun."
+    }
+  ],
+  "raw_receipt_sha256": {
+    "editor_first_four_and_pdf_selection_diagnostic": "dd1eccf4072d0d97398d536bcd84938bd405dd2f126138bbd7ab14e83606c97a",
+    "pdf_and_preview_closes": "37850e55e245563c2990a99a64bc8ee3b24a2f1f38ca77567d9c61f5ec32c5b0",
+    "native_explorer_final": "51f49254400e6e79547a23b12a9d9e96da6526a43be3b6a97b99275273c3c086"
+  },
+  "editor_process_ownership_scope": "Original driver required exact title/image and a single matching editor, then normal close waited for the launched process. It did not persist or explicitly assert HWND PID == Popen PID; the public runner now requires this guard."
+}
