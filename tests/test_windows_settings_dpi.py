@@ -16,9 +16,12 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QScrollArea
 sys.path.insert(0, str(Path.cwd() / 'tests'))
 from test_windows import FakeNative
+from citrica.gui import STYLE
 from citrica.windows.app import Desktop, Settings
 
 app = QApplication([])
+app.setStyle('Fusion')
+app.setStyleSheet(STYLE)
 desktop = Desktop(app, FakeNative, listen=False)
 window = Settings(desktop)
 desktop.keep_window(window)

@@ -29,6 +29,11 @@ events = {'finished': 0, 'destroyed': 0, 'retained_until_destroyed': [],
           'removed_after_destroyed': [], 'native_close': 0, 'shutdown': 0}
 entered = threading.Event()
 
+# Saving preferences is exercised against temporary APPDATA. Do not change the
+# real Windows user's Run value while testing Settings with FakeNative.
+resident.config.startup_enabled = lambda: False
+resident.config.set_startup = lambda enabled: events.update(startup_requested=enabled)
+
 class FakeNative(QObject):
     toggle = Signal()
     mode = Signal(str)
