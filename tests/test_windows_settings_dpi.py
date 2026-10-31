@@ -24,6 +24,12 @@ from citrica.windows.app import Desktop, Settings
 app = QApplication([])
 app.setStyle('Fusion')
 app.setStyleSheet(STYLE)
+# The generic Windows offscreen backend has no system font database: it sizes
+# every missing glyph as a square. Use the native Windows renderer below so
+# this check measures the same fonts, decorations and DPI as the application.
+assert QFontDatabase.families(), 'The DPI test requires a working font renderer'
+if sys.platform == 'win32':
+    assert 'Segoe UI' in QFontDatabase.families()
 desktop = Desktop(app, FakeNative, listen=False)
 window = Settings(desktop)
 desktop.keep_window(window)
@@ -111,7 +117,9 @@ for name in ['SavePreferences', 'SaveAndTestWheel']:
     rect = QRect(button.mapToGlobal(QPoint(0, 0)), button.size())
     assert available.contains(rect), (name, available, rect)
 result = {'screen': available.getRect(), 'window': window.frameGeometry().getRect(),
-          'all_styles_reachable': selected, 'save_controls_on_screen': True}
+          'all_styles_reachable': selected, 'save_controls_on_screen': True,
+          'platform': app.platformName(), 'font': QFontInfo(window.font()).family()}
+assert result['font'], 'The settings font did not resolve'
 desktop.prepare_shutdown()
 desktop.native.deleteLater()
 QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
@@ -120,7 +128,8 @@ print(json.dumps(result))
 
 
 def test_windows_settings_fit_and_scroll_at_150_percent(tmp_path):
-    env = dict(os.environ, QT_QPA_PLATFORM='offscreen', QT_SCALE_FACTOR='1.5',
+    env = dict(os.environ, QT_QPA_PLATFORM='windows' if sys.platform == 'win32' else 'offscreen',
+               QT_SCALE_FACTOR='1.5',
                APPDATA=str(tmp_path / 'settings'), LOCALAPPDATA=str(tmp_path / 'local'))
     run = subprocess.run([sys.executable, '-c', DRIVER], capture_output=True, text=True,
                          env=env, cwd=Path(__file__).resolve().parents[1], timeout=15)
