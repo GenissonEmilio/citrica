@@ -46,9 +46,21 @@ jobs:
       - name: Lint
         run: ruff check citrica tests packaging
       - name: Testes reais de conversão e interface
+        timeout-minutes: 10
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m pytest -q
+        run: |
+          python -u - <<'PY'
+          import faulthandler
+          import pytest
+
+          faulthandler.dump_traceback_later(120, repeat=True)
+          try:
+              result = pytest.main(['-q'])
+          finally:
+              faulthandler.cancel_dump_traceback_later()
+          raise SystemExit(result)
+          PY
       - name: Pacotes Linux x86_64
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         run: python packaging/build.py

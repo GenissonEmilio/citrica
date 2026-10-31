@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "product_version": "0.7.0",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "initial_ci_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41200161616",
+  "initial_ci_head": "b2f9a732f75b728f603a43020812160f5f73a8e7",
+  "initial_run_status_at_observation": "in_progress",
+  "initial_run_conclusion_at_observation": "",
+  "initial_jobs": [
+    {
+      "name": "linux",
+      "status": "in_progress",
+      "conclusion": ""
+    },
+    {
+      "name": "windows",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "observation": "Linux pytest step remained active without visible test progress for more than nine minutes. That attempt was cancelled; no PASS is attributed to it. Windows had already completed successfully.",
+  "single_isolated_local_diagnostic": {
+    "python": "3.14.8",
+    "pytest": "9.1.1",
+    "collected": 378,
+    "passed": 357,
+    "skipped": 21,
+    "exit_code": 0,
+    "pytest_duration_seconds": 49.41,
+    "faulthandler_90s_fired": false,
+    "configuration": "offscreen; fresh XDG/APPDATA directories; memory GSettings; no source modifications",
+    "log_sha256": "b1085dacef5a3c0b8dc375d87662282c6dc1ef43314c6a25b4127868e9319811",
+    "scope": "Different Python/host from the GitHub Linux runner; did not reproduce the remote stall."
+  },
+  "ci_change": "Same pytest assertions and collection; unbuffered Python, repeated120s thread traces, ten-minute step limit. No production code changed and no test was removed or suppressed.",
+  "subsequent_checks": "The pull request checks provide the result of the rerun with these diagnostics.",
+  "pull_request": "https://github.com/GenissonEmilio/citrica/pull/7"
+}

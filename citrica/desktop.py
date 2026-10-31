@@ -16,7 +16,7 @@ from citrica.runtime import external_environment
 
 UUID = "citrica@genissonemilio.github.io"
 SHELL_VERSION = 3
-SHELL_REVISION = 3
+SHELL_REVISION = 4
 DESKTOP_PATH = "/io/github/GenissonEmilio/Citrica/Desktop"
 DESKTOP_NAME = "io.github.GenissonEmilio.Citrica.Desktop"
 SUPPORTED_SHELLS = {46, 50, 51}

@@ -132,6 +132,7 @@ def test_real_local_socket_response_requires_main_thread_event_pump(qt_app, monk
         for socket in connections:
             socket.abort()
         server.close()
+        server.deleteLater()
 
 
 def test_missing_server_returns_none_without_implicit_retry(qt_app, monkeypatch):

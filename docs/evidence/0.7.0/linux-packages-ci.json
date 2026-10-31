@@ -1,0 +1,101 @@
+{
+  "version": "0.7.0",
+  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692",
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "linux_jobs": [
+    {
+      "name": "linux",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692/job/124402591187"
+    },
+    {
+      "name": "ubuntu-deb (26.04)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692/job/124405010569"
+    },
+    {
+      "name": "ubuntu-deb (24.04)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692/job/124405010591"
+    },
+    {
+      "name": "ubuntu-deb (26.10)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692/job/124405010596"
+    }
+  ],
+  "artifact_downloads": {
+    "portable-download-receipt.json": {
+      "run": 41155927692,
+      "artifact_id": 13025341291,
+      "name": "citrica-portable-x86_64",
+      "sha256": "74c6ba92a683d23ba2e9607877a69599d36d931ea9d2e3030cc567d8e35ee204",
+      "github_digest": "sha256:74c6ba92a683d23ba2e9607877a69599d36d931ea9d2e3030cc567d8e35ee204",
+      "size": 247652369,
+      "verified": true,
+      "resumed": false,
+      "seconds": 70.15
+    },
+    "native-download-receipt.json": {
+      "run": 41155927692,
+      "artifact_id": 13025461122,
+      "name": "citrica-native-packages",
+      "sha256": "f393a7c104c4d18fc220f29ee01cdd59cdd8b0a97cd9078dc970aaddccfc4b46",
+      "github_digest": "sha256:f393a7c104c4d18fc220f29ee01cdd59cdd8b0a97cd9078dc970aaddccfc4b46",
+      "size": 521781702,
+      "verified": true,
+      "resumed": false,
+      "seconds": 105.5
+    }
+  },
+  "ubuntu_artifact_downloads": {
+    "24.04": {
+      "run": 41155927692,
+      "artifact_id": 13025960072,
+      "sha256": "6d50e0634145ff7dd9850436532ff113067559a2be2e2f9575c8b55aff4ce74c",
+      "digest_verified": true,
+      "crc_verified": true
+    },
+    "26.04": {
+      "run": 41155927692,
+      "artifact_id": 13025490544,
+      "sha256": "9858da5a3018bc6249a306cd719fff440b4a4622a5ee32031bb170ad0ddc727b",
+      "digest_verified": true,
+      "crc_verified": true
+    },
+    "26.10": {
+      "run": 41155927692,
+      "artifact_id": 13025221725,
+      "sha256": "2dc976bcf9bbe5b5c22e1f6c85c3a08f6c3cf3be3e5d0938995f64eb04faee49",
+      "digest_verified": true,
+      "crc_verified": true
+    }
+  },
+  "packages": {
+    "citrica-0.7.0-1.x86_64.rpm": {
+      "bytes": 248235949,
+      "sha256": "ca3ab7409dc6fc90a04986de00da4812787c9e08d71a7fec641097ac7fb889f6"
+    },
+    "citrica-0.7.0-linux-x86_64.tar.gz": {
+      "bytes": 249429418,
+      "sha256": "676a2f381814a1b5767a138789a3809d6d664d1ed96d99d989383156aa051419"
+    },
+    "citrica_0.7.0_amd64.deb": {
+      "bytes": 275188346,
+      "sha256": "a1cdaed72a47c27fa9f5832121cbd065d77d4b212a0d38d91ddd986723965748"
+    }
+  },
+  "reports": [
+    "citrica-linux-engine-parity.json",
+    "citrica-linux-static-tools-parity.json",
+    "citrica-ubuntu-24.04-validation.json",
+    "citrica-ubuntu-26.04-validation.json",
+    "citrica-ubuntu-26.10-validation.json"
+  ],
+  "scope": "Linux package build, engine/static-tools parity and clean Ubuntu 24.04/26.04/26.10 native installation. Windows and the overall workflow have separate status."
+}

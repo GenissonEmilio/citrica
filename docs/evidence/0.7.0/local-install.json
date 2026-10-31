@@ -1,0 +1,28 @@
+{
+  "scope": "User-scoped Fedora installation updated after frozen Linux QA; running GNOME session deliberately kept intact",
+  "version": "0.7.0",
+  "time_utc": "2026-10-31T01:50:15.095703+00:00",
+  "executable_sha256": "aa394bb1fa4e1d81308122c595b4220a5408b247c74d2726f1665ee51a63c68a",
+  "extension_revision_on_disk": 4,
+  "loaded_shell_revision": 2,
+  "preferences_preserved": true,
+  "previous_application_and_extension_backed_up": true,
+  "image_export_after_install": {
+    "success": true,
+    "size": [
+      320,
+      200
+    ]
+  },
+  "new_settings_process_after_install": "exit0",
+  "requires_next_gnome_login": true,
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "post_install_recheck": {
+    "time_utc": "2026-10-31T12:12:27.227867+00:00",
+    "executable_sha256": "aa394bb1fa4e1d81308122c595b4220a5408b247c74d2726f1665ee51a63c68a",
+    "extension_revision_on_disk": 4,
+    "loaded_shell_revision_observed_via_gnome_extensions_info": 3,
+    "state": "ACTIVE",
+    "requires_next_gnome_login": true
+  }
+}

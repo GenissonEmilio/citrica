@@ -5,10 +5,11 @@ import struct
 from pathlib import Path
 
 from PySide6.QtCore import QEasingCurve, QPointF, QRectF, Qt, QVariantAnimation, Signal
-from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath, QPixmap
+from PySide6.QtGui import QColor, QFont, QLinearGradient, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import QWidget
 
 from citrica.windows.icons import draw_icon
+from citrica.wheel_themes import get_theme
 
 SIZE, CENTER, INNER, OUTER, LABEL_RADIUS = 380, 190, 66, 170, 122
 TAU = math.tau
@@ -121,6 +122,7 @@ class Wheel(QWidget):
         self.setWindowTitle('Cítrica · roda de arquivos')
         self.setAccessibleName('Cítrica · arraste e solte no formato desejado')
         self.animations = animations
+        self.theme = get_theme()
         self.items, self.paths, self.info = [], [], None
         self.selected, self.progress, self._hover_value = -1, 1., {}
         self._closing, self._closing_frame = False, None
@@ -136,6 +138,11 @@ class Wheel(QWidget):
         self._hover.setEasingCurve(QEasingCurve.Type.OutCubic)
         self._hover.valueChanged.connect(self._hover_frame)
         self._hover_from, self._hover_to = {}, {}
+
+    def set_theme(self, theme_id):
+        """Apply appearance without clearing the drag, changing hit regions or remapping HWND."""
+        self.theme = get_theme(theme_id)
+        self.update()
 
     def _motion_value(self, value):
         self.progress = float(value)
@@ -272,10 +279,13 @@ class Wheel(QWidget):
         scale = .88 + .12 * opening
         painter.scale(scale, scale)
         painter.translate(-CENTER, -CENTER)
+        theme = self.theme
+        def color(rgba):
+            return QColor.fromRgbF(*rgba)
         halo = QPainterPath()
         halo.addEllipse(QPointF(CENTER, CENTER), OUTER + 8, OUTER + 8)
         halo.addEllipse(QPointF(CENTER, CENTER), INNER - 6, INNER - 6)
-        painter.fillPath(halo, QColor(255, 227, 194, 61))
+        painter.fillPath(halo, color(theme.halo))
         count = len(self.items) or 8
         for i in range(count):
             item = self.items[i] if self.items else None
@@ -292,22 +302,38 @@ class Wheel(QWidget):
             painter.scale(.92 + .08 * bounce + .015 * active, .92 + .08 * bounce + .015 * active)
             painter.translate(-CENTER, -CENTER)
             gradient = QLinearGradient(0, 0, SIZE, SIZE)
-            gradient.setColorAt(0, QColor(255, 240, 204, 240 if item else 72))
-            gradient.setColorAt(1, QColor(255, 217, 204, 240 if item else 72))
+            for position, rgba in ((0, theme.start), (1, theme.end)):
+                gradient.setColorAt(position, color((*rgba[:3], rgba[3] * (1 if item else .30))))
             painter.fillPath(path, gradient)
+            if theme.gloss:
+                sheen = QLinearGradient(0, 0, 0, SIZE)
+                sheen.setColorAt(0, QColor.fromRgbF(1, 1, 1, theme.gloss))
+                sheen.setColorAt(.50, QColor.fromRgbF(1, 1, 1, 0))
+                sheen.setColorAt(1, QColor.fromRgbF(1, 1, 1, 0))
+                painter.fillPath(path, sheen)
             if active:
                 painter.setOpacity(opening * active)
                 selected = QLinearGradient(0, 0, SIZE, SIZE)
-                selected.setColorAt(0, QColor('#ffa64c'))
-                selected.setColorAt(1, QColor('#fa4d1a'))
+                selected.setColorAt(0, color(theme.selected_start))
+                selected.setColorAt(1, color(theme.selected_end))
                 painter.fillPath(path, selected)
                 painter.setOpacity(opening)
+            painter.setPen(QPen(color(theme.border), theme.border_width))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawPath(path)
             if item:
                 center = point(LABEL_RADIUS, angle)
-                painter.setPen(QColor('#251e1a'))
+                text_color = color(tuple(a + (b-a)*active for a, b in zip(theme.text, theme.active_text)))
+                if theme.label_chip:
+                    label_rect = QRectF(center.x()-42, center.y()-17, 84, 34) if item['kind'] == 'format' else \
+                        QRectF(center.x()-43, center.y()-28, 86, 66)
+                    painter.setPen(Qt.PenStyle.NoPen)
+                    painter.setBrush(color(theme.label_chip))
+                    painter.drawRoundedRect(label_rect, 10, 10)
+                painter.setPen(text_color)
                 if item['kind'] != 'format':
                     draw_icon(painter, 'page' if item['kind'] == 'page' else item['id'],
-                              QRectF(center.x()-11, center.y()-24, 22, 22))
+                              QRectF(center.x()-11, center.y()-24, 22, 22), text_color)
                 font = QFont('Segoe UI')
                 font.setPixelSize(13 if item['kind'] == 'format' else 10)
                 font.setBold(True)
@@ -320,19 +346,19 @@ class Wheel(QWidget):
             if not preview.isNull():
                 painter.drawPixmap(QRectF(CENTER-32, CENTER-38, 64, 64), preview, QRectF(preview.rect()))
             else:
-                draw_icon(painter, 'document', QRectF(CENTER-22, CENTER-35, 44, 44), '#49372a')
+                draw_icon(painter, 'document', QRectF(CENTER-22, CENTER-35, 44, 44), color(theme.icon))
             size = self.info.get('bytes', 0)
             text = f'{size / 1024:.1f} KB' if size >= 1024 else f'{size} bytes'
         else:
-            draw_icon(painter, 'add', QRectF(CENTER-20, CENTER-31, 40, 40), '#49372a')
+            draw_icon(painter, 'add', QRectF(CENTER-20, CENTER-31, 40, 40), color(theme.icon))
             text = 'Arraste um arquivo'
         if self.selected >= 0:
             text = self.items[self.selected]['label']
         pill = QRectF(CENTER-74, CENTER+24, 148, 30)
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(QColor(255, 246, 231, 245))
+        painter.setBrush(color(theme.pill))
         painter.drawRoundedRect(pill, 15, 15)
-        painter.setPen(QColor('#291f1a'))
+        painter.setPen(color(theme.pill_text))
         font = QFont('Segoe UI')
         font.setPixelSize(11)
         font.setBold(True)
@@ -343,7 +369,7 @@ class Wheel(QWidget):
             hint = QRectF(6, SIZE-4, SIZE-12, 28)
             painter.setPen(Qt.PenStyle.NoPen)
             painter.drawRoundedRect(hint, 14, 14)
-            painter.setPen(QColor('#291f1a'))
+            painter.setPen(color(theme.pill_text))
             painter.drawText(hint, Qt.AlignmentFlag.AlignCenter, 'Solte um arquivo aqui · Esc para fechar')
 
     def dragEnterEvent(self, event):

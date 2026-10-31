@@ -1,0 +1,13 @@
+{
+  "per_user_install": true,
+  "installed_cli_version": "C\u00edtrica 0.7.0",
+  "sendto_shortcut": true,
+  "installed_gui_launch": true,
+  "upgrade_replaces_runtime": true,
+  "unicode_install_path": true,
+  "installed_engine_smoke": true,
+  "uninstall": true,
+  "startup_entry_removed": true,
+  "upgrade_while_resident_running": true,
+  "uninstall_while_resident_running": true
+}

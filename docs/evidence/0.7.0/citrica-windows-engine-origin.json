@@ -1,0 +1,11 @@
+{
+  "repository": "GenissonEmilio/citrica",
+  "source_run_id": 40735116402,
+  "source_artifact_id": 12840413543,
+  "source_commit": "ff90885439e1c536c885e90c3e0068b01ee1992d",
+  "source_run_conclusion": "failure",
+  "artifact_digest": "sha256:c50e992d9bc2425f687d8b9220f33a2b10d3a6036e2f9a52f6b20ee406a086e9",
+  "current_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "purpose": "unsigned-test-only",
+  "release_eligible": false
+}

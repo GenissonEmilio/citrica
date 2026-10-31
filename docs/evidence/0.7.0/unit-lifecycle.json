@@ -1,0 +1,43 @@
+{
+  "scope": "Source tests on Fedora; separate from packaged Windows/Linux and Store certification",
+  "build_commit": "80eaf07b5238838c2ebf6f1ebe6e95e069c273a0",
+  "runtime_commit": "c5fcc5c9f58509b0655172eb1d896cf22d694a7f",
+  "repeated_full_suite": [
+    {
+      "iteration": 0,
+      "exit": 0,
+      "elapsed": 48.47,
+      "summary": "353 passed, 21 skipped, 5 warnings in 47.83s",
+      "shared_qobject_warning": false
+    },
+    {
+      "iteration": 1,
+      "exit": 0,
+      "elapsed": 48.21,
+      "summary": "353 passed, 21 skipped, 5 warnings in 47.59s",
+      "shared_qobject_warning": false
+    },
+    {
+      "iteration": 2,
+      "exit": 0,
+      "elapsed": 48.88,
+      "summary": "353 passed, 21 skipped, 5 warnings in 48.29s",
+      "shared_qobject_warning": false
+    }
+  ],
+  "standalone_subprocess_regressions": [
+    "close PDF",
+    "export and close PDF",
+    "exit with active export",
+    "screenshot with active preview"
+  ],
+  "resident_subprocess_regressions": [
+    "five sequential PDF closes",
+    "PDF export and close",
+    "quit with active preview",
+    "app.exit with active preview",
+    "app.exit with active conversion job"
+  ],
+  "assertions_removed": false,
+  "fatal_errors_suppressed": false
+}

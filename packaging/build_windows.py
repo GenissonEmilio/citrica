@@ -91,7 +91,7 @@ for package in ['pillow_heif', 'pymupdf', 'pdf2docx']:
     hiddenimports += h
 datas += collect_data_files('cv2')
 datas += collect_data_files('docx')
-for package in ['Pillow', 'pypdf', 'PyMuPDF', 'PySide6-Essentials', 'shiboken6',
+for package in ['Pillow', 'pypdf', 'PyMuPDF', 'PySide6-Essentials', 'PySide6-Addons', 'shiboken6',
                 'zxing-cpp', 'numpy', 'opencv-python-headless', 'python-docx', 'pdf2docx',
                 'fonttools', 'lxml', 'fire', 'termcolor', 'typing_extensions', 'pywin32']:
     datas += copy_metadata(package)

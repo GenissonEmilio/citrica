@@ -42,6 +42,7 @@ run(sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--name", "ci
     "--copy-metadata", "fonttools", "--copy-metadata", "lxml",
     "--copy-metadata", "fire", "--copy-metadata", "termcolor", "--copy-metadata", "typing_extensions",
     "--copy-metadata", "PyMuPDF", "--copy-metadata", "PySide6-Essentials",
+    "--copy-metadata", "PySide6-Addons",
     "--copy-metadata", "zxing-cpp", "--copy-metadata", "numpy",
     "--copy-metadata", "shiboken6", *ocr, "packaging/entry.py")
 
@@ -49,10 +50,13 @@ payload = ROOT / "dist/citrica"
 for name in ["README.md", "LICENSE", "THIRD_PARTY.md"]:
     shutil.copy2(ROOT / name, payload / name)
 shutil.copytree(ROOT / "licenses", payload / "licenses", dirs_exist_ok=True)
-for package in ['libtesseract5', 'liblept5', 'tesseract-ocr-eng']:
+for package in ['libtesseract5', 'liblept5', 'tesseract-ocr-eng', 'libpulse0']:
     copyright_file = Path('/usr/share/doc') / package / 'copyright'
     if copyright_file.is_file():
         shutil.copy2(copyright_file, payload / 'licenses' / f'{package}-copyright.txt')
+lgpl21 = Path('/usr/share/common-licenses/LGPL-2.1')
+if lgpl21.is_file():
+    shutil.copy2(lgpl21, payload / 'licenses' / 'LGPL-2.1.txt')
 shutil.copy2(ROOT / "requirements.lock", payload / "requirements.lock")
 shutil.copytree(ROOT / 'gnome', payload / 'gnome', dirs_exist_ok=True)
 shutil.copy2(ROOT / "packaging/install.sh", payload / "install.sh")

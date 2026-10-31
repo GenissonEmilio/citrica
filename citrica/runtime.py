@@ -1,5 +1,7 @@
 """Environment for system programs called by the portable application."""
+import configparser
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -8,6 +10,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 _spawn_lock = threading.RLock()
+_LOCALSEND_FLATPAK = 'org.localsend.localsend_app'
 
 
 def program(name):
@@ -51,6 +54,101 @@ def program(name):
             candidate = Path(os.environ[env]) / suffix
             if candidate.is_file():
                 return str(candidate)
+    return None
+
+
+def _localsend_executable(path):
+    """Accept a LocalSend binary/AppImage, never a shell or desktop wrapper."""
+    path = Path(path).expanduser()
+    name = path.name.casefold()
+    is_appimage = (name == 'localsend.appimage' or name.startswith(('localsend-', 'localsend_')))
+    is_appimage = is_appimage and name.endswith('.appimage')
+    return (path.is_absolute() and (name in {'localsend', 'localsend_app'} or is_appimage)
+            and path.is_file() and os.access(path, os.X_OK))
+
+
+def _localsend_desktop_executable():
+    """Read bounded desktop entries without executing or trusting their Exec line."""
+    home = Path.home()
+    data_home = Path(os.environ.get('XDG_DATA_HOME', home / '.local/share'))
+    data_dirs = os.environ.get('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(os.pathsep)
+    for root in [data_home, *map(Path, filter(None, data_dirs))]:
+        folder = root / 'applications'
+        try:
+            candidates = sorted(path for path in folder.iterdir()
+                                if 'localsend' in path.name.casefold() and path.suffix == '.desktop')
+        except OSError:
+            continue
+        for entry in candidates:
+            try:
+                if entry.stat().st_size > 65536:
+                    continue
+                config = configparser.ConfigParser(interpolation=None, strict=False)
+                config.read_string(entry.read_text(encoding='utf-8'))
+                desktop = config['Desktop Entry']
+                if desktop.get('Type') != 'Application' or desktop.get('Hidden', '').lower() == 'true':
+                    continue
+                args = shlex.split(desktop.get('Exec', ''))
+                # Only use the application path. Placeholders, shell operators,
+                # launch wrappers and unexpected arguments are never evaluated.
+                if not args or any(arg not in {'%f', '%F', '%u', '%U'} for arg in args[1:]):
+                    continue
+                executable = args[0]
+                if not Path(executable).is_absolute():
+                    executable = shutil.which(executable)
+                if executable and _localsend_executable(executable):
+                    return str(Path(executable).expanduser())
+            except (OSError, UnicodeError, configparser.Error, KeyError, ValueError):
+                continue
+    return None
+
+
+def _localsend_appimage():
+    home = Path.home()
+    # Immediate children only: do not traverse a user's downloads or documents.
+    for name in ['Applications', 'Aplicativos', 'Downloads', 'Baixados', 'Desktop',
+                 'Área de Trabalho', '.local/bin']:
+        try:
+            candidates = sorted((home / name).iterdir(), key=lambda path: path.name.casefold(), reverse=True)
+        except OSError:
+            continue
+        for candidate in candidates:
+            if candidate.name.casefold().endswith('.appimage') and _localsend_executable(candidate):
+                return str(candidate)
+    return None
+
+
+def localsend_command(paths=()):
+    """Build an argv for the installed LocalSend GUI; do not launch or transfer.
+
+    Linux Flatpak installations are not normally on PATH. Forward selected paths
+    through its document portal so files outside Downloads remain accessible.
+    program() keeps its path-only contract for other external tools and Windows.
+    """
+    if sys.platform == 'win32':
+        executable = program('localsend')
+        return [executable, *map(str, paths)] if executable else None
+    selected = [str(Path(path).expanduser().absolute()) for path in paths]
+    for name in ['localsend', 'localsend_app']:
+        executable = shutil.which(name)
+        if executable:
+            return [executable, *selected]
+    if sys.platform.startswith('linux'):
+        flatpak = shutil.which('flatpak')
+        if flatpak:
+            for installation in ['--user', '--system']:
+                try:
+                    result = run_external([flatpak, 'info', installation, '--show-ref', _LOCALSEND_FLATPAK],
+                                          capture_output=True, text=True, encoding='utf-8', timeout=2)
+                    if result.returncode == 0 and result.stdout.strip().startswith(
+                            f'app/{_LOCALSEND_FLATPAK}/'):
+                        command = [flatpak, 'run', installation, '--file-forwarding', _LOCALSEND_FLATPAK]
+                        return command + ['@@', *selected, '@@'] if selected else command
+                except (OSError, subprocess.SubprocessError, UnicodeError):
+                    continue
+        executable = _localsend_desktop_executable() or _localsend_appimage()
+        if executable:
+            return [executable, *selected]
     return None
 
 

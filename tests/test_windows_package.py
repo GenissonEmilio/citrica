@@ -140,7 +140,7 @@ def test_first_msix_launch_migrates_only_valid_whitelisted_settings_once(msix):
     legacy.write_text(json.dumps({'shortcut': 'Win+Shift+F8', 'drag_key': 'Win', 'animations': False,
                                   'startup': 'must not migrate registry state'}))
     before = legacy.read_bytes()
-    expected = {'shortcut': 'Win+Shift+F8', 'drag_key': 'Win', 'animations': False}
+    expected = {'shortcut': 'Win+Shift+F8', 'drag_key': 'Win', 'animations': False, 'wheel_theme': 'classic'}
     assert config.load() == expected and json.loads(target.read_text()) == expected
     assert legacy.read_bytes() == before
     legacy.write_text(json.dumps(config.DEFAULTS))

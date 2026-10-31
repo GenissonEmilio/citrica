@@ -9,7 +9,7 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
 import pytest
 from PIL import Image
-from PySide6.QtCore import QMimeData, QObject, QPoint, QPointF, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import QCoreApplication, QEvent, QMimeData, QObject, QPoint, QPointF, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -72,11 +72,9 @@ def desktop(tmp_path, monkeypatch):
     controller.pointer_timer.stop()
     yield controller
     controller.hide_wheel()
-    for job in list(controller.jobs):
-        job.cancel.set()
-        job.wait(5000)
-    QApplication.processEvents()
-    controller.close()
+    controller.prepare_shutdown()
+    controller.native.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     app._windows_test_controller = None
 
 
@@ -108,7 +106,7 @@ def test_windows_hotkey_validation_and_atomic_preferences(tmp_path, monkeypatch)
     for text in ['Shift+C', 'Ctrl+Ctrl+A', 'Win+Super+C', 'C', 'Ctrl+F25', 'Alt+Unknown', '', None]:
         with pytest.raises(ValueError):
             config.parse_shortcut(text)
-    data = {'shortcut': 'Win+Shift+F8', 'animations': False, 'drag_key': 'Shift'}
+    data = {'shortcut': 'Win+Shift+F8', 'animations': False, 'drag_key': 'Shift', 'wheel_theme': 'classic'}
     config.save(data)
     assert config.load() == data
     file = config.config_dir() / 'settings.json'
@@ -361,3 +359,46 @@ def test_windows_docx_and_pdf_options_without_libreoffice(desktop, tmp_path, mon
     spin_until(lambda: desktop.counts['converted'] == 2 and not desktop.busy)
     assert any('Citrica without LibreOffice' in unicodedata.normalize('NFKC', p.text)
                for p in Document(tmp_path/'document (1).docx').paragraphs)
+
+
+def test_drop_in_empty_center_dismisses_and_reopening_is_empty(desktop, tmp_path):
+    source = image_file(tmp_path)
+    desktop.show_wheel([source], dragging=True)
+    spin_until(lambda: desktop.wheel.items)
+    desktop.drop([source], QPoint(CENTER, CENTER))
+    spin_until(lambda: not desktop.active)
+    assert_empty(desktop)
+    assert desktop.counts == {'converted': 0, 'errors': 0}
+    desktop.show_wheel([])
+    QTest.qWait(300)
+    assert not desktop.paths and not desktop.wheel.info
+
+
+def test_release_outside_survives_late_offer_generation_change(desktop, tmp_path):
+    source = image_file(tmp_path)
+    desktop.drag_mode('actions')
+    desktop.release()
+    # Explorer can deliver the OLE offer after the native button-up. This
+    # changes the palette generation, but still belongs to the same drag.
+    desktop.offer([source])
+    spin_until(lambda: not desktop.active and not desktop.armed)
+    assert_empty(desktop)
+
+
+def test_button_state_fallback_dismisses_when_native_release_is_missed(desktop, tmp_path):
+    source = image_file(tmp_path)
+    desktop.show_wheel([source], dragging=True)
+    desktop.pointer_timer.start(20)
+    spin_until(lambda: not desktop.active)
+    assert_empty(desktop)
+
+
+def test_stale_release_does_not_dismiss_a_new_drag(desktop, tmp_path, monkeypatch):
+    source = image_file(tmp_path)
+    desktop.show_wheel([source], dragging=True)
+    desktop.release()
+    desktop.hide_wheel()
+    monkeypatch.setattr(desktop.native, 'left_down', lambda: True)
+    desktop.show_wheel([source], dragging=True)
+    QTest.qWait(350)
+    assert desktop.active and desktop.dragging

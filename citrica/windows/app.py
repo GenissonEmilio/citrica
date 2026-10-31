@@ -9,15 +9,17 @@ import threading
 from contextlib import contextmanager
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QPoint, QThread, QTimer, Signal, Slot
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QPoint, QThread, QTimer, Signal, Slot
 from PySide6.QtGui import QAction, QCursor, QIcon
 from PySide6.QtNetwork import QLocalServer
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFormLayout, QHBoxLayout,
-    QLabel, QLineEdit, QMenu, QMessageBox, QPushButton, QSystemTrayIcon, QVBoxLayout,
+    QLabel, QLineEdit, QMenu, QMessageBox, QPushButton, QScrollArea, QSystemTrayIcon, QTabWidget,
+    QVBoxLayout, QWidget,
 )
 
 from citrica import __version__
+from citrica.appearance import WheelAppearancePicker
 from citrica.companion import Shelf, ToolDialog, file_action
 from citrica.core import convert, dependencies
 from citrica.desktop import request
@@ -92,7 +94,8 @@ class Settings(QDialog):
         super().__init__()
         self.desktop = desktop
         self.setWindowTitle('Cítrica · configurações')
-        self.resize(560, 430)
+        available = self.screen().availableGeometry()
+        self.resize(min(590, available.width() - 32), min(700, available.height() - 64))
         layout = QVBoxLayout(self)
         title = QLabel('Cítrica · direto no seu arquivo')
         title.setStyleSheet('font-size:23px;font-weight:bold;')
@@ -100,13 +103,16 @@ class Settings(QDialog):
         note = QLabel('Arraste um arquivo no Explorer e pressione Shift.\n'
                       'Alt: ferramentas · Ctrl: ações · Esc: cancelar.')
         note.setWordWrap(True)
-        layout.addWidget(note)
         self.status = QLabel('O Cítrica continua na bandeja ao fechar esta janela.')
         if getattr(desktop.native, 'elevated', False):
             self.status.setText('Executando como administrador: o Windows pode bloquear arrastes do Explorer. '
                                 'Feche pela bandeja e abra o Cítrica com permissões normais.')
         self.status.setWordWrap(True)
-        layout.addWidget(self.status)
+        self.tabs = QTabWidget()
+        self.tabs.setObjectName('SettingsTabs')
+        general = QWidget()
+        general_layout = QVBoxLayout(general)
+        general_layout.addWidget(note)
         form = QFormLayout()
         self.shortcut = QLineEdit(desktop.settings['shortcut'])
         self.shortcut.setAccessibleName('Atalho global para mostrar a roda')
@@ -121,36 +127,52 @@ class Settings(QDialog):
         self.startup = QCheckBox('Iniciar na bandeja ao entrar no Windows')
         self.startup.setChecked(config.startup_enabled() if sys.platform == 'win32' else False)
         form.addRow('', self.startup)
-        layout.addLayout(form)
+        general_layout.addLayout(form)
+        self.tabs.addTab(general, 'Geral e atalhos')
+        self.appearance = WheelAppearancePicker(desktop.settings.get('wheel_theme', 'classic'))
+        appearance_scroll = QScrollArea()
+        appearance_scroll.setWidgetResizable(True)
+        appearance_scroll.setWidget(self.appearance)
+        self.tabs.addTab(appearance_scroll, 'Personalizar a roda')
+        layout.addWidget(self.tabs, 1)
+        layout.addWidget(self.status)
         row = QHBoxLayout()
         save = QPushButton('Salvar preferências')
+        save.setObjectName('SavePreferences')
         save.clicked.connect(self.save)
-        test = QPushButton('Testar roda agora')
+        test = QPushButton('Salvar e testar roda')
+        test.setObjectName('SaveAndTestWheel')
         test.clicked.connect(self.test)
         row.addWidget(save)
         row.addWidget(test)
         layout.addLayout(row)
         diagnostics = QPushButton('Salvar diagnóstico para suporte')
         diagnostics.clicked.connect(self.diagnostics)
-        layout.addWidget(diagnostics)
+        general_layout.addWidget(diagnostics)
         info = dependencies()
         details = QLabel('Processamento local · originais preservados.\n'
                          f"FFmpeg: {'disponível' if info['ffmpeg'] else 'não encontrado'} · "
                          f"LibreOffice: {'disponível' if info['libreoffice'] else 'opcional, não encontrado'}")
         details.setWordWrap(True)
-        layout.addWidget(details)
+        general_layout.addWidget(details)
+        general_layout.addStretch()
 
     def save(self):
         try:
             self.desktop.apply_settings({'shortcut': self.shortcut.text().strip(),
-                'drag_key': self.modifier.currentText(), 'animations': self.animations.isChecked()})
+                'drag_key': self.modifier.currentText(), 'animations': self.animations.isChecked(),
+                'wheel_theme': self.appearance.theme_id()})
             if sys.platform == 'win32':
                 config.set_startup(self.startup.isChecked())
             self.status.setText('Preferências salvas. O atalho e a tecla de arraste já estão ativos.')
+            return True
         except Exception as error:
             QMessageBox.warning(self, 'Verifique as preferências', str(error))
+            return False
 
     def test(self):
+        if not self.save():
+            return
         self.hide()
         self.desktop.show_wheel([])
 
@@ -182,6 +204,7 @@ class Desktop(QObject):
         self.last_message, self.hotkey_error = '', ''
         self._quitting = False
         self.wheel = Wheel(lambda: self.settings['animations'])
+        self.wheel.set_theme(self.settings.get('wheel_theme', 'classic'))
         self.wheel.filesOffered.connect(self.offer)
         self.wheel.dropped.connect(self.drop)
         self.wheel.offerObserved.connect(self.observe_offer)
@@ -221,7 +244,11 @@ class Desktop(QObject):
         if listen and not self.server.listen(server_name()):
             raise RuntimeError('Já existe uma instância do Cítrica. Aguarde e tente novamente.')
         self.pointer_timer = QTimer(self)
-        self.pointer_timer.timeout.connect(lambda: self.wheel.pointer(QCursor.pos()) if self.active else None)
+        self.pointer_timer.timeout.connect(self.poll_pointer)
+        self.drag_release_timer = QTimer(self)
+        self.drag_release_timer.setSingleShot(True)
+        self.drag_release_timer.timeout.connect(self.finish_release)
+        self._released_epoch = None
         self.pointer_timer.start(20)
 
     def _accept(self):
@@ -381,6 +408,8 @@ class Desktop(QObject):
             selected = hit_test(point.x(), point.y(), len(current))
             if selected >= 0:
                 self.apply(current[selected])
+            else:
+                self.hide_wheel()
 
     def observe_offer(self, formats):
         self.offer_formats = [str(f)[:200] for f in formats[:64]]
@@ -424,6 +453,13 @@ class Desktop(QObject):
 
     def drag_mode(self, mode):
         QA.debug('drag_mode.begin mode=%s active=%s armed=%s', mode, self.active, self.armed)
+        if self.active and not self.dragging and self.native.left_down():
+            # A wheel left open by More or the global shortcut is not the new
+            # physical drag. Discard that selection before probing this gesture;
+            # prepare_drag already owns any pending Explorer preview for it.
+            self.active = self.armed = False
+            self.pending_drop = None
+            self.drag_release_timer.stop()
         if not self.active:
             if self.busy or self._quitting:
                 return
@@ -450,14 +486,34 @@ class Desktop(QObject):
         QA.debug('drag_mode.end mode=%s active=%s armed=%s', self.mode, self.active, self.armed)
 
     def release(self):
-        token = self.generation
+        if not (self.dragging or self.armed) or self.drag_release_timer.isActive():
+            return
+        self._released_epoch = self.drag_epoch
         # OLE may dispatch Drop just after the physical button-up. Let its
-        # validated file offer commit first, then dismiss unhandled releases.
-        QTimer.singleShot(250, lambda: self.hide_wheel() if token == self.generation and
-                          self.dragging and not self.native.left_down() else None)
+        # validated file offer commit first. A late offer changes the palette
+        # generation, but must not cancel dismissal of this physical drag.
+        self.drag_release_timer.start(250)
+
+    def finish_release(self):
+        if (self._released_epoch == self.drag_epoch and (self.dragging or self.armed)
+                and not self.native.left_down()):
+            self.hide_wheel()
+
+    def poll_pointer(self):
+        if self.active:
+            self.wheel.pointer(QCursor.pos())
+        if self.dragging or self.armed:
+            # Explorer's native OLE loop can consume the button-up notification.
+            # Check its real state as well, without closing manually opened wheels
+            # or a committed drop that is waiting for asynchronous file analysis.
+            if self.native.left_down():
+                self.drag_release_timer.stop()
+            else:
+                self.release()
 
     def hide_wheel(self):
         QA.debug('hide.begin generation=%s', self.generation)
+        self.drag_release_timer.stop()
         self.generation += 1
         self.paths, self.palette, self.dragging, self.active = [], None, False, False
         self.armed = False
@@ -527,7 +583,11 @@ class Desktop(QObject):
 
     def keep_window(self, window):
         self.windows.add(window)
-        window.finished.connect(lambda: self.windows.discard(window))
+        # Retain the wrapper until Qt destroys the widget tree, outside the
+        # finished signal's call stack. Dropping it here can leave child
+        # wrappers to PySide's unsafe interpreter-exit destruction order.
+        window.finished.connect(window.deleteLater)
+        window.destroyed.connect(lambda: self.windows.discard(window))
         window.show()
         window.raise_()
         window.activateWindow()
@@ -558,6 +618,7 @@ class Desktop(QObject):
             self.native.register(previous['shortcut'])
             raise
         self.settings.update(settings)
+        self.wheel.set_theme(self.settings.get('wheel_theme', 'classic'))
         self.hotkey_error = ''
 
     def quit(self):
@@ -567,7 +628,14 @@ class Desktop(QObject):
             job.cancel.set()
         for window in list(self.windows):
             window.close()
-        if self.jobs or any(getattr(w, 'worker', None) and w.worker.isRunning() for w in self.windows):
+            # QDialog.close() does not emit finished when it was already
+            # hidden by Save and test. Still dispose it on quit, after any
+            # editor threads have stopped, so the resident cannot wait forever.
+            if not window.isVisible() and not getattr(window, 'busy', lambda: False)():
+                if hasattr(window, 'prepare_shutdown'):
+                    window.prepare_shutdown()
+                window.deleteLater()
+        if self.jobs or self.windows:
             QTimer.singleShot(100, self.quit)
             return
         self.close()
@@ -576,9 +644,27 @@ class Desktop(QObject):
     def close(self):
         self.native.close()
         self.pointer_timer.stop()
+        self.drag_release_timer.stop()
         self.server.close()
         self.tray.hide()
         self.wheel.hide()
+
+    def prepare_shutdown(self):
+        """Join editor threads and destroy widgets before QApplication teardown."""
+        self.close()
+        for job in list(self.jobs):
+            job.cancel.set()
+            job.wait()
+            job.deleteLater()
+        self.jobs.clear()
+        for window in list(self.windows):
+            if hasattr(window, 'prepare_shutdown'):
+                window.prepare_shutdown()
+            window.deleteLater()
+        self.wheel.deleteLater()
+        self.menu.deleteLater()
+        self.deleteLater()
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
 
 
 def math_ceil(value, divisor):
@@ -629,4 +715,7 @@ def _launch(args):
                 window.grab().save(str(args.screenshot))
             desktop.quit()
         QTimer.singleShot(600, capture)
-    return app.exec()
+    try:
+        return app.exec()
+    finally:
+        desktop.prepare_shutdown()

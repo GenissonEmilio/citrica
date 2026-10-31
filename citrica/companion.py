@@ -9,16 +9,18 @@ import sys
 import threading
 from pathlib import Path
 
-from PySide6.QtCore import QMimeData, QPoint, QRect, Qt, QThread, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QDrag, QIcon, QPainter, QPen, QPixmap
+from PySide6.QtCore import QMimeData, Qt, QThread, QUrl, Signal
+from PySide6.QtGui import QDrag, QIcon
 from PySide6.QtWidgets import (
-    QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QFormLayout,
-    QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPlainTextEdit, QPushButton, QVBoxLayout,
+    QApplication, QCheckBox, QComboBox, QDialog, QFileDialog, QFormLayout,
+    QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QScrollArea, QTabWidget, QVBoxLayout, QWidget,
 )
 
+from citrica.appearance import WheelAppearancePicker
 from citrica.desktop import (
     SHELL_REVISION, SHELL_VERSION, desktop_call, extension_dir, extension_status, gnome_environment, install_gnome,
 )
+from citrica.editors import EditorDialog, ImageSelection as ImageSelection
 from citrica.gui import ICON, STYLE
 from citrica.runtime import external_environment
 from citrica.tools import TOOLS, execute
@@ -41,51 +43,6 @@ def readable_shortcut(accelerator):
     reverse = {value: name for name, value in KEY_NAMES.items()}
     key = reverse.get(key, key.upper() if len(key) == 1 else key)
     return '+'.join([*mods, key])
-
-
-class ImageSelection(QLabel):
-    selected = Signal(str)
-
-    def __init__(self, path):
-        super().__init__()
-        from PIL import Image, ImageOps
-        from PIL.ImageQt import ImageQt
-        with Image.open(path) as im:
-            preview = ImageOps.exif_transpose(im).convert('RGBA')
-            self.source_size = preview.size
-            self.pixmap_source = QPixmap.fromImage(ImageQt(preview)).scaled(
-                440, 260, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        self.setFixedSize(self.pixmap_source.size())
-        self.start = self.end = None
-        self.setToolTip('Arraste sobre a foto para escolher a área. O original será preservado.')
-
-    def mousePressEvent(self, event):
-        self.start = self.end = event.position().toPoint()
-
-    def mouseMoveEvent(self, event):
-        if self.start is not None:
-            self.end = event.position().toPoint()
-            self.update()
-
-    def mouseReleaseEvent(self, event):
-        if self.start is None:
-            return
-        self.end = event.position().toPoint()
-        rect = QRect(self.start, self.end).normalized().intersected(self.rect())
-        sx, sy = self.source_size[0]/self.width(), self.source_size[1]/self.height()
-        x, y = int(rect.x()*sx), int(rect.y()*sy)
-        w, h = max(1, int(rect.width()*sx)), max(1, int(rect.height()*sy))
-        w, h = min(w, self.source_size[0]-x), min(h, self.source_size[1]-y)
-        self.selected.emit(f'{x},{y},{w},{h}')
-        self.update()
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.drawPixmap(QPoint(0, 0), self.pixmap_source)
-        if self.start is not None and self.end is not None:
-            painter.setPen(QPen(QColor('#ed713d'), 2))
-            painter.setBrush(QColor(237, 113, 61, 50))
-            painter.drawRect(QRect(self.start, self.end).normalized())
 
 
 def show_wheel(paths):
@@ -161,7 +118,7 @@ class Settings(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Cítrica · configurações')
-        self.resize(560, 440)
+        self.resize(590, 700)
         layout = QVBoxLayout(self)
         title = QLabel('Cítrica · direto no seu arquivo')
         title.setStyleSheet('font-size:23px;font-weight:bold;')
@@ -169,10 +126,13 @@ class Settings(QDialog):
         note = QLabel('Arraste um arquivo, pressione Shift e solte no formato.\n'
                       'Alt abre ferramentas. Ctrl abre ações. Esc fecha a roda.')
         note.setWordWrap(True)
-        layout.addWidget(note)
         self.status = QLabel()
         self.status.setWordWrap(True)
-        layout.addWidget(self.status)
+        self.tabs = QTabWidget()
+        self.tabs.setObjectName('SettingsTabs')
+        general = QWidget()
+        general_layout = QVBoxLayout(general)
+        general_layout.addWidget(note)
         form = QFormLayout()
         self.shortcut = QLineEdit('Super+Shift+C')
         self.shortcut.setAccessibleName('Atalho global para mostrar a roda')
@@ -183,22 +143,33 @@ class Settings(QDialog):
         self.animations = QCheckBox('Animar a abertura da roda')
         self.animations.setChecked(True)
         form.addRow('', self.animations)
-        layout.addLayout(form)
+        general_layout.addLayout(form)
+        self.tabs.addTab(general, 'Geral e atalhos')
+        self.appearance = WheelAppearancePicker()
+        appearance_scroll = QScrollArea()
+        appearance_scroll.setWidgetResizable(True)
+        appearance_scroll.setWidget(self.appearance)
+        self.tabs.addTab(appearance_scroll, 'Personalizar a roda')
+        layout.addWidget(self.tabs, 1)
+        layout.addWidget(self.status)
         self.install = QPushButton('Instalar integração GNOME neste usuário')
         self.install.clicked.connect(self.install_extension)
-        layout.addWidget(self.install)
+        general_layout.addWidget(self.install)
         row = QHBoxLayout()
         save = QPushButton('Salvar atalho e preferências')
+        save.setObjectName('SavePreferences')
         save.clicked.connect(self.save)
         row.addWidget(save)
-        test = QPushButton('Testar roda agora')
+        test = QPushButton('Salvar e testar roda')
+        test.setObjectName('SaveAndTestWheel')
         test.clicked.connect(self.test)
         row.addWidget(test)
         layout.addLayout(row)
         details = QLabel('As conversões acontecem no desktop. Esta janela serve apenas para configurar.\n'
                          'A roda global é para GNOME 46, 50 ou 51 com Wayland, incluindo Ubuntu e Fedora.')
         details.setWordWrap(True)
-        layout.addWidget(details)
+        general_layout.addWidget(details)
+        general_layout.addStretch()
         self.refresh()
 
     def refresh(self):
@@ -223,6 +194,7 @@ class Settings(QDialog):
                 self.shortcut.setText(readable_shortcut(key))
                 self.modifier.setCurrentIndex(1 if shell_settings('drag-key') == 'super' else 0)
                 self.animations.setChecked(shell_settings('animations'))
+                self.appearance.set_theme(shell_settings('wheel-theme'))
             except Exception:
                 pass
 
@@ -242,15 +214,25 @@ class Settings(QDialog):
             accelerator = validate_shortcut(self.shortcut.text())
             if not (extension_dir() / 'schemas/gschemas.compiled').exists():
                 raise ValueError('Instale a integração GNOME primeiro.')
+            try:
+                shell_settings('wheel-theme')
+            except subprocess.CalledProcessError:
+                raise ValueError('Atualize a integração GNOME pelo botão Instalar integração '
+                                 'para habilitar a personalização da roda.') from None
             shell_settings('toggle-wheel', [accelerator])
             shell_settings('drag-key', 'super' if self.modifier.currentIndex() else 'shift')
             shell_settings('animations', self.animations.isChecked())
+            shell_settings('wheel-theme', self.appearance.theme_id())
             self.status.setText('Preferências salvas. Use o atalho ou arraste um arquivo e pressione a tecla configurada.')
+            return True
         except Exception as e:
-            QMessageBox.warning(self, 'Verifique o atalho', str(e))
+            QMessageBox.warning(self, 'Verifique as preferências', str(e))
+            return False
 
     def test(self):
         try:
+            if not self.save():
+                return
             show_wheel([])
             self.close()
         except Exception as e:
@@ -294,100 +276,10 @@ class Shelf(QDialog):
         drag.exec(Qt.DropAction.CopyAction)
 
 
-class ToolDialog(QDialog):
+class ToolDialog(EditorDialog):
+    """Bind the shared visual workspace to the existing cancellable tool worker."""
     def __init__(self, tool, paths):
-        super().__init__()
-        self.tool, self.paths, self.worker = tool, paths, None
-        self.setWindowTitle('Cítrica · ' + TOOLS[tool]['label'])
-        self.resize(520, 180)
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(f"{TOOLS[tool]['label']} · {len(paths)} arquivo(s)"))
-        form = QFormLayout()
-        self.fields = {}
-        for key, title, default in TOOLS[tool]['fields']:
-            field = QLineEdit(default)
-            form.addRow(title, field)
-            self.fields[key] = field
-        layout.addLayout(form)
-        from citrica.core import family
-        if paths and family(paths[0]) == 'image' and tool in {'crop', 'redact', 'annotate'}:
-            self.canvas = ImageSelection(paths[0])
-            def select_area(rect):
-                if 'rect' in self.fields:
-                    self.fields['rect'].setText(rect)
-                if 'position' in self.fields:
-                    self.fields['position'].setText(','.join(rect.split(',')[:2]))
-            self.canvas.selected.connect(select_area)
-            layout.addWidget(QLabel('Arraste na foto para selecionar a área:' if tool != 'annotate' else
-                                    'Clique na foto para posicionar o texto:'))
-            layout.addWidget(self.canvas)
-        self.message = QLabel('Uma nova cópia será criada. O original será preservado.')
-        self.message.setWordWrap(True)
-        if tool == 'target_size':
-            self.message.setText('Saída: WebP para imagens, MP3 para áudio, MP4 para vídeo. '
-                                 'Imagens podem ter a resolução reduzida para caber no limite.')
-        elif tool in {'redact_faces', 'redact_text'}:
-            self.message.setText('Detecção local automática. Revise a cópia antes de compartilhar; '
-                                 'a detecção pode deixar áreas sem identificar.')
-        layout.addWidget(self.message)
-        self.output = QPlainTextEdit()
-        self.output.setReadOnly(True)
-        self.output.hide()
-        layout.addWidget(self.output)
-        self.open_output = QPushButton('Abrir resultado')
-        self.latest_output = None
-        self.open_output.clicked.connect(self.open_result)
-        self.open_output.hide()
-        layout.addWidget(self.open_output)
-        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Apply | QDialogButtonBox.StandardButton.Close)
-        self.buttons.button(QDialogButtonBox.StandardButton.Apply).setText('Executar')
-        self.buttons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply)
-        self.buttons.rejected.connect(self.close)
-        layout.addWidget(self.buttons)
-
-    def apply(self):
-        if self.worker and self.worker.isRunning():
-            return
-        self.worker = ToolWorker(self.tool, self.paths, {k: v.text() for k, v in self.fields.items()})
-        self.worker.done.connect(self.tool_done)
-        self.worker.failed.connect(lambda e: self.message.setText('Falha: ' + e))
-        self.worker.finished.connect(lambda: self.buttons.button(QDialogButtonBox.StandardButton.Apply).setEnabled(True))
-        self.buttons.button(QDialogButtonBox.StandardButton.Apply).setEnabled(False)
-        self.message.setText('Processando localmente…')
-        self.worker.start()
-
-    def tool_done(self, result):
-        if 'text' in result:
-            self.output.setPlainText(result['text'])
-            self.output.show()
-            self.resize(600, 450)
-            self.message.setText('Resultado local; você pode selecionar e copiar o texto.')
-        else:
-            self.message.setText('Concluído.\n' + '\n'.join(str(p) for p in result['outputs']))
-            if result['outputs']:
-                self.latest_output = result['outputs'][0]
-                self.open_output.show()
-
-    def open_result(self):
-        if self.latest_output:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.latest_output)))
-
-    def closeEvent(self, event):
-        if self.worker and self.worker.isRunning():
-            self.worker.cancel.set()
-            self.message.setText('Cancelando…')
-            event.ignore()
-        else:
-            event.accept()
-
-    def reject(self):
-        # QDialog handles Escape through reject(), bypassing closeEvent(). Keep
-        # the worker alive until it has stopped and cleaned up its temporary data.
-        if self.worker and self.worker.isRunning():
-            self.worker.cancel.set()
-            self.message.setText('Cancelando…')
-            return
-        super().reject()
+        super().__init__(tool, paths, worker_factory=ToolWorker)
 
 
 def file_action(tool, paths, *, resident=False):
@@ -439,11 +331,11 @@ def file_action(tool, paths, *, resident=False):
                 publish(staged, Path(target) / path.name)
                 path.unlink()
     elif tool == 'share':
-        from citrica.runtime import program, popen_external
-        executable = program('localsend')
-        if not executable:
+        from citrica.runtime import localsend_command, popen_external
+        command = localsend_command(paths)
+        if not command:
             raise ValueError('Instale LocalSend para compartilhar arquivos.')
-        popen_external([executable, *map(str, paths)])
+        popen_external(command)
     return None
 
 
@@ -490,4 +382,13 @@ def launch_companion(args):
             window.grab().save(str(args.screenshot))
             app.quit()
         QTimer.singleShot(400, capture)
-    return app.exec()
+    result = app.exec()
+    if isinstance(window, EditorDialog):
+        window.prepare_shutdown()
+    # Destroy the entire widget tree before PySide's QApplication teardown.
+    # Leaving Python-reference cycles for its atexit wrapper traversal can
+    # delete individual PDF editor children in an unsafe order.
+    from PySide6.QtCore import QCoreApplication, QEvent
+    window.deleteLater()
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    return result

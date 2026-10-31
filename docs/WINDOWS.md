@@ -1,14 +1,14 @@
 # Cítrica no Windows
 
-Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. O aplicativo permanece na bandeja. A versão Linux 0.6.0 usa a extensão do GNOME 46/50/51 com Wayland.
+Alvo: Windows x64, com o mesmo fluxo de arrastar → Shift → roda → soltar. O aplicativo permanece na bandeja. A versão Linux 0.7.0 usa a extensão do GNOME 46/50/51 com Wayland.
 
 ## Instalar e abrir
 
 **[Instale pela Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR)** e abra **Cítrica** pelo menu Iniciar. O aplicativo está disponível na loja desde 29/10/2026. O canal MSIX inclui os motores descritos abaixo, usa preferências próprias e oferece inicialização automática pelas configurações do aplicativo ou do Windows. [Detalhes e testes do MSIX](WINDOWS-STORE.md).
 
-Como alternativa, a [release 0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0) oferece o [instalador Windows](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica-0.6.0-windows-x86_64-setup-unsigned-test.exe), terminado em `setup-unsigned-test.exe`. Esse pacote passou pelo CI completo e pela VM Windows 11 e continua sem assinatura pública; [resultados e escopo dos testes](VALIDACAO-0.6.0.md).
+Como alternativa, a [release 0.7.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.7.0) oferece o [instalador Windows](https://github.com/GenissonEmilio/citrica/releases/download/v0.7.0/citrica-0.7.0-windows-x86_64-setup-unsigned-test.exe), terminado em `setup-unsigned-test.exe`. Consulte o estado dos builds e dos testes desta atualização em [Validação 0.7.0](VALIDACAO-0.7.0.md). Os arquivos do GitHub continuam sem assinatura pública.
 
-Os arquivos da 0.6.0 mantêm `unsigned-test` no nome para identificar o estado da assinatura. O instalador usa a conta atual, cria a entrada no menu Iniciar e adiciona **Enviar para → Cítrica** no Explorer. Atalho na área de trabalho e inicialização automática são opcionais.
+Os arquivos da 0.7.0 mantêm `unsigned-test` no nome para identificar o estado da assinatura. O instalador usa a conta atual, cria a entrada no menu Iniciar e adiciona **Enviar para → Cítrica** no Explorer. Atalho na área de trabalho e inicialização automática são opcionais.
 
 A assinatura Authenticode e a reputação do SmartScreen são verificações diferentes. O relatório `citrica-windows-signing.json` informa se aquele pacote está assinado; um candidato marcado `unsigned` ainda pode exibir **Editor desconhecido**. Não desative o Defender, SmartScreen ou Smart App Control. Consulte [assinatura e distribuição](WINDOWS-SIGNING.md) para os caminhos de certificação/loja e os limites dessa validação.
 
@@ -28,9 +28,17 @@ O aplicativo no menu abre as configurações. Fechar essa janela mantém o Cítr
 
 A ativação observa tecla e movimento do botão. A seleção da janela de origem do Explorer antecipa a prévia, inclusive com o mouse parado ao tocar Ctrl/Alt/Shift; a operação só é autorizada quando o Windows/Qt entrega a oferta real de arquivo. Drops durante o carregamento aguardam as opções ficarem prontas. Arrastes de texto, URLs da web ou pastas não são aceitos como arquivos para conversão. As conversões solicitam o efeito de cópia ao Explorer, inclusive quando Shift sugere mover.
 
+## Personalização e edição
+
+Em **Configurações → Personalizar a roda**, escolha Cítrica, Aquarela, Vidro claro, Grafite ou Alto contraste. **Salvar e testar roda** grava as preferências e abre a roda com a aparência selecionada. O atalho, a tecla de arraste e a inicialização continuam na aba Geral.
+
+Alt abre as ferramentas. Os editores usam prévia ampla e painel de ajustes: recorte com seleção e alças, controles visuais de imagem, PDF paginado/reordenável e player de áudio/vídeo com linha do tempo. Arraste as alças amarelas ou use Início/Duração/Fim. **Salvar cópia** preserva o original e **Abrir resultado** abre a exportação.
+
+Soltar o arquivo fora de uma opção fecha a roda e limpa a seleção. Ao soltar numa opção válida durante o carregamento, o Cítrica aguarda a análise e conclui a operação. A escolha Mais permite clicar nas opções seguintes após terminar o arraste.
+
 ## Motores e ferramentas
 
-O Cítrica 0.6.0 inclui Python, Qt, Pillow/codecs de imagem, PDF, QR, detecção local de rostos e os motores FFmpeg/FFprobe, LibreOffice e Tesseract com modelo OCR. Não é preciso instalar Word, configurar PATH nem baixar motores ao usar a roda. As versões 0.4.0/0.5.0 exigiam motores externos para parte desses recursos.
+O Cítrica 0.7.0 inclui Python, Qt, Pillow/codecs de imagem, PDF, QR, detecção local de rostos e os motores FFmpeg/FFprobe, LibreOffice e Tesseract com modelo OCR. Não é preciso instalar Word, configurar PATH nem baixar motores ao usar a roda. As versões 0.4.0/0.5.0 exigiam motores externos para parte desses recursos.
 
 - **Áudio/vídeo:** conversões e ferramentas usam o FFmpeg/FFprobe da própria pasta instalada, inclusive **Tamanho alvo**.
 - **DOCX e PDF:** PDF→DOCX, DOCX→PDF/TXT e TXT→PDF/DOCX funcionam com os motores incluídos, sem Word/LibreOffice. O modo básico pode alterar layouts avançados; PDFs escaneados continuam como imagens no DOCX, sem OCR automático.
@@ -61,7 +69,7 @@ Use cópias de arquivos de teste numa pasta com espaços e acentos no nome. Regi
 
 Em caso de erro, use **Configurações → Salvar diagnóstico para suporte**, informe os passos e envie uma captura/gravação. No EXE/portátil, os logs ficam em `%LOCALAPPDATA%/Citrica/Logs/citrica.log` e as preferências em `%APPDATA%/Citrica/settings.json`. O MSIX usa `LocalCache` para logs e `LocalState` para preferências dentro dos dados do pacote; prefira o diagnóstico exportado pelo aplicativo.
 
-CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
+CLI e diagnóstico no PowerShell para o instalador EXE ou ZIP portátil, dentro da respectiva pasta:
 
 ```powershell
 .\citrica-cli.exe --version
@@ -73,6 +81,8 @@ CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
 
 ## O que foi validado e o que ainda falta
 
-Os testes do motor e da interface Qt são executados no CI Linux e Windows. A matriz do pacote publicado usa o executável congelado com PATH reduzido ao Windows: 50 extensões de entrada, todas as saídas anunciadas e as ferramentas de mídia/OCR. Isso detecta dependências instaladas por acaso na máquina de build. O mesmo instalador publicado passou na VM limpa por instalação, atualização da versão pública 0.5.0, remoção, 38 operações avançadas e 24 arrastes reais no Explorer. A execução efetiva e as evidências estão registradas em [VALIDACAO-0.6.0.md](VALIDACAO-0.6.0.md); isso não equivale a validar todos os PCs, monitores ou documentos do usuário.
+A [validação 0.7.0](VALIDACAO-0.7.0.md) registra o CI do pacote final: 304 conversões sobre 50 extensões, 23 operações de mídia, 38 operações estáticas, ciclo do instalador e Explorer em 100%/150%. A VM Windows 11 testou o mesmo executável nos novos editores e em 12 percursos reais do Explorer, incluindo a soltura fora da roda. A variante MSIX QA instalada confirmou os cinco estilos e a persistência, com escala Qt efetiva 1,0/1,5. Isso não equivale a validar todos os PCs, monitores ou documentos do usuário, nem à certificação da Store.
+
+O teste anterior de instalação em VM limpa, atualização desde a versão pública 0.5.0, remoção e 24 arrastes pertence à candidata 0.6.0 e permanece em [VALIDACAO-0.6.0.md](VALIDACAO-0.6.0.md). As evidências históricas não substituem os resultados desta atualização.
 
 Para forçar o motor incluído mesmo com LibreOffice instalado, defina `CITRICA_OFFICE_ENGINE=builtin` antes de iniciar o aplicativo ou a CLI. O padrão automático prefere LibreOffice quando encontrado.

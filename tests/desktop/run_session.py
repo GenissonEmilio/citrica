@@ -20,7 +20,12 @@ HARNESS = 'citrica-test-harness@local'
 def main():
     from PIL import Image, ImageOps
     STATE.mkdir(parents=True, exist_ok=True)
-    for name, source in [(UUID, ROOT / 'gnome' / UUID), (HARNESS, ROOT / 'tests/desktop/harness')]:
+    executable = os.environ.get('CITRICA_TEST_EXECUTABLE')
+    extension_source = (Path(executable).resolve().parent / 'gnome' / UUID if executable else
+                        ROOT / 'gnome' / UUID)
+    if not (extension_source / 'metadata.json').is_file():
+        raise RuntimeError(f'The packaged GNOME extension is missing: {extension_source}')
+    for name, source in [(UUID, extension_source), (HARNESS, ROOT / 'tests/desktop/harness')]:
         target = STATE / 'data/gnome-shell/extensions' / name
         shutil.copytree(source, target, dirs_exist_ok=True)
     subprocess.run(['glib-compile-schemas', str(STATE / 'data/gnome-shell/extensions' / UUID / 'schemas')],

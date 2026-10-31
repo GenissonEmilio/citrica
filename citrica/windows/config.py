@@ -7,8 +7,9 @@ import tempfile
 from pathlib import Path
 
 from citrica.windows import package
+from citrica.wheel_themes import DEFAULT_THEME, THEME_IDS, normalize_theme
 
-DEFAULTS = {'shortcut': 'Ctrl+Alt+C', 'drag_key': 'Shift', 'animations': True}
+DEFAULTS = {'shortcut': 'Ctrl+Alt+C', 'drag_key': 'Shift', 'animations': True, 'wheel_theme': DEFAULT_THEME}
 MODIFIERS = {'alt': 1, 'ctrl': 2, 'control': 2, 'shift': 4, 'win': 8, 'super': 8}
 KEYS = {'space': 0x20, 'esc': 0x1b, 'escape': 0x1b, 'enter': 0x0d, 'return': 0x0d,
         'left': 0x25, 'up': 0x26, 'right': 0x27, 'down': 0x28, 'home': 0x24,
@@ -53,6 +54,9 @@ def _validated(stored, *, strict=False):
     result = dict(DEFAULTS)
     result.update({key: stored[key] for key in DEFAULTS if key in stored})
     result['animations'] = bool(result['animations'])
+    # A newer version may have saved a theme that this version does not know.
+    # Keep the user's working shortcuts and fall back only for appearance.
+    result['wheel_theme'] = normalize_theme(result['wheel_theme'])
     return result
 
 
@@ -88,6 +92,9 @@ def load():
 
 
 def save(settings):
+    theme = settings.get('wheel_theme', DEFAULT_THEME)
+    if not isinstance(theme, str) or theme not in THEME_IDS:
+        raise ValueError('Escolha um dos estilos disponíveis para a roda.')
     if package.package_family_name() is not None:
         settings = _validated(settings, strict=True)
     parse_shortcut(settings['shortcut'])

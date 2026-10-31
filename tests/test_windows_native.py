@@ -40,3 +40,4 @@ def test_win32_registration_conflict_preserves_previous_binding():
         if thread.ident:
             thread.join(timeout=5)
     assert native.hotkey_id == 0
+    native.deleteLater()

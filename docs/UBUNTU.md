@@ -1,8 +1,8 @@
-# Instalar o Cítrica 0.6.0 no Ubuntu
+# Instalar o Cítrica 0.7.0 no Ubuntu
 
-A [versão 0.6.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.6.0) oferece instalador DEB e roda global no GNOME 46/50/51 com Wayland. O mesmo DEB publicado passou nos testes de instalação e conversão descritos abaixo.
+A [versão 0.7.0](https://github.com/GenissonEmilio/citrica/releases/tag/v0.7.0) oferece instalador DEB, editores visuais e cinco estilos de roda no GNOME 46/50/51 com Wayland. A [validação da atualização](VALIDACAO-0.7.0.md) distingue os resultados novos do histórico da 0.6.0 descrito abaixo.
 
-1. Baixe diretamente [citrica_0.6.0_amd64.deb](https://github.com/GenissonEmilio/citrica/releases/download/v0.6.0/citrica_0.6.0_amd64.deb), sem precisar entrar no GitHub.
+1. Baixe diretamente [citrica_0.7.0_amd64.deb](https://github.com/GenissonEmilio/citrica/releases/download/v0.7.0/citrica_0.7.0_amd64.deb), sem precisar entrar no GitHub.
 2. Localize o DEB na pasta de downloads. Ele contém o aplicativo, Python, Qt e os motores de imagem/PDF; essas bibliotecas não precisam ser instaladas manualmente.
 3. Abra o DEB com o instalador de aplicativos do Ubuntu e confirme a instalação.
 
@@ -10,7 +10,7 @@ Se a loja da sua instalação não abrir arquivos DEB locais, abra um terminal n
 
 ```bash
 sudo apt update
-sudo apt install ./citrica_0.6.0_amd64.deb
+sudo apt install ./citrica_0.7.0_amd64.deb
 ```
 
 O `apt` resolve e instala automaticamente as bibliotecas do sistema exigidas pelo aplicativo. A conexão com a internet é usada para obter essas dependências. Usar somente `dpkg -i` pode deixar dependências pendentes; nesse caso, execute `sudo apt --fix-broken install`.
@@ -55,6 +55,8 @@ sudo apt remove citrica
 ```
 
 ## Validação reproduzível
+
+Na 0.7.0, o DEB final do commit `027e785` passou instalação, abertura, conversão e remoção em Ubuntu 24.04, 26.04 e 26.10 no [CI 41155927692](https://github.com/GenissonEmilio/citrica/actions/runs/41155927692). Os [recibos atuais](VALIDACAO-0.7.0.md) também registram a matriz Linux de 304 conversões e o teste dos cinco estilos, editores e animações no GNOME 50/Fedora. Os percursos de desktop GNOME 46/51 descritos a seguir pertencem à 0.6.0.
 
 `tests/linux/install_smoke.py` instala o DEB em um container Ubuntu descartável, abre o aplicativo como usuário comum, verifica a configuração inicial, converte PNG→PDF→DOCX e remove o pacote. O script recusa execução fora de container e não acessa a sessão gráfica de trabalho. Esse teste de pacote é distinto dos testes de arraste no compositor GNOME/Wayland real.
 

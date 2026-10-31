@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "scope": "Windows SDK MakeAppx validation and package integrity only; installed VM and certification recorded separately",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "builder_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "run": "https://github.com/GenissonEmilio/citrica/actions/runs/41156230529",
+  "job_conclusion": "success",
+  "artifact_id": 13026960212,
+  "artifact_sha256": "023ecb632dbc246855f2c468315dca16d5a7eddcfb6b383b7fc26843f6d61278",
+  "makeappx_validation_disabled": false,
+  "input_payload_unchanged_verified": true,
+  "input_inventory_files": 21340,
+  "build_report_sha256": "77c9fed08d347be94d735403bcdec17464107b837f12e7a0ea0fdeafddb6218b",
+  "excluded_input_files": [
+    {
+      "path": "_internal/docx/templates/default-docx-template/[Content_Types].xml",
+      "size": 1782,
+      "sha256": "888a7cd9d95d0998436a499759f30530350ce1acf84d3c07ef47ed6aba489e9e",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/_rels/.rels",
+      "size": 748,
+      "sha256": "f8bc20b7e1d59262abbdc48f9ffa6aca57468688bbd40dc627817732732526b3",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/customXml/_rels/item1.xml.rels",
+      "size": 300,
+      "sha256": "32fa6ddf5bdffdeec97e77d0805928f4d2411f23a3335d1ee0449b740ce1d84d",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/customXml/item1.xml",
+      "size": 262,
+      "sha256": "a86086ffc5d8e83ebd6c71a55d1d2efaa31b137977f5f3a752366e1023612144",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/customXml/itemProps1.xml",
+      "size": 354,
+      "sha256": "c542307b13ec29a8b546217bb37936ab4822e044b265d2952985ec3d6afed24e",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/docProps/app.xml",
+      "size": 1132,
+      "sha256": "be664981c3141cddfc59362beb287ebf20d0773660e2dd6faac5968a5930a081",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/docProps/core.xml",
+      "size": 753,
+      "sha256": "10bfd20ea5d9c8ab0236a2f4e49f99cdb207aac6711e4780cf7a390b322a1d40",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/docProps/thumbnail.jpeg",
+      "size": 8324,
+      "sha256": "96367138dc44ce09bf2c8f0f8e49348a1478d2c5c0af69bbc2bbc38b63cdcead",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/_rels/document.xml.rels",
+      "size": 1253,
+      "sha256": "4f2b7b47d8a7d10d44e3bad6d03829ba2e755cc8b29a2d35a49eef79ed7b11d6",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/document.xml",
+      "size": 1594,
+      "sha256": "f5154b3c5dae749abb0e381e10ea02e19e137650065c4b1f11b059c6d75340bf",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/fontTable.xml",
+      "size": 2811,
+      "sha256": "79385fb7f60247507ecaffc292e9ebd52ea0657b8634f629ba6fccc54011d6bb",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/numbering.xml",
+      "size": 6747,
+      "sha256": "ca605d64e9ba232fd8ff401d700669f7b5c4351865b1c16b91fd5a4aac9be249",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/settings.xml",
+      "size": 2749,
+      "sha256": "31522d2d3c366aec5714c921ce556b4838ca7faa33fa795a66dc32575c710b27",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/styles.xml",
+      "size": 438677,
+      "sha256": "09e350b95e121e7b63841485a6adacf2facd496c189297b2dba634bbb2898a88",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/stylesWithEffects.xml",
+      "size": 438131,
+      "sha256": "463ae0928cf0d84775dbf8cf18d6c3029f6707c81bf590f6d6dd8757a5e93f15",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/theme/theme1.xml",
+      "size": 10939,
+      "sha256": "e3a8ab7db9ca7afca56f5f2820a56e8b660016c647773555b060b0a02ac76941",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    },
+    {
+      "path": "_internal/docx/templates/default-docx-template/word/webSettings.xml",
+      "size": 438,
+      "sha256": "349d36de7434d09f86987ff671d8814964a0588c1e630c06e562cda7e75e9f95",
+      "reason": "Unused python-docx source template; runtime uses templates/default.docx."
+    }
+  ],
+  "packages": [
+    {
+      "variant": "store",
+      "file": "Citrica_1.7.0.0_x64_store-unsigned.msix",
+      "size": 819096536,
+      "sha256": "979635db2ae1fb0942c2a0e1623a225179ec0e6c350f18652b15f6289a44b740",
+      "identity": {
+        "Name": "Emilians.Ctrica",
+        "Publisher": "CN=4F26C959-AACA-4166-BA27-5DE331C059E7",
+        "Version": "1.7.0.0",
+        "ProcessorArchitecture": "x64"
+      },
+      "makeappx_validation": "passed",
+      "makeappx_returncode": 0,
+      "signed": false,
+      "checked_runtime_files": {
+        "Citrica.exe": {
+          "size": 10333009,
+          "sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688"
+        },
+        "citrica-cli.exe": {
+          "size": 10338129,
+          "sha256": "bcbdf6357fd3ba1b30ec746c2eaec7c049015d2fc4846affa40484b9288db194"
+        },
+        "citrica-package.exe": {
+          "size": 206848,
+          "sha256": "3f35c25067d103b917171792410c6429ca5b676d1c5a51b63c426abb8a89f773"
+        },
+        "_internal/engines.json": {
+          "size": 4671,
+          "sha256": "d953db70b6a1332c50ff5fd0498e137f7afc55cc40c3f9bb0703ba5eebdd823d"
+        },
+        "_internal/engine-sources.zip": {
+          "size": 52100981,
+          "sha256": "89e4b1b10d303b59d9ee9527ddc1074ba6dd80a08257aecaafe96779ce4e9c43"
+        },
+        "_internal/docx/templates/default.docx": {
+          "size": 38116,
+          "sha256": "2094b5bddffe9cf973d61fe03388413804f034160718494a65db7e98da40d35d"
+        },
+        "_internal/PySide6/Qt6Multimedia.dll": {
+          "size": 1399096,
+          "sha256": "7629a499b204fcc71a96e12c7180b0a8a920d05ee2f2b20bbec1a819610a69b0"
+        },
+        "_internal/PySide6/Qt6MultimediaWidgets.dll": {
+          "size": 62264,
+          "sha256": "b43e76d5d6b99e0134a8bd6bd581a7935a8b9bae45b1c39cd93d0ca7a46cce85"
+        }
+      },
+      "vm_validated_by_this_report": false,
+      "store_certified": false
+    },
+    {
+      "variant": "qa",
+      "file": "Citrica_1.7.0.0_x64_qa-unsigned-NOT-FOR-STORE.msix",
+      "size": 819096577,
+      "sha256": "97dd2d63ddb14b0b69a575460b953942a234c9ace5e0e3e8239d429a1a4b2b2c",
+      "identity": {
+        "Name": "Emilians.Ctrica.UnsignedQA",
+        "Publisher": "CN=4F26C959-AACA-4166-BA27-5DE331C059E7, OID.2.25.311729368913984317654407730594956997722=1",
+        "Version": "1.7.0.0",
+        "ProcessorArchitecture": "x64"
+      },
+      "makeappx_validation": "passed",
+      "makeappx_returncode": 0,
+      "signed": false,
+      "checked_runtime_files": {
+        "Citrica.exe": {
+          "size": 10333009,
+          "sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688"
+        },
+        "citrica-cli.exe": {
+          "size": 10338129,
+          "sha256": "bcbdf6357fd3ba1b30ec746c2eaec7c049015d2fc4846affa40484b9288db194"
+        },
+        "citrica-package.exe": {
+          "size": 206848,
+          "sha256": "3f35c25067d103b917171792410c6429ca5b676d1c5a51b63c426abb8a89f773"
+        },
+        "_internal/engines.json": {
+          "size": 4671,
+          "sha256": "d953db70b6a1332c50ff5fd0498e137f7afc55cc40c3f9bb0703ba5eebdd823d"
+        },
+        "_internal/engine-sources.zip": {
+          "size": 52100981,
+          "sha256": "89e4b1b10d303b59d9ee9527ddc1074ba6dd80a08257aecaafe96779ce4e9c43"
+        },
+        "_internal/docx/templates/default.docx": {
+          "size": 38116,
+          "sha256": "2094b5bddffe9cf973d61fe03388413804f034160718494a65db7e98da40d35d"
+        },
+        "_internal/PySide6/Qt6Multimedia.dll": {
+          "size": 1399096,
+          "sha256": "7629a499b204fcc71a96e12c7180b0a8a920d05ee2f2b20bbec1a819610a69b0"
+        },
+        "_internal/PySide6/Qt6MultimediaWidgets.dll": {
+          "size": 62264,
+          "sha256": "b43e76d5d6b99e0134a8bd6bd581a7935a8b9bae45b1c39cd93d0ca7a46cce85"
+        }
+      },
+      "vm_validated_by_this_report": false,
+      "store_certified": false
+    }
+  ]
+}
