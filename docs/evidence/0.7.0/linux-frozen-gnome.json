@@ -1,0 +1,173 @@
+{
+  "version": "0.7.0",
+  "decision": "PASS",
+  "time_utc": "2026-10-31T00:41:50.939725+00:00",
+  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41150263133",
+  "build_commit": "80eaf07b5238838c2ebf6f1ebe6e95e069c273a0",
+  "runtime_commit": "c5fcc5c9f58509b0655172eb1d896cf22d694a7f",
+  "environment": {
+    "distribution": "Fedora44",
+    "gnome_major": 50,
+    "protocol": "Wayland",
+    "compositor": "isolated headless",
+    "monitor": [
+      1280,
+      800
+    ],
+    "scale": 1,
+    "host_session_untouched": true
+  },
+  "frozen_executable": {
+    "sha256": "02d54c2a381660dea27ea90d42d71fa24c2335b0608a9e2606323252fff6ed30",
+    "bytes": 9746592
+  },
+  "packages": {
+    "citrica-0.7.0-1.x86_64.rpm": {
+      "bytes": 248237221,
+      "sha256": "36e17ddeb8c966d346fa53871c566ad3198d4fb5f52a21ebb0db1f91504ac437"
+    },
+    "citrica-0.7.0-linux-x86_64.tar.gz": {
+      "bytes": 249437112,
+      "sha256": "b0e708b8196c6029305b2b261197f451b18f00c5294b3f3b32fce20f98830e9e"
+    },
+    "citrica_0.7.0_amd64.deb": {
+      "bytes": 275185960,
+      "sha256": "e1f2b119176af10b6d08f8e00216e0381cfa1a230a131c95411a30cdc8aded9e"
+    }
+  },
+  "editors": {
+    "image_crop_ui_export": {
+      "size": [
+        160,
+        90
+      ],
+      "original_preserved": true
+    },
+    "pdf_preview_and_metadata_ui_export": {
+      "pages": 3,
+      "original_preserved": true
+    },
+    "video_player_and_trim_ui_export": {
+      "position_advanced_seconds": 0.557,
+      "pause_held_position": true,
+      "timeline_seek_seconds": 1.812,
+      "export_duration": 1.25,
+      "original_preserved": true
+    }
+  },
+  "all_editor_processes_close_exit_code": 0,
+  "pdf_entire_page_and_header_visible": true,
+  "wheel_styles": {
+    "styles": [
+      {
+        "theme": "classic",
+        "live_update": true,
+        "selection_preserved": true,
+        "thumbnail_preserved": true,
+        "sha256": "527ebb2a2c17eb40cc70e701fbae5f8ccec70ae1f5e4d02bf1879e6965c5a97c"
+      },
+      {
+        "theme": "watercolor",
+        "live_update": true,
+        "selection_preserved": true,
+        "thumbnail_preserved": true,
+        "sha256": "d9c456fcc307aff34e3abc55ee1043d1dacd9a7e92ebf7e5470693c20ff6c49d"
+      },
+      {
+        "theme": "glass",
+        "live_update": true,
+        "selection_preserved": true,
+        "thumbnail_preserved": true,
+        "sha256": "baec6b78155ed33d2096d366bc53296c12d1f01b196c1321d8de50bb1b414d72"
+      },
+      {
+        "theme": "graphite",
+        "live_update": true,
+        "selection_preserved": true,
+        "thumbnail_preserved": true,
+        "sha256": "0dfbff9c8340a26353ce38bc35afb8a9713c724368f35369cb90f74c92de04f8"
+      },
+      {
+        "theme": "contrast",
+        "live_update": true,
+        "selection_preserved": true,
+        "thumbnail_preserved": true,
+        "sha256": "263843128b3d7ee5d53367bc3a2c4e04ccd79cb106b5264e9662336d595b3f45"
+      }
+    ],
+    "conversion_after_live_theme_changes": true,
+    "reopen_empty": true,
+    "original_preserved": true,
+    "native_intermediate_frames": 26
+  },
+  "settings": {
+    "settings_save": true,
+    "saved_shortcut_invoked": true,
+    "theme_saved_by_actual_ui": "watercolor",
+    "theme_loaded_in_new_settings_process": true,
+    "save_and_test_opens_selected_theme": true,
+    "settings_window_fits_test_monitor": true
+  },
+  "localsend": {
+    "ctrl_wheel_share_visible": true,
+    "localsend_system_flatpak_installed": true,
+    "share_not_invoked": true,
+    "paths_are_synthetic": true,
+    "labels": [
+      "Copiar",
+      "Mover",
+      "Copiar caminho",
+      "Terminal",
+      "Prateleira",
+      "Compartilhar"
+    ]
+  },
+  "cli": {
+    "version": "Cítrica 0.7.0",
+    "image_to_jpg": true,
+    "image_to_pdf": true,
+    "pdf_to_editable_docx": true,
+    "pdf_to_png": true,
+    "originals_preserved": true,
+    "localsend_share_action_present": true,
+    "host_install_changed": false
+  },
+  "dependencies": {
+    "licenses": {
+      "libpulse0-copyright.txt": {
+        "sha256": "aff3f1d729168de06e34d940dc493cc305a6e4a6278f1ac38ee52ec0f69e342c",
+        "bytes": 21813
+      },
+      "LGPL-2.1.txt": {
+        "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+        "bytes": 26530
+      },
+      "QtMultimedia-NOTICES.txt": {
+        "sha256": "7206fc9166d8995b24c60d54c6c099e0f61789511ee5c4a44fa735e0110f04dc",
+        "bytes": 61380
+      }
+    },
+    "multimedia_linkage": {
+      "_internal/PySide6/Qt/lib/libQt6Multimedia.so.6": {
+        "all_linked_libraries_resolved": true
+      },
+      "_internal/PySide6/Qt/plugins/multimedia/libffmpegmediaplugin.so": {
+        "all_linked_libraries_resolved": true
+      }
+    },
+    "pulse_runtime_bundled": true
+  },
+  "screenshots_sha256": {
+    "linux-editor-image.png": "e536e68de83c3db6dc4d3a5c5b842bc5e1069ec39b6525a493014ac79cc11884",
+    "linux-editor-pdf.png": "33080801a0fc372b8a8ce456f3fd01fb305acf0757c862e70fe4b10079a03703",
+    "linux-editor-video.png": "6bc3d752d6a515f98199d9defcc8f59110fa2b43697b6ef84aad3c365b38a56a",
+    "linux-wheel-settings.png": "e234fff2137dba4ef6f8a64be72b559d100a9082248f75798f2b5f6528d5f1e3",
+    "linux-share.png": "d0979007b83ee05586a36c09c55f89ff9b174ff8844b68cad5b4581557a2727e"
+  },
+  "limits": [
+    "Software-rendered isolated compositor, scale1; hardware acceleration and LinuxHiDPI not evaluated here.",
+    "Synthetic audio was muted through the volume control; audible speaker output was not evaluated.",
+    "LocalSend action availability was verified; no network transfer was initiated.",
+    "Host installation and MicrosoftStore/Windows validation are separate records."
+  ]
+}

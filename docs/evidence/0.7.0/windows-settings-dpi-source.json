@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "project": "Cítrica",
+  "version": "0.7.0",
+  "scope": "development source UI diagnosis; not a frozen build or Microsoft Store package test",
+  "source_commit": "79d2336f9f475ae956a7666ba0bf4c6b9133ff32",
+  "runtime_commit": "18e96d8006d38f919edb0d042b1723eb15cc5ce2",
+  "python": "3.12.10 embeddable, isolated",
+  "qt": "6.12.0 Essentials",
+  "qt_addons_present": false,
+  "platform_plugin": "windows",
+  "style": "Fusion",
+  "stylesheet": "citrica.gui.STYLE",
+  "native_desktop_hooks": "FakeNative only for source layout diagnosis; frozen NativeDesktop validation remains separate",
+  "user_configuration": "temporary process-local APPDATA/LOCALAPPDATA; startup queries/writes mocked; no system configuration changed",
+  "cases": {
+    "windows100": {
+      "process_exit_code": 0,
+      "environment_scale": "1",
+      "device_pixel_ratio": 1.0,
+      "logical_dpi": 96.0,
+      "font_family_count": 149,
+      "resolved_families": [
+        "Segoe UI"
+      ],
+      "frame_logical": [
+        655,
+        126,
+        590,
+        731
+      ],
+      "available_logical": [
+        0,
+        0,
+        1920,
+        1032
+      ],
+      "frame_fits_available": true,
+      "all_five_styles_reachable": {
+        "classic": true,
+        "watercolor": true,
+        "glass": true,
+        "graphite": true,
+        "contrast": true
+      },
+      "buttons_general": {
+        "SavePreferences": {
+          "global_rect": [
+            666,
+            807,
+            281,
+            39
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        },
+        "SaveAndTestWheel": {
+          "global_rect": [
+            953,
+            807,
+            281,
+            39
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        }
+      },
+      "buttons_appearance": {
+        "SavePreferences": {
+          "global_rect": [
+            666,
+            807,
+            281,
+            39
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        },
+        "SaveAndTestWheel": {
+          "global_rect": [
+            953,
+            807,
+            281,
+            39
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        }
+      }
+    },
+    "windows150": {
+      "process_exit_code": 0,
+      "environment_scale": "1.5",
+      "device_pixel_ratio": 1.5,
+      "logical_dpi": 96.0,
+      "font_family_count": 149,
+      "resolved_families": [
+        "Segoe UI"
+      ],
+      "frame_logical": [
+        335,
+        0,
+        590,
+        645
+      ],
+      "available_logical": [
+        0,
+        0,
+        1280,
+        688
+      ],
+      "frame_fits_available": true,
+      "all_five_styles_reachable": {
+        "classic": true,
+        "watercolor": true,
+        "glass": true,
+        "graphite": true,
+        "contrast": true
+      },
+      "buttons_general": {
+        "SavePreferences": {
+          "global_rect": [
+            346,
+            594,
+            281,
+            40
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        },
+        "SaveAndTestWheel": {
+          "global_rect": [
+            633,
+            594,
+            281,
+            40
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        }
+      },
+      "buttons_appearance": {
+        "SavePreferences": {
+          "global_rect": [
+            346,
+            594,
+            281,
+            40
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        },
+        "SaveAndTestWheel": {
+          "global_rect": [
+            633,
+            594,
+            281,
+            40
+          ],
+          "visible": true,
+          "fully_inside_available": true
+        }
+      }
+    }
+  },
+  "source_ui_screenshot": {
+    "file": "windows-settings-dpi150-source.png",
+    "sha256": "d0ab08bdba1adf5dd6300376b3fd953fbc6bc130f105e5e06238350eebfe0df4",
+    "scope": "native Windows150% rendering of development source, not frozen/Store"
+  }
+}

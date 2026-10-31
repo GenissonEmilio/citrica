@@ -18,9 +18,21 @@ No Fedora, a detecção real encontrou LocalSend 1.18.2 instalado como Flatpak d
 
 Os testes dos editores exportam recortes e ajustes de imagem, fundo com proporção, PDF reordenado, trim de vídeo e bleep de áudio. Também exercitam alças/arraste, sincronização dos campos, miniaturas, forma de onda, reprodução/pausa/seek no QtMultimedia e cancelamento seguro de subprocessos e workers.
 
+O encerramento foi testado em subprocessos independentes: fechar/exportar PDF, sair com worker ativo, capturar com prévia ativa e abrir/fechar cinco PDFs no residente. Threads são canceladas e aguardadas; a árvore de widgets é destruída enquanto o QApplication está vivo. A prévia PDF também foi verificada em três tamanhos de janela, preservando topo, rodapé e proporção.
+
+A suíte completa foi executada três vezes em processos independentes no Fedora: 353 testes passaram e 21 foram ignorados em cada execução, com código de saída 0. O [recibo](evidence/0.7.0/unit-lifecycle.json) distingue esses testes dos pacotes. A limpeza de janelas criadas diretamente pelos testes também foi corrigida; nenhuma assertion foi removida e nenhum erro fatal foi suprimido.
+
+A [verificação final de código-fonte](evidence/0.7.0/source-tests-final.json) passou 356 testes e ignorou 21 em cada plataforma, Linux e Windows, com saída 0. O teste de escala Windows usa o renderizador nativo e fontes Segoe UI: o plugin genérico offscreen não disponibiliza fontes nesse sistema e não representa as métricas do aplicativo. A [prova separada na VM](evidence/0.7.0/windows-settings-dpi-source.json) confirma os cinco estilos e os dois botões de salvar dentro da área útil em 100% e 150%; ela usa código-fonte e não substitui o teste do pacote final.
+
 ## Pacotes e publicação
 
-Builds, testes da VM Windows, pacotes Ubuntu e envio à Store ainda estão em preparação nesta branch. Resultados de código-fonte ou de uma versão anterior não são tratados como aprovação dos pacotes novos. Os recibos serão acrescentados conforme cada etapa terminar.
+O [build Linux](evidence/0.7.0/linux-packages-ci.json) passou 304 conversões sobre 50 extensões e 38 operações estáticas de imagem/PDF (32 positivas e seis rejeições esperadas), com originais preservados. O DEB passou instalação, abertura, conversão e remoção em Ubuntu 24.04, 26.04 e 26.10 limpos.
+
+O [TAR final no Fedora/GNOME 50](evidence/0.7.0/linux-frozen-gnome.json) passou pelos editores e controles reais, pelas cinco aparências durante o arraste, persistência das preferências, atalho global e presença de Compartilhar. O player avançou 0,557 s durante a reprodução, manteve a posição em pausa, navegou para 1,812 s e exportou um corte de 1,25 s. Todos os processos de editor encerraram com código 0; página PDF inteira e botões de configurações ficaram visíveis em 1280×800. O áudio sintético foi silenciado no teste e não houve envio pelo LocalSend.
+
+A [instalação local](evidence/0.7.0/local-install.json) foi atualizada para esse mesmo binário, com backup e preferências preservadas. A extensão revisão 4 está no disco; a sessão em execução mantém a revisão 2 até o próximo login, sem encerrar o trabalho do usuário.
+
+O pacote Windows e seu MSIX ainda estão em preparação nesta branch. As verificações Linux não são tratadas como validação do Windows nem como certificação da Microsoft.
 
 ## Limites
 

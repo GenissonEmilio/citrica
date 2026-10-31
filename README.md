@@ -9,7 +9,7 @@ O Cítrica 0.7 oferece a roda nativa do GNOME Shell no Linux e uma integração 
 
 **Versão 0.7.0:** aba **Personalizar a roda** com cinco estilos, incluindo Aquarela e Vidro claro translúcidos; editores com prévia ampla, ajustes visuais e linha do tempo de áudio/vídeo. Corrige Compartilhar com LocalSend Flatpak/AppImage no Linux e fecha a roda Windows ao soltar fora de uma opção. [Mudanças, testes e limites](docs/VALIDACAO-0.7.0.md).
 
-O Cítrica está disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026. Atualizações da Store têm pacote e certificação próprios. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes da distribuição](docs/WINDOWS-STORE.md).
+O Cítrica está disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026. Atualizações da Store têm pacote e certificação próprios: os recursos da 0.7.0 chegam à loja após a aprovação do pacote 1.7.0.0. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes da distribuição](docs/WINDOWS-STORE.md).
 
 **Na 0.5.0:** correções da roda no Explorer, DOCX→PDF/TXT sem Office, PDF→DOCX em ambas as plataformas e miniatura do arraste acima da roda no GNOME. A roda reabre vazia após converter ou cancelar e mantém as animações de abertura, seleção e fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 
@@ -102,11 +102,11 @@ Confira `SHA256SUMS` na pasta dos downloads. Mantenha `_internal` junto ao execu
 
 Alt durante o arraste abre as ferramentas do arquivo. A imagem fica em um canvas amplo: arraste uma seleção, mova a área ou use as alças para recortar; os números usam os pixels do original. Brilho, contraste, saturação, nitidez, anotações e fundos têm controles próprios e prévia quando aplicável.
 
-Vídeo e áudio têm player interno, linha do tempo com miniaturas ou forma de onda, alças de seleção e campos de tempo sincronizados. É possível assistir, pausar, navegar e escolher o trecho antes de exportar. PDF tem navegação de páginas e seleção/reordenação visual. As ferramentas usam o mesmo espaço de trabalho, com **Salvar cópia**, cancelamento e **Abrir resultado**.
+Vídeo e áudio têm player interno, linha do tempo com miniaturas ou forma de onda, alças de seleção e campos de tempo sincronizados. É possível assistir, pausar, navegar e escolher o trecho antes de exportar. O player usa QtMultimedia; a leitura da duração e as prévias de miniaturas, quadros e forma de onda usam FFmpeg/ffprobe. A reprodução depende dos codecs disponíveis no backend. PDF tem navegação de páginas e seleção/reordenação visual. As ferramentas usam o mesmo espaço de trabalho, com **Salvar cópia**, cancelamento e **Abrir resultado**.
 
 ![Editor visual de vídeo](docs/editor-video.png)
 
-A interface é inspirada em editores de mídia; não há montagem multipista, transições ou edição completa de documentos Office. Prévias usam um arquivo de referência quando a operação recebe vários arquivos. Codecs sem reprodução no player continuam com a alternativa de miniaturas/quadros quando FFmpeg consegue decodificá-los.
+A interface oferece editores focados nas ferramentas do Cítrica; não há montagem multitrilha, transições ou edição completa de documentos Office. Em operações com vários arquivos, a prévia pode mostrar apenas um arquivo de referência. Codecs sem reprodução no player continuam com a alternativa de miniaturas/quadros quando FFmpeg consegue decodificá-los.
 
 ## Ferramentas
 

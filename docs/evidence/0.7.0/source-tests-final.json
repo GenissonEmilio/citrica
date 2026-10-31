@@ -1,0 +1,22 @@
+{
+  "product_version": "0.7.0",
+  "scope": "source tests, not packaged application or Microsoft certification",
+  "commit": "91dbf7c821c855dc2959bdecf9c824a9dc8a1d01",
+  "run": "https://github.com/GenissonEmilio/citrica/actions/runs/41154441953",
+  "platforms": {
+    "linux": {
+      "passed": 356,
+      "skipped": 21,
+      "process_exit_code": 0,
+      "duration_seconds": 43.12,
+      "lint": "passed"
+    },
+    "windows": {
+      "passed": 356,
+      "skipped": 21,
+      "process_exit_code": 0,
+      "duration_seconds": 69.56,
+      "dpi_settings_backend": "native windows with Segoe UI; QT_SCALE_FACTOR=1.5"
+    }
+  }
+}

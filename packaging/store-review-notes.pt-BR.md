@@ -21,8 +21,8 @@ o pacote.
    edição do texto no resultado; PDFs escaneados permanecem como imagens nessa
    conversão. Documentos complexos podem apresentar diferenças de layout.
 5. Durante outro arraste, `Alt` mostra as ferramentas disponíveis para o tipo de
-   arquivo e `Ctrl` mostra ações. A miniatura do arquivo deve ficar acima da
-   roda. Pressione `Esc` para cancelar.
+   arquivo e `Ctrl` mostra ações. A roda apresenta a prévia ou o ícone do arquivo
+   quando disponível. Pressione `Esc` para cancelar.
 6. Solte outro arraste fora da roda: ela deve fechar e reabrir vazia. Em Alt,
    Recortar abre o novo canvas; em vídeo/áudio, Cortar tempo abre o player com
    linha do tempo e alças. Salvar cópia preserva o original. PDF permite navegar
@@ -30,6 +30,14 @@ o pacote.
 7. Fechar a tela de configurações mantém o aplicativo na bandeja. A opção
    **Sair** da bandeja encerra o residente. A inicialização com o Windows é
    opcional e deve respeitar a escolha do usuário nas configurações do sistema.
+
+Os editores são focados nas operações selecionadas; não há montagem multitrilha,
+transições ou edição completa de documentos Office. O player de vídeo/áudio usa
+QtMultimedia. A leitura da duração e as prévias de miniaturas, quadros e forma de
+onda usam FFmpeg/ffprobe. A reprodução depende dos codecs do backend; quando um
+codec não abre no player, a alternativa por quadros pode continuar disponível
+se o FFmpeg conseguir decodificá-lo. A ferramenta Censurar áudio aplica um tom
+ao trecho selecionado de um arquivo de áudio.
 
 O aplicativo opera com o nível normal do usuário. `runFullTrust` é utilizado
 pela integração desktop da roda, atalhos globais, arrastes OLE, área de
