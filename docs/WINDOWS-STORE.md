@@ -103,8 +103,8 @@ também não constituem compilação ou instalação real.
 
 | Saída | Finalidade |
 | --- | --- |
-| `Citrica_1.6.0.0_x64_store-unsigned.msix` | Identidade real; entrada sem assinatura para submissão ao Partner Center. |
-| `Citrica_1.6.0.0_x64_qa-unsigned-NOT-FOR-STORE.msix` | Teste unsigned na VM; nunca enviar à Store ou distribuir como versão verificada. |
+| `Citrica_1.7.0.0_x64_store-unsigned.msix` | Identidade real; entrada sem assinatura para submissão ao Partner Center. |
+| `Citrica_1.7.0.0_x64_qa-unsigned-NOT-FOR-STORE.msix` | Teste unsigned na VM; nunca enviar à Store ou distribuir como versão verificada. |
 
 A variante QA tem nome `Emilians.Ctrica.UnsignedQA`, nome visível
 `Cítrica · QA unsigned` e acrescenta ao Publisher o marcador oficial

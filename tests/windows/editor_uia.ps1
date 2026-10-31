@@ -24,7 +24,11 @@ foreach($element in $elements) {
         $current=$element.Current
         if($Name -and $current.Name -ne $Name) { continue }
         if($ControlType -and $current.ControlType.ProgrammaticName -ne "ControlType.$ControlType") { continue }
-        if($AutomationId -and $current.AutomationId -ne $AutomationId) { continue }
+        # Qt exposes an objectName as the last component of its UIA path.
+        # Keep exact full paths accepted, and match only a complete final
+        # component when the caller supplies a public objectName.
+        if($AutomationId -and $current.AutomationId -ne $AutomationId -and
+           -not $current.AutomationId.EndsWith('.'+$AutomationId,[StringComparison]::Ordinal)) { continue }
         if($ClassName -and $current.ClassName -ne $ClassName) { continue }
         $controls.Add($element)
     } catch [System.Windows.Automation.ElementNotAvailableException] { continue }

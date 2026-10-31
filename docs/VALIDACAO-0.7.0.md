@@ -1,6 +1,6 @@
 # Validação do Cítrica 0.7.0
 
-Produto 0.7.0; pacote Microsoft Store 1.7.0.0; protocolo GNOME 3, revisão 4. Este documento acompanha os resultados da atualização. O histórico anterior permanece em [0.6.0](VALIDACAO-0.6.0.md).
+Produto 0.7.0; pacote Microsoft Store 1.7.0.0; protocolo GNOME 3, revisão 4. Este documento acompanha os resultados da atualização. O histórico anterior permanece em [0.6.0](https://github.com/GenissonEmilio/citrica/blob/05462b6150b4484816668317c9a5937192aa459d/docs/VALIDACAO-0.6.0.md).
 
 ## Escopo
 
