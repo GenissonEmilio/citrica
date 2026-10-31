@@ -627,6 +627,13 @@ class Desktop(QObject):
             job.cancel.set()
         for window in list(self.windows):
             window.close()
+            # QDialog.close() does not emit finished when it was already
+            # hidden by Save and test. Still dispose it on quit, after any
+            # editor threads have stopped, so the resident cannot wait forever.
+            if not window.isVisible() and not getattr(window, 'busy', lambda: False)():
+                if hasattr(window, 'prepare_shutdown'):
+                    window.prepare_shutdown()
+                window.deleteLater()
         if self.jobs or self.windows:
             QTimer.singleShot(100, self.quit)
             return

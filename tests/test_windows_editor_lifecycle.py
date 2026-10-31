@@ -46,7 +46,7 @@ class FakeNative(QObject):
     def close(self):
         events['native_close'] += 1
 
-if mode in {'quit-preview', 'exit-preview'}:
+if mode in {'quit-preview', 'exit-preview', 'quit-hidden-preview'}:
     class SlowPreview(QThread):
         ready = Signal(object)
         failed = Signal(str)
@@ -58,6 +58,12 @@ if mode in {'quit-preview', 'exit-preview'}:
             if self.cancel.wait(10):
                 (output / 'preview-cancelled').touch()
     editors.PreviewWorker = SlowPreview
+
+if mode == 'hidden-settings':
+    # Exercise the real preferences workflow without changing the CI user's
+    # Windows startup registry/task outside this temporary configuration.
+    resident.config.startup_enabled = lambda: False
+    resident.config.set_startup = lambda enabled: events.update(startup_requested=enabled)
 
 original = resident.Desktop
 class ProbeDesktop(original):
@@ -73,6 +79,21 @@ class ProbeDesktop(original):
         QTimer.singleShot(8000, lambda: app.exit(2))
 
     def open_editor(self):
+        if mode == 'hidden-settings':
+            window = resident.Settings(self)
+            self.keep_window(window)
+            window.finished.connect(lambda _: self.finished_editor(window))
+            window.destroyed.connect(lambda: self.destroyed_editor(window))
+            window.shortcut.setText('Ctrl+Alt+F9')
+            window.modifier.setCurrentText('Win')
+            window.animations.setChecked(False)
+            window.appearance.set_theme('glass')
+            window.test()
+            events['hidden_after_save_and_test'] = not window.isVisible()
+            events['wheel_shown_after_test'] = self.active
+            events['saved_preferences'] = resident.config.load()
+            QTimer.singleShot(20, self.quit)
+            return
         if mode == 'exit-job':
             def operation(cancel):
                 entered.set()
@@ -84,7 +105,7 @@ class ProbeDesktop(original):
             job.destroyed.connect(lambda: events.update(job_destroyed=True))
             QTimer.singleShot(20, self.wait_preview)
             return
-        tool = 'trim' if mode in {'quit-preview', 'exit-preview'} else 'edit_metadata'
+        tool = 'trim' if mode in {'quit-preview', 'exit-preview', 'quit-hidden-preview'} else 'edit_metadata'
         window = ToolDialog(tool, [source])
         self.opened += 1
         self.keep_window(window)
@@ -125,8 +146,11 @@ class ProbeDesktop(original):
             QTimer.singleShot(20, self.wait_preview)
         elif mode == 'exit-job':
             self.app.exit(0)
-        elif mode == 'quit-preview':
+        elif mode in {'quit-preview', 'quit-hidden-preview'}:
             assert self.current.busy()
+            if mode == 'quit-hidden-preview':
+                self.current.hide()
+                events['preview_hidden_while_busy'] = not self.current.isVisible()
             self.quit()
         else:
             assert self.current.busy()
@@ -151,11 +175,12 @@ sys.exit(result)
 '''
 
 
-@pytest.mark.parametrize('mode', ['repeat-close', 'export', 'quit-preview', 'exit-preview', 'exit-job'])
+@pytest.mark.parametrize('mode', ['repeat-close', 'export', 'quit-preview', 'exit-preview', 'exit-job',
+                                 'hidden-settings', 'quit-hidden-preview'])
 def test_resident_editor_destruction_and_shutdown(tmp_path, mode):
     import pymupdf
 
-    if mode in {'quit-preview', 'exit-preview'}:
+    if mode in {'quit-preview', 'exit-preview', 'quit-hidden-preview'}:
         source = tmp_path / 'audio.wav'
         with wave.open(str(source), 'wb') as audio:
             audio.setnchannels(1)
@@ -187,14 +212,21 @@ def test_resident_editor_destruction_and_shutdown(tmp_path, mode):
     assert all(events['removed_after_destroyed'])
     assert events['native_close'] >= 1
     assert source.read_bytes() == before
-    if mode != 'exit-preview':
+    if mode not in {'exit-preview', 'hidden-settings', 'quit-hidden-preview'}:
         assert events['finished'] == events['destroyed']
+    if mode != 'exit-preview':
         assert events['windows_before_shutdown'] == 0
     else:
         assert events['windows_before_shutdown'] == 1
-    if mode in {'quit-preview', 'exit-preview'}:
+    if mode in {'quit-preview', 'exit-preview', 'quit-hidden-preview'}:
         assert events['preview_entered']
         assert (tmp_path / 'preview-cancelled').exists()
+    if mode == 'quit-hidden-preview':
+        assert events['preview_hidden_while_busy']
+    if mode == 'hidden-settings':
+        assert events['hidden_after_save_and_test'] and events['wheel_shown_after_test']
+        assert events['saved_preferences'] == {'shortcut': 'Ctrl+Alt+F9', 'drag_key': 'Win',
+                                                'animations': False, 'wheel_theme': 'glass'}
     if mode == 'exit-job':
         assert events['preview_entered']
         assert events['job_cancelled'] and events['job_destroyed']
