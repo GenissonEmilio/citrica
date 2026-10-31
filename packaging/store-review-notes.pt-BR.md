@@ -2,12 +2,16 @@
 
 Atualização produto 0.7.0 / MSIX 1.7.0.0. Texto de apoio para o campo de informações adicionais de teste. O roteiro não
 constitui um relatório de aprovação: os resultados do pacote instalado são
-registrados separadamente em `docs/evidence/store/`.
+registrados separadamente em `docs/evidence/0.7.0/` (histórico em `docs/evidence/store/`).
 
 O Cítrica é um conversor local de arquivos para Windows Desktop x64. A interface
 está em português do Brasil. Não há conta, login, senha de teste, compra ou
 serviço remoto necessário para as conversões. Os motores de conversão acompanham
 o pacote.
+
+Código-fonte do runtime desta atualização:
+https://github.com/GenissonEmilio/citrica/tree/027e7855cb9f80242acb573d8fe22e8a1f25f049
+As fontes correspondentes dos motores e seus avisos acompanham o aplicativo.
 
 1. Abra o Cítrica pelo menu Iniciar. Geral e atalhos apresenta o atalho, a
    animação, a inicialização na bandeja e o estado dos motores. Na aba Personalizar
