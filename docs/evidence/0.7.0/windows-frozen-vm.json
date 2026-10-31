@@ -162,5 +162,11 @@
     "pdf_and_preview_closes": "37850e55e245563c2990a99a64bc8ee3b24a2f1f38ca77567d9c61f5ec32c5b0",
     "native_explorer_final": "51f49254400e6e79547a23b12a9d9e96da6526a43be3b6a97b99275273c3c086"
   },
-  "editor_process_ownership_scope": "Original driver required exact title/image and a single matching editor, then normal close waited for the launched process. It did not persist or explicitly assert HWND PID == Popen PID; the public runner now requires this guard."
+  "editor_process_ownership_scope": "Original driver required exact title/image and a single matching editor, then normal close waited for the launched process. It did not persist or explicitly assert HWND PID == Popen PID; the public runner now requires this guard.",
+  "exercised_harness_sha256": {
+    "v070_editor_cases.py": "c0cc926e214b7a132baabfef7caa0241ab4096715774e9cac621505b996bc750",
+    "v070-msix-context.py": "a5016b1646b69414baafa2d9773d4cbfbe411c7cc259b7499820b6f0cc20893f",
+    "v070_settings_cases.py": "e44d000169a4871c5a19fa3dbe4831d22610c6f29af5d6ad2fa652317f9eaeda"
+  },
+  "published_runner_review": "The public QA drivers additionally enforce HWND PID == Popen PID, assert hotkey_active after readiness polling and assert the resulting seek time. These stronger guards do not retroactively expand the original portable receipt."
 }

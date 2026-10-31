@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "product_version": "0.7.0",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "result": "passed",
+  "performed_utc": "2026-10-31T12:12:50.531744+00:00",
+  "original_inno_version": "0.6.0",
+  "original_inno_executable_and_preferences_hash_unchanged": true,
+  "external_original_and_output_files_verified_unchanged": 6,
+  "original_Run_value_absent": true,
+  "original_automation_task_disabled": true,
+  "Defender_antivirus_and_realtime_enabled": true,
+  "QA_package_1_7_removed": true,
+  "owned_desktop_fixture_removed_after_exact_hash_guard": true,
+  "isolated_DevQA_preserved": true,
+  "original_resident_restored": {
+    "result": "passed",
+    "original_version": "0.6.0",
+    "actual_original_process_path_guarded": true,
+    "hotkey_active": true,
+    "normal_integrity": true,
+    "background_not_busy": true
+  },
+  "password_certificate_developer_mode_or_protection_changes": false,
+  "owned_guest_QA_controller_stopped": true,
+  "owned_host_loopback_server_stopped": true,
+  "private_control_media_detached_from_live_domain": true,
+  "vm_state": "shut off with libvirt managed save",
+  "vm_destroyed": false,
+  "functional_processes_force_terminated": false,
+  "kit_force_terminated": false
+}

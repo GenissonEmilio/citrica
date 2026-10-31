@@ -24,6 +24,8 @@ foi repetida na VM; os testes funcionais abaixo usaram a variante QA descrita.
 
 A identidade permanece a mesma e a versão MSIX aumenta para `1.7.0.0`. O payload é recompilado com os novos editores e QtMultimedia, mantendo os motores offline e as preferências do usuário. Build, validação e envio da atualização são registrados em [Validação 0.7.0](VALIDACAO-0.7.0.md); o histórico acima não comprova a publicação deste pacote novo.
 
+Em 31/10/2026, o pacote oficial `Citrica_1.7.0.0_x64_store-unsigned.msix` foi aceito como **Validated** e enviado na Submission 2 do produto existente. O Partner Center confirmou **Na certificação**, com pré-processamento em andamento e publicação automática após aprovação. A listagem recebeu cinco capturas atuais de imagem, PDF, roda, vídeo e personalização. O [recibo desta atualização](evidence/0.7.0/store-update-status.json) distingue envio, certificação e publicação; a aprovação da 1.7.0.0 ainda não foi observada.
+
 Uma release no GitHub não atualiza a Store automaticamente. O novo MSIX oficial precisa ser enviado em uma atualização do produto existente no Partner Center. Após a certificação e publicação, a Store distribui a atualização conforme as preferências do Windows. A variante QA de teste tem identidade separada e não deve ser enviada como pacote oficial.
 
 ## Identidade pública

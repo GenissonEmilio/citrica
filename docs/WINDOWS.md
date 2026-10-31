@@ -69,7 +69,7 @@ Use cópias de arquivos de teste numa pasta com espaços e acentos no nome. Regi
 
 Em caso de erro, use **Configurações → Salvar diagnóstico para suporte**, informe os passos e envie uma captura/gravação. No EXE/portátil, os logs ficam em `%LOCALAPPDATA%/Citrica/Logs/citrica.log` e as preferências em `%APPDATA%/Citrica/settings.json`. O MSIX usa `LocalCache` para logs e `LocalState` para preferências dentro dos dados do pacote; prefira o diagnóstico exportado pelo aplicativo.
 
-CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
+CLI e diagnóstico no PowerShell para o instalador EXE ou ZIP portátil, dentro da respectiva pasta:
 
 ```powershell
 .\citrica-cli.exe --version
@@ -81,6 +81,8 @@ CLI e diagnóstico no PowerShell, dentro da pasta instalada/portátil:
 
 ## O que foi validado e o que ainda falta
 
-Os testes do motor e da interface Qt são executados no CI Linux e Windows. A matriz do pacote publicado usa o executável congelado com PATH reduzido ao Windows: 50 extensões de entrada, todas as saídas anunciadas e as ferramentas de mídia/OCR. Isso detecta dependências instaladas por acaso na máquina de build. O mesmo instalador publicado passou na VM limpa por instalação, atualização da versão pública 0.5.0, remoção, 38 operações avançadas e 24 arrastes reais no Explorer. A execução efetiva e as evidências estão registradas em [VALIDACAO-0.6.0.md](VALIDACAO-0.6.0.md); isso não equivale a validar todos os PCs, monitores ou documentos do usuário.
+A [validação 0.7.0](VALIDACAO-0.7.0.md) registra o CI do pacote final: 304 conversões sobre 50 extensões, 23 operações de mídia, 38 operações estáticas, ciclo do instalador e Explorer em 100%/150%. A VM Windows 11 testou o mesmo executável nos novos editores e em 12 percursos reais do Explorer, incluindo a soltura fora da roda. A variante MSIX QA instalada confirmou os cinco estilos e a persistência, com escala Qt efetiva 1,0/1,5. Isso não equivale a validar todos os PCs, monitores ou documentos do usuário, nem à certificação da Store.
+
+O teste anterior de instalação em VM limpa, atualização desde a versão pública 0.5.0, remoção e 24 arrastes pertence à candidata 0.6.0 e permanece em [VALIDACAO-0.6.0.md](VALIDACAO-0.6.0.md). As evidências históricas não substituem os resultados desta atualização.
 
 Para forçar o motor incluído mesmo com LibreOffice instalado, defina `CITRICA_OFFICE_ENGINE=builtin` antes de iniciar o aplicativo ou a CLI. O padrão automático prefere LibreOffice quando encontrado.

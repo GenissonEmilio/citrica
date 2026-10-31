@@ -9,7 +9,7 @@ O Cítrica 0.7 oferece a roda nativa do GNOME Shell no Linux e uma integração 
 
 **Versão 0.7.0:** aba **Personalizar a roda** com cinco estilos, incluindo Aquarela e Vidro claro translúcidos; editores com prévia ampla, ajustes visuais e linha do tempo de áudio/vídeo. Corrige Compartilhar com LocalSend Flatpak/AppImage no Linux e fecha a roda Windows ao soltar fora de uma opção. [Mudanças, testes e limites](docs/VALIDACAO-0.7.0.md).
 
-O Cítrica está disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026. Atualizações da Store têm pacote e certificação próprios: os recursos da 0.7.0 chegam à loja após a aprovação do pacote 1.7.0.0. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes da distribuição](docs/WINDOWS-STORE.md).
+O Cítrica está disponível na [Microsoft Store](https://apps.microsoft.com/detail/9nv389wmrjnc?hl=pt-BR&gl=BR) desde 29/10/2026. Atualizações da Store têm pacote e certificação próprios: o pacote 1.7.0.0 foi enviado para certificação em 31/10/2026 e os recursos da 0.7.0 chegam à loja após a aprovação. O EXE e o ZIP do GitHub continuam sem assinatura pública. [Detalhes da distribuição](docs/WINDOWS-STORE.md).
 
 **Na 0.5.0:** correções da roda no Explorer, DOCX→PDF/TXT sem Office, PDF→DOCX em ambas as plataformas e miniatura do arraste acima da roda no GNOME. A roda reabre vazia após converter ou cancelar e mantém as animações de abertura, seleção e fechamento. [Veja a gravação nativa](docs/wheel-native.mp4) e a [análise visual](docs/ANALISE.md).
 

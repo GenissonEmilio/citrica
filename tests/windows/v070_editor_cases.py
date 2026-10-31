@@ -11,6 +11,7 @@ import array
 import ctypes
 from ctypes import wintypes
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -23,10 +24,11 @@ import wave
 
 from PIL import Image, ImageGrab
 
-# Load the independent oracle's C++ runtime locally, as the existing Explorer
-# controller does. The frozen child gets a clean PATH and its own Qt plugins.
+# PyMuPDF's independent oracle needs the C++ runtime from the separately
+# installed Qt dependency. This imports no Cítrica source. Frozen children get
+# a clean PATH and resolve their own bundled Qt/runtime dependencies.
 if os.name == "nt":
-    pass
+    importlib.import_module("PySide6.QtCore")
 import pymupdf
 
 

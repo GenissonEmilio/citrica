@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "product_version": "0.7.0",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "github_actions_run": 41156230529,
+  "package_version": "1.7.0.0",
+  "result": "passed",
+  "scope": "installed unsigned QA MSIX only, final frozen GUI",
+  "gui_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+  "package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+  "duration_oracle": "SHA-identical ffprobe from the validated portable; not a direct WindowsApps helper launch",
+  "oracle_ffprobe_sha256": "b47fb1c085c8cb0f609447393d33e290b6563198d21d7cca279f0de4d4d6abea",
+  "cases": {
+    "video_player_seek_export_normal_exit0": {
+      "actual_pid": 6316,
+      "actual_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+      "executable_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+      "integrity_rid": 8192,
+      "playback_position_seconds": 1.636,
+      "actual_seek_position_seconds": 2.5,
+      "output_duration_seconds": 2.0,
+      "normal_editor_exit_code": 0,
+      "original_hash_unchanged": true
+    },
+    "docx_to_pdf_packaged_registered_executable": {
+      "actual_pid": 3040,
+      "actual_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+      "executable_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+      "integrity_rid": 8192,
+      "exit_code": 0,
+      "stderr": "",
+      "independent_pdf_text_verified": true
+    },
+    "pdf_to_editable_docx_packaged_registered_executable": {
+      "actual_pid": 10660,
+      "actual_package_family": "Emilians.Ctrica.UnsignedQA_p9dw1q8pw0bz6",
+      "executable_sha256": "5cf40dd9550b41becfe6f902b4259a64e777d2a61370d5eb775e9942c8d89688",
+      "integrity_rid": 8192,
+      "exit_code": 0,
+      "stderr": "",
+      "editable_document_parsed_and_text_verified": true,
+      "original_docx_and_pdf_hash_unchanged": true
+    }
+  },
+  "runner_source": "tests/windows/v070-msix-final-smoke.py",
+  "runner_sha256": "6ac7e26ae7ab8def85ee6c2fa7a4a4db2f47f8b952d3f653a66a42ad6a716934",
+  "editor_driver_sha256": "84ca19516e40c108a034042ca3783de52d4aec8ccb8fd4610a74d06a007d2e17",
+  "post_wack": true,
+  "normal_medium_integrity": true,
+  "actual_package_family_checked_on_every_tested_process": true,
+  "actual_editor_pid_equals_Popen_pid": true,
+  "child_environment": "PATH=System32; no PYTHONPATH, PYTHONHOME, Qt/plugin/backend or Cítrica engine overrides",
+  "conversion_activation": "Registered installed Citrica.exe --to; not an unregistered helper or source entry point",
+  "no_product_rebuild_or_security_changes": true,
+  "harness_history": [
+    {
+      "attempt": "post-WACK initial",
+      "result": "oracle ImportError before GUI Popen or state creation",
+      "cause": "Independent PyMuPDF oracle needed C++ runtime preload from separately installed PySide6; corrected without installing system runtime or changing child PATH."
+    },
+    {
+      "attempt": "first functional rerun",
+      "result": "oracle failed after GUI export; normal editor cleanup exit0",
+      "cause": "Direct external launch of WindowsApps ffprobe denied WinError5. Final oracle uses SHA-identical validated portable ffprobe; product binary unchanged. Prior failed state and logs preserved."
+    }
+  ],
+  "limits": [
+    "Official Store-identity MSIX not installed in the VM; distinct unsigned QA identity was used. Same GUI/engines hashes verified separately.",
+    "This is functional QA, not Microsoft Store certification."
+  ],
+  "private_output_proof_zip_sha256": "7c6891f68688c81883ddf9f3872fa7b1b67e10e29cf8dd92a6886f7f35d3701a",
+  "cleanup_receipt": "windows-vm-cleanup.json",
+  "unregistered_cli_or_WindowsApps_helper_launch_validated": false,
+  "driver_exact_snapshot_matches_public_source": true
+}

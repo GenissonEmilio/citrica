@@ -56,6 +56,8 @@ sudo apt remove citrica
 
 ## Validação reproduzível
 
+Na 0.7.0, o DEB final do commit `027e785` passou instalação, abertura, conversão e remoção em Ubuntu 24.04, 26.04 e 26.10 no [CI 41155927692](https://github.com/GenissonEmilio/citrica/actions/runs/41155927692). Os [recibos atuais](VALIDACAO-0.7.0.md) também registram a matriz Linux de 304 conversões e o teste dos cinco estilos, editores e animações no GNOME 50/Fedora. Os percursos de desktop GNOME 46/51 descritos a seguir pertencem à 0.6.0.
+
 `tests/linux/install_smoke.py` instala o DEB em um container Ubuntu descartável, abre o aplicativo como usuário comum, verifica a configuração inicial, converte PNG→PDF→DOCX e remove o pacote. O script recusa execução fora de container e não acessa a sessão gráfica de trabalho. Esse teste de pacote é distinto dos testes de arraste no compositor GNOME/Wayland real.
 
 No [CI 40735116402](https://github.com/GenissonEmilio/citrica/actions/runs/40735116402), o mesmo DEB publicado na 0.6.0 passou nos três containers limpos: **Ubuntu 24.04, 26.04 e 26.10**. A abertura ocorreu como usuário comum, inclusive com um portátil antigo simulado antes do aplicativo no PATH. Os relatórios `citrica-ubuntu-VERSAO-validation.json` estão nos artifacts de evidências de cada job. Esses jobs validam os pacotes Linux; os resultados Windows estão registrados separadamente em [Validação 0.6.0](VALIDACAO-0.6.0.md).
