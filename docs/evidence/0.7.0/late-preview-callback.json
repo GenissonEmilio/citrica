@@ -1,0 +1,60 @@
+{
+  "product_version": "0.7.0",
+  "runtime": {
+    "platform": "linux",
+    "python": "3.14.8",
+    "pyside": "6.12.0",
+    "qt": "6.12.0",
+    "qt_platform": "offscreen"
+  },
+  "scenario": "Editor deferred-deleted while a real preview QThread is notifying finished receivers",
+  "method": "A DirectConnection temporarily pauses finished emission after native isRunning() becomes false. No thread-state or QObject-validity APIs are mocked.",
+  "before": {
+    "native_running_during_finished": false,
+    "dialog_valid_after_deferred_delete": false,
+    "late_callback_errors": [
+      "libshiboken: Internal C++ object (ToolDialog) already deleted."
+    ]
+  },
+  "after": {
+    "native_running_during_finished": false,
+    "dialog_valid_after_deferred_delete": false,
+    "late_callback_errors": [],
+    "process_exit": 0
+  },
+  "late_signals": {
+    "signals": [
+      "ready",
+      "failed",
+      "finished"
+    ],
+    "result": {
+      "errors": [],
+      "preview_cancelled": true
+    },
+    "process_exit": 0
+  },
+  "ownership": {
+    "preview_list_empty": true,
+    "python_wrapper_released": true,
+    "native_destroyed": true,
+    "method": "Normal completion observed through weakref and QObject.destroyed; sender wrapper remains locally referenced until the receiving slot returns."
+  },
+  "regression": {
+    "file": "tests/test_editor_lifecycle.py",
+    "test": "test_finishing_preview_cannot_call_a_destroyed_editor",
+    "before_fix": "failed on access to destroyed ToolDialog",
+    "after_fix": "passed",
+    "focused_suite": {
+      "passed": 37,
+      "elapsed_seconds": 14.74,
+      "process_exit": 0
+    },
+    "ruff": "passed"
+  },
+  "limits": [
+    "The finishing phase is deliberately delayed to make a narrow scheduling race deterministic.",
+    "This receipt is a source-level regression check, not validation of the final frozen Windows package.",
+    "No original or exported file was lost in the reproduction."
+  ]
+}

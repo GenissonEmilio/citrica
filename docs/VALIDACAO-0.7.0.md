@@ -24,6 +24,8 @@ A suíte completa foi executada três vezes em processos independentes no Fedora
 
 A [verificação final de código-fonte](evidence/0.7.0/source-tests-final.json) passou 356 testes e ignorou 21 em cada plataforma, Linux e Windows, com saída 0. O teste de escala Windows usa o renderizador nativo e fontes Segoe UI: o plugin genérico offscreen não disponibiliza fontes nesse sistema e não representa as métricas do aplicativo. A [prova separada na VM](evidence/0.7.0/windows-settings-dpi-source.json) confirma os cinco estilos e os dois botões de salvar dentro da área útil em 100% e 150%; ela usa código-fonte e não substitui o teste do pacote final.
 
+A [regressão de evento tardio da prévia](evidence/0.7.0/late-preview-callback.json) reproduziu uma corrida estreita: a thread já reportava finalização, a janela recebia DeferredDelete e uma lambda ainda acessava o diálogo destruído. Os sinais de prévia agora usam slots com contexto do EditorDialog; Qt descarta a entrega se o receptor foi destruído. O teste falhou antes e passou depois da correção, incluindo sinais ready, failed e finished tardios, cancelamento e liberação da thread. Não houve perda de arquivo na reprodução.
+
 ## Pacotes e publicação
 
 O [build Linux](evidence/0.7.0/linux-packages-ci.json) passou 304 conversões sobre 50 extensões e 38 operações estáticas de imagem/PDF (32 positivas e seis rejeições esperadas), com originais preservados. O DEB passou instalação, abertura, conversão e remoção em Ubuntu 24.04, 26.04 e 26.10 limpos.

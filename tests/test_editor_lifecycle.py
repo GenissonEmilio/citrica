@@ -131,3 +131,77 @@ def test_standalone_editor_cleans_up_before_application_exit(tmp_path, mode):
             assert result.metadata['author'] == 'Citrica QA'
     if mode == 'screenshot-preview':
         assert (tmp_path / 'screenshot.png').stat().st_size > 1000
+
+
+FINISHING_PREVIEW_DRIVER = r'''
+import json
+import sys
+import threading
+from pathlib import Path
+from PySide6.QtCore import QCoreApplication, QEvent, QThread, Qt, Signal
+from PySide6.QtWidgets import QApplication
+from shiboken6 import isValid
+from citrica import editors
+from citrica.companion import ToolDialog
+
+run_gate, finish_gate, finishing = threading.Event(), threading.Event(), threading.Event()
+errors = []
+sys.excepthook = lambda kind, error, stack: errors.append(str(error))
+
+class FinishingPreview(QThread):
+    ready = Signal(object)
+    failed = Signal(str)
+    def __init__(self, path, instant=None):
+        super().__init__()
+        self.cancel = threading.Event()
+        # Real QThread reports isRunning=False before it finishes notifying
+        # receivers. Hold this boundary to model a preemption deterministically.
+        self.finished.connect(self.hold_finish, Qt.ConnectionType.DirectConnection)
+    def hold_finish(self):
+        finishing.set()
+        finish_gate.wait(3)
+        self.ready.emit({'late_preview': True})
+        self.failed.emit('Late preview failure after the editor closed')
+    def run(self):
+        run_gate.wait(3)
+
+editors.PreviewWorker = FinishingPreview
+app = QApplication([])
+app.setQuitOnLastWindowClosed(False)
+dialog = ToolDialog('trim', [Path(sys.argv[1])])
+dialog.finished.connect(dialog.deleteLater)
+dialog.show()
+thread = dialog.preview_threads[0]
+run_gate.set()
+assert finishing.wait(3)
+assert not thread.isRunning()
+dialog.close()
+QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+assert not isValid(dialog)
+finish_gate.set()
+assert thread.wait(3000)
+app.processEvents()
+cancelled = thread.cancel.is_set()
+thread.deleteLater()
+QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+print(json.dumps({'errors': errors, 'preview_cancelled': cancelled}))
+'''
+
+
+def test_finishing_preview_cannot_call_a_destroyed_editor(tmp_path):
+    source = tmp_path / 'audio.wav'
+    with wave.open(str(source), 'wb') as audio:
+        audio.setnchannels(1)
+        audio.setsampwidth(2)
+        audio.setframerate(8000)
+        audio.writeframes(b'\0\0' * 800)
+    before = source.read_bytes()
+    run = subprocess.run([sys.executable, '-c', FINISHING_PREVIEW_DRIVER, str(source)],
+                         env=dict(os.environ, QT_QPA_PLATFORM='offscreen'),
+                         cwd=Path(__file__).resolve().parents[1],
+                         capture_output=True, text=True, timeout=12)
+    assert run.returncode == 0, run.stdout + run.stderr
+    result = json.loads(run.stdout)
+    assert result['errors'] == []
+    assert result['preview_cancelled']
+    assert source.read_bytes() == before

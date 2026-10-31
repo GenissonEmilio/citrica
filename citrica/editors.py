@@ -16,7 +16,7 @@ from pathlib import Path
 
 from PIL import Image, ImageEnhance, ImageOps
 from PIL.ImageQt import ImageQt
-from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QThread, QTimer, QUrl, Signal
+from PySide6.QtCore import QPointF, QRectF, QSize, Qt, QThread, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QColor, QDesktopServices, QImage, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QAbstractItemView, QCheckBox, QColorDialog, QComboBox, QDialog, QDialogButtonBox,
@@ -1035,9 +1035,22 @@ class EditorDialog(QDialog):
     def start_preview(self, thread):
         self.preview_threads.append(thread)
         thread.ready.connect(self.preview_ready)
-        thread.failed.connect(lambda error: self.preview_note.setText('Prévia parcial: ' + error))
-        thread.finished.connect(lambda: self.preview_finished(thread))
+        thread.failed.connect(self.preview_failed)
+        thread.finished.connect(self.preview_thread_finished)
         thread.start()
+
+    @Slot(str)
+    def preview_failed(self, error):
+        if not self._close_pending:
+            self.preview_note.setText('Prévia parcial: ' + error)
+
+    @Slot()
+    def preview_thread_finished(self):
+        # Keep the sender's Python wrapper alive through list removal and any
+        # frame follow-up. Qt drops this queued slot if the editor is destroyed.
+        thread = self.sender()
+        if thread is not None:
+            self.preview_finished(thread)
 
     def preview_finished(self, thread):
         if thread in self.preview_threads:
@@ -1049,6 +1062,7 @@ class EditorDialog(QDialog):
         if self._close_pending and not self.busy():
             self.close()
 
+    @Slot(object)
     def preview_ready(self, result):
         if self._close_pending:
             return
