@@ -94,7 +94,8 @@ class Settings(QDialog):
         super().__init__()
         self.desktop = desktop
         self.setWindowTitle('Cítrica · configurações')
-        self.resize(590, 700)
+        available = self.screen().availableGeometry()
+        self.resize(min(590, available.width() - 32), min(700, available.height() - 64))
         layout = QVBoxLayout(self)
         title = QLabel('Cítrica · direto no seu arquivo')
         title.setStyleSheet('font-size:23px;font-weight:bold;')
