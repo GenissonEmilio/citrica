@@ -4,7 +4,7 @@
   "path_isolated": false,
   "input_extensions": 50,
   "conversions": 304,
-  "duration_seconds": 137.23,
+  "duration_seconds": 160.15,
   "ocr_redaction": true,
   "originals_preserved": true,
   "cases": [
@@ -2253,5 +2253,8 @@
       "tool": "channels",
       "success": true
     }
-  ]
+  ],
+  "source_ci_report_sha256": "72835abb379cdebbf770b9b3e410d9f2b827b5bf1bc83cd2bea7efbb755f2262",
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692"
 }

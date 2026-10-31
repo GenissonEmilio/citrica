@@ -25,5 +25,8 @@
       "installed": false,
       "active": false
     }
-  }
+  },
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692",
+  "source_ci_report_sha256": "6d293ad823a54e88fc4b8a6dd41ece71798a7496d0608f7217c0d3be40559cd6"
 }

@@ -1,12 +1,12 @@
 {
   "version": "0.7.0",
   "decision": "PASS",
-  "time_utc": "2026-10-31T00:41:50.939725+00:00",
-  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41150263133",
-  "build_commit": "80eaf07b5238838c2ebf6f1ebe6e95e069c273a0",
-  "runtime_commit": "c5fcc5c9f58509b0655172eb1d896cf22d694a7f",
+  "time_utc": "2026-10-31T01:49:36.874700+00:00",
+  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692",
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "runtime_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
   "environment": {
-    "distribution": "Fedora44",
+    "distribution": "Fedora 44",
     "gnome_major": 50,
     "protocol": "Wayland",
     "compositor": "isolated headless",
@@ -18,21 +18,21 @@
     "host_session_untouched": true
   },
   "frozen_executable": {
-    "sha256": "02d54c2a381660dea27ea90d42d71fa24c2335b0608a9e2606323252fff6ed30",
-    "bytes": 9746592
+    "bytes": 9747024,
+    "sha256": "aa394bb1fa4e1d81308122c595b4220a5408b247c74d2726f1665ee51a63c68a"
   },
   "packages": {
     "citrica-0.7.0-1.x86_64.rpm": {
-      "bytes": 248237221,
-      "sha256": "36e17ddeb8c966d346fa53871c566ad3198d4fb5f52a21ebb0db1f91504ac437"
+      "bytes": 248235949,
+      "sha256": "ca3ab7409dc6fc90a04986de00da4812787c9e08d71a7fec641097ac7fb889f6"
     },
     "citrica-0.7.0-linux-x86_64.tar.gz": {
-      "bytes": 249437112,
-      "sha256": "b0e708b8196c6029305b2b261197f451b18f00c5294b3f3b32fce20f98830e9e"
+      "bytes": 249429418,
+      "sha256": "676a2f381814a1b5767a138789a3809d6d664d1ed96d99d989383156aa051419"
     },
     "citrica_0.7.0_amd64.deb": {
-      "bytes": 275185960,
-      "sha256": "e1f2b119176af10b6d08f8e00216e0381cfa1a230a131c95411a30cdc8aded9e"
+      "bytes": 275188346,
+      "sha256": "a1cdaed72a47c27fa9f5832121cbd065d77d4b212a0d38d91ddd986723965748"
     }
   },
   "editors": {
@@ -56,6 +56,32 @@
     }
   },
   "all_editor_processes_close_exit_code": 0,
+  "preview_startup_close": [
+    {
+      "attempt": 1,
+      "close_after_map": true,
+      "close_method": "WM_DELETE addressed byPID+windowID",
+      "exit_code": 0,
+      "seconds_after_map": 0.067,
+      "unhandled_callback_errors": false
+    },
+    {
+      "attempt": 2,
+      "close_after_map": true,
+      "close_method": "WM_DELETE addressed byPID+windowID",
+      "exit_code": 0,
+      "seconds_after_map": 0.07,
+      "unhandled_callback_errors": false
+    },
+    {
+      "attempt": 3,
+      "close_after_map": true,
+      "close_method": "WM_DELETE addressed byPID+windowID",
+      "exit_code": 0,
+      "seconds_after_map": 0.069,
+      "unhandled_callback_errors": false
+    }
+  ],
   "pdf_entire_page_and_header_visible": true,
   "wheel_styles": {
     "styles": [
@@ -64,41 +90,46 @@
         "live_update": true,
         "selection_preserved": true,
         "thumbnail_preserved": true,
-        "sha256": "527ebb2a2c17eb40cc70e701fbae5f8ccec70ae1f5e4d02bf1879e6965c5a97c"
+        "capture": "appearance-classic.png",
+        "sha256": "0cd32fc08beda62fb388b0ae305160a985ef58b98f33ae3075ac7138925849c4"
       },
       {
         "theme": "watercolor",
         "live_update": true,
         "selection_preserved": true,
         "thumbnail_preserved": true,
-        "sha256": "d9c456fcc307aff34e3abc55ee1043d1dacd9a7e92ebf7e5470693c20ff6c49d"
+        "capture": "appearance-watercolor.png",
+        "sha256": "87593ac85b9e9939f748f99bb7b81b4d863290c9c6f1645fe831925901d9b3ff"
       },
       {
         "theme": "glass",
         "live_update": true,
         "selection_preserved": true,
         "thumbnail_preserved": true,
-        "sha256": "baec6b78155ed33d2096d366bc53296c12d1f01b196c1321d8de50bb1b414d72"
+        "capture": "appearance-glass.png",
+        "sha256": "9c11fae31edec1a0268e436c16dd4ee78c84abec78b5356ac76d44ca6aab5fce"
       },
       {
         "theme": "graphite",
         "live_update": true,
         "selection_preserved": true,
         "thumbnail_preserved": true,
-        "sha256": "0dfbff9c8340a26353ce38bc35afb8a9713c724368f35369cb90f74c92de04f8"
+        "capture": "appearance-graphite.png",
+        "sha256": "e18850081a107d36de8a8b5bb19be68294882c4686d60909589964a4a6e6c0e7"
       },
       {
         "theme": "contrast",
         "live_update": true,
         "selection_preserved": true,
         "thumbnail_preserved": true,
-        "sha256": "263843128b3d7ee5d53367bc3a2c4e04ccd79cb106b5264e9662336d595b3f45"
+        "capture": "appearance-contrast.png",
+        "sha256": "718579e76d86058d1db907fdaeb93e4cd1d5aaa4c7413eca24f2811e32ccce63"
       }
     ],
     "conversion_after_live_theme_changes": true,
     "reopen_empty": true,
     "original_preserved": true,
-    "native_intermediate_frames": 26
+    "native_intermediate_frames": 27
   },
   "settings": {
     "settings_save": true,
@@ -157,17 +188,18 @@
     },
     "pulse_runtime_bundled": true
   },
+  "packaged_gnome_source_matches_build_commit": true,
   "screenshots_sha256": {
-    "linux-editor-image.png": "e536e68de83c3db6dc4d3a5c5b842bc5e1069ec39b6525a493014ac79cc11884",
-    "linux-editor-pdf.png": "33080801a0fc372b8a8ce456f3fd01fb305acf0757c862e70fe4b10079a03703",
-    "linux-editor-video.png": "6bc3d752d6a515f98199d9defcc8f59110fa2b43697b6ef84aad3c365b38a56a",
-    "linux-wheel-settings.png": "e234fff2137dba4ef6f8a64be72b559d100a9082248f75798f2b5f6528d5f1e3",
-    "linux-share.png": "d0979007b83ee05586a36c09c55f89ff9b174ff8844b68cad5b4581557a2727e"
+    "linux-editor-image.png": "b1923c6925cdd5d3fe84323f8c74624540a45cdccd40a8d298aa4966f981d742",
+    "linux-editor-pdf.png": "e88c0f3ce23fa37ca9ac6141a4ef2aed4861d8f233dabb9393e6e7ec996a5fbf",
+    "linux-editor-video.png": "0bda183b2648bbaca991028f8d1a78f11c880e58f6fed348c4170cc2b4154b70",
+    "linux-wheel-settings.png": "51007417b23095581a910eed17c8a72d6abc7fe16bbd7896365254cf60e31436",
+    "linux-share.png": "d0b726f10c2751bddf4aee90b3fa3a6faff7ecc32df103813f4c0d9b385962b6"
   },
   "limits": [
-    "Software-rendered isolated compositor, scale1; hardware acceleration and LinuxHiDPI not evaluated here.",
+    "Software-rendered isolated compositor, scale 1; hardware acceleration and Linux HiDPI not evaluated here.",
     "Synthetic audio was muted through the volume control; audible speaker output was not evaluated.",
     "LocalSend action availability was verified; no network transfer was initiated.",
-    "Host installation and MicrosoftStore/Windows validation are separate records."
+    "Host installation and Microsoft Store/Windows validation are separate records."
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "executable": "citrica (final frozen Linux payload)",
+  "executable": "<frozen Linux artifact>/citrica",
   "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
   "application_api": "--desktop-request",
   "source_application_imports": false,
@@ -12,8 +12,8 @@
     "rosto da astronauta.png": "88431cd9653ccd539741b555fb0a46b61558b301d4110412b5bc28b5e3ea6cb5",
     "texto confidencial João.png": "1203660b55ea6abf1c64ab88b805ea2d1173360350956d544f73f263d031be2f",
     "código QR Unicode.png": "cc99aa97856a089e636268b24665081e188da1cce5e3e454feab2037dfbc1717",
-    "páginas com conteúdo.pdf": "ce185237d7b8693f22eb8732fc561bbcca74a57ae2b449b10a3e4ac6eaa491f2",
-    "segundo documento.pdf": "752643735d8558b5ababdedf1a5c63ed16be7e1697c56debd6e445772bff7d29",
+    "páginas com conteúdo.pdf": "03cf3a7b33c5f1e26705c61badf3097d2b9333f2f15c36beaf387a4ecdede251",
+    "segundo documento.pdf": "31f4d9030c0bd98ef17046b6ea082c8ff7253b83338d539555a0bee8965f19b1",
     "animação recusada.gif": "49a94e3a2089136fe288c546e380ee0bb860c38ee97c8af4f2d8ec68282785c2"
   },
   "originals_preserved": true,
@@ -410,9 +410,11 @@
   "operations": 38,
   "positive_operations": 32,
   "negative_operations": 6,
-  "duration_seconds": 10.41,
+  "duration_seconds": 11.71,
   "sanitized_fields": [
     "executable"
   ],
-  "source_ci_report_sha256": "6a92abda870499dbbd5d735c7469ab52185a9345245a682dd766396aa0d10987"
+  "source_ci_report_sha256": "d7b58d82f9df195a92565dc4fc91d002a371a63c3a76e31a040ce33591d8110e",
+  "build_commit": "027e7855cb9f80242acb573d8fe22e8a1f25f049",
+  "build_run": "https://github.com/GenissonEmilio/citrica/actions/runs/41155927692"
 }

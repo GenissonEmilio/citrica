@@ -12,6 +12,7 @@ const XML = `<node><interface name="io.github.GenissonEmilio.Citrica.Test">
  <method name="Key"><arg type="u" direction="in"/><arg type="b" direction="in"/></method>
  <method name="Screenshot"><arg type="s" direction="in"/><arg type="b" direction="out"/></method>
  <method name="Windows"><arg type="s" direction="out"/></method>
+ <method name="CloseWindow"><arg type="u" direction="in"/><arg type="u" direction="in"/></method>
  <method name="State"><arg type="s" direction="out"/></method>
  <method name="DragLayers"><arg type="s" direction="out"/></method>
  <method name="Clipboard"><arg type="s" direction="out"/></method>
@@ -41,9 +42,17 @@ export default class Harness extends Extension {
         pressed ? Clutter.KeyState.PRESSED : Clutter.KeyState.RELEASED); }
     Windows() { return JSON.stringify(global.get_window_actors().map(a => {
         const r = a.meta_window.get_frame_rect();
-        return {id:a.meta_window.get_stable_sequence(),title:a.meta_window.title,rect:[r.x,r.y,r.width,r.height],visible:a.visible,
+        return {id:a.meta_window.get_stable_sequence(),pid:a.meta_window.get_pid(),title:a.meta_window.title,rect:[r.x,r.y,r.width,r.height],visible:a.visible,
             minimized:a.meta_window.minimized,workspace:a.meta_window.get_workspace().index()};
     })); }
+    CloseWindow(pid, id) {
+        // Target only the exact test-owned Wayland client. This is the native
+        // window-manager close request, independent of keyboard focus.
+        const window = global.get_window_actors().map(actor => actor.meta_window).find(w =>
+            w.get_pid() === pid && w.get_stable_sequence() === id);
+        if (!window) throw new Error('The specified test window is no longer present');
+        window.delete(global.get_current_time());
+    }
     Prepare() { Main.welcomeDialog?.close(); Main.overview.hide(); }
     State() { return JSON.stringify({pointer:global.get_pointer(),
         focus:global.display.focus_window?.get_stable_sequence(),overview:Main.overview.visible,
